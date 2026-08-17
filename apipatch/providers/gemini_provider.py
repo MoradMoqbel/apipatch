@@ -39,7 +39,10 @@ class GeminiProvider(BaseProvider):
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
                 "responseMimeType": "application/json",
-                "temperature": 0.0
+                "temperature": 0.0,
+                "thinkingConfig": {
+                    "thinkingBudget": 0
+                }
             }
         }
         req = urllib.request.Request(

@@ -32,6 +32,7 @@ def main():
     scan_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
     scan_parser.add_argument("--api-key", help="API key for chosen provider")
     scan_parser.add_argument("--model", help="Specific model name (e.g., gpt-4o, claude-3-7-sonnet)")
+    scan_parser.add_argument("-c", "--concurrency", type=int, default=6, help="Number of parallel worker threads (default: 6)")
 
     # Command: fix
     fix_parser = subparsers.add_parser("fix", help="Audit and generate modernized code refactors")
@@ -41,6 +42,7 @@ def main():
     fix_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
     fix_parser.add_argument("--api-key", help="API key for chosen provider")
     fix_parser.add_argument("--model", help="Specific model name")
+    fix_parser.add_argument("-c", "--concurrency", type=int, default=6, help="Number of parallel worker threads (default: 6)")
 
     # Command: detect
     detect_parser = subparsers.add_parser("detect", help="Auto-discover project dependencies and deprecation rules")
@@ -64,7 +66,8 @@ def main():
             provider_name=args.provider,
             api_key=args.api_key,
             model=args.model,
-            create_backup=False
+            create_backup=False,
+            concurrency=getattr(args, "concurrency", 6)
         )
         if os_is_file(args.path):
             engine.process_file(args.path, write_in_place=False)
@@ -76,7 +79,8 @@ def main():
             provider_name=args.provider,
             api_key=args.api_key,
             model=args.model,
-            create_backup=not args.no_backup
+            create_backup=not args.no_backup,
+            concurrency=getattr(args, "concurrency", 6)
         )
         if os_is_file(args.path):
             engine.process_file(args.path, write_in_place=args.write)
