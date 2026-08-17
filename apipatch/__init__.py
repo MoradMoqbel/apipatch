@@ -1,8 +1,10 @@
 """
 ApiPatch - Autonomous AI Agent for API Breaking Changes & Self-Maintaining Codebases
+Detects and fixes deprecated third-party API calls in Python, JavaScript, TypeScript,
+JSX, TSX, and any other language — powered by LLM reasoning.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __author__ = "Morad Moqbel"
 __license__ = "MIT"
 
