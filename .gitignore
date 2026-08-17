@@ -1,0 +1,30 @@
+# Private Internal Planning & Application Documents
+DEVELOPMENT_PLAN.md
+yc_answers.md
+implementation_plan.md
+Apply to Y Combinator.pdf
+
+# Frontend Assets (Hosted Separately)
+front/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary fixed preview files
+*_fixed.py
+temp_*.py
+
+# Environments & IDE settings
+.env
+.venv
+env/
+venv/
+.vscode/
+.idea/
+.gemini/
+
+# OS specific
+.DS_Store
+Thumbs.db
