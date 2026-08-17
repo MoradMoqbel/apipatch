@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: apipatch
-Version: 0.3.1
+Version: 0.3.2
 Summary: Autonomous AI Agent that detects and fixes deprecated API calls in Python, JS, TS via LLM-powered Pull Requests
 Author-email: Morad Moqbel <moradmoqbel@gmail.com>
 License-Expression: MIT

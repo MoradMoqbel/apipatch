@@ -16,7 +16,7 @@ class GeminiProvider(BaseProvider):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         super().__init__(
             api_key=api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"),
-            model=model or "gemini-2.0-flash"
+            model=model or "gemini-2.5-flash"
         )
 
     def audit_code(
@@ -30,9 +30,10 @@ class GeminiProvider(BaseProvider):
 
         prompt = self.build_prompt(file_name, code, detected_libraries)
 
+        model_name = self.model[7:] if self.model.startswith("models/") else self.model
         url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{self.model}:generateContent?key={self.api_key}"
+            f"{model_name}:generateContent?key={self.api_key}"
         )
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
@@ -48,7 +49,7 @@ class GeminiProvider(BaseProvider):
             method="POST"
         )
         try:
-            with urllib.request.urlopen(req, timeout=60) as response:
+            with urllib.request.urlopen(req, timeout=120) as response:
                 data = json.loads(response.read().decode("utf-8"))
                 candidates = data.get("candidates", [])
                 if candidates:
