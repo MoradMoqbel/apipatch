@@ -35,16 +35,33 @@ class BaseProvider(abc.ABC):
         pass
 
     def clean_json_response(self, raw_text: str) -> Dict[str, Any]:
-        """Cleans and extracts JSON payload from LLM responses."""
+        """Robustly cleans and extracts JSON payload from LLM responses, repairing common escape issues."""
         text = raw_text.strip()
         text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
         text = re.sub(r"\s*```$", "", text)
         text = text.strip()
+
+        # Attempt 1: Direct parse with non-strict mode
         try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            # Fallback regex extraction if model enclosed text in conversational blocks
-            match = re.search(r"\{.*\}", text, re.DOTALL)
-            if match:
-                return json.loads(match.group(0))
-            raise
+            return json.loads(text, strict=False)
+        except Exception:
+            pass
+
+        # Attempt 2: Repair unescaped invalid backslashes (common in JS regex/strings like \d, \w, \s, \/)
+        repaired = re.sub(r'\\([^"\\/bfnrtuU0-9])', r'\\\\\1', text)
+        try:
+            return json.loads(repaired, strict=False)
+        except Exception:
+            pass
+
+        # Attempt 3: Extract outermost JSON object block
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if match:
+            block = match.group(0)
+            try:
+                return json.loads(block, strict=False)
+            except Exception:
+                block_repaired = re.sub(r'\\([^"\\/bfnrtuU0-9])', r'\\\\\1', block)
+                return json.loads(block_repaired, strict=False)
+
+        raise ValueError(f"Could not parse valid JSON from LLM response: {raw_text[:200]}...")

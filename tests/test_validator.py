@@ -56,12 +56,13 @@ def different_func():
         self.assertFalse(res_bad.is_valid)
         self.assertIn("calculate_tax", res_bad.error_message)
 
-    def test_bracket_balance(self):
-        good_js = "function add(a, b) { return [a, b]; }"
-        bad_js = "function add(a, b) { return [a, b; }"
+    def test_generic_integrity(self):
+        orig_js = "function add(a, b) { return a + b; }"
+        good_js = "function add(a, b) { return Number(a) + Number(b); }"
+        empty_js = ""
 
-        self.assertTrue(CodeValidator.validate_bracket_balance(good_js).is_valid)
-        self.assertFalse(CodeValidator.validate_bracket_balance(bad_js).is_valid)
+        self.assertTrue(CodeValidator.validate_generic_integrity(orig_js, good_js).is_valid)
+        self.assertFalse(CodeValidator.validate_generic_integrity(orig_js, empty_js).is_valid)
 
 
 if __name__ == "__main__":

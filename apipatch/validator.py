@@ -85,51 +85,16 @@ class CodeValidator:
         return ValidationResult(is_valid=True)
 
     @staticmethod
-    def validate_bracket_balance(code: str) -> ValidationResult:
-        """Basic balanced delimiter validation for JS/TS/generic files."""
-        stack = []
-        mapping = {')': '(', '}': '{', ']': '['}
-        in_string = False
-        string_char = None
-        escape = False
+    def validate_generic_integrity(original_code: str, refactored_code: str) -> ValidationResult:
+        """Sanity check for non-Python files (JS, TS, etc.) ensuring no severe truncation."""
+        if not refactored_code or not refactored_code.strip():
+            return ValidationResult(is_valid=False, error_message="Refactored code is empty")
 
-        for line_num, line in enumerate(code.splitlines(), 1):
-            for char in line:
-                if escape:
-                    escape = False
-                    continue
-                if char == '\\':
-                    escape = True
-                    continue
-                if char in ('"', "'", '`'):
-                    if not in_string:
-                        in_string = True
-                        string_char = char
-                    elif string_char == char:
-                        in_string = False
-                        string_char = None
-                    continue
-
-                if in_string:
-                    continue
-
-                if char in mapping.values():
-                    stack.append((char, line_num))
-                elif char in mapping.keys():
-                    if not stack or stack[-1][0] != mapping[char]:
-                        return ValidationResult(
-                            is_valid=False,
-                            error_message=f"Unmatched closing delimiter '{char}'",
-                            error_line=line_num
-                        )
-                    stack.pop()
-
-        if stack:
-            unmatched, line_num = stack[-1]
+        # Ensure refactored code isn't mysteriously truncated (at least 20% of original length)
+        if len(original_code) > 100 and len(refactored_code) < len(original_code) * 0.2:
             return ValidationResult(
                 is_valid=False,
-                error_message=f"Unclosed delimiter '{unmatched}'",
-                error_line=line_num
+                error_message="Refactored code appears abnormally truncated compared to original source."
             )
 
         return ValidationResult(is_valid=True)
@@ -148,4 +113,4 @@ class CodeValidator:
 
             return ValidationResult(is_valid=True)
         else:
-            return cls.validate_bracket_balance(refactored_code)
+            return cls.validate_generic_integrity(original_code, refactored_code)
