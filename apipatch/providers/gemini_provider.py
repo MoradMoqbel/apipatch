@@ -16,7 +16,7 @@ class GeminiProvider(BaseProvider):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         super().__init__(
             api_key=api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"),
-            model=model or "gemini-1.5-flash"
+            model=model or "gemini-2.0-flash"
         )
 
     def audit_code(

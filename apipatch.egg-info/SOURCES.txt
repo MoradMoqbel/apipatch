@@ -6,7 +6,6 @@ apipatch/auto_detector.py
 apipatch/cli.py
 apipatch/engine.py
 apipatch/proactive_hunter.py
-apipatch/rules.py
 apipatch/validator.py
 apipatch.egg-info/PKG-INFO
 apipatch.egg-info/SOURCES.txt
@@ -23,5 +22,4 @@ apipatch/providers/openai_provider.py
 tests/test_cli.py
 tests/test_detector.py
 tests/test_engine.py
-tests/test_rules.py
 tests/test_validator.py
