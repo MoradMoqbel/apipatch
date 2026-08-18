@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-08-18T13:19:07.850591Z",
+  "apipatch_version": "0.3.4",
+  "total_scanned": 1,
+  "affected_files": 0,
+  "results": [
+    {
+      "file": "D:\\projects\\ApiPatch\\tests\\sample_deprecated_app.py",
+      "status": "clean",
+      "issues": []
+    }
+  ]
+}

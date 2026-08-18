@@ -3,6 +3,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://img.shields.io/badge/pypi-v0.4.0-brightgreen.svg)](https://pypi.org/project/apipatch/)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
 [![Tests: Passing](https://img.shields.io/badge/Tests-23%2F23%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
 
@@ -29,13 +30,15 @@ Tools like **Dependabot** and **Renovate** only bump version numbers in `require
 
 ## 🚀 Key Features
 
-* 🧠 **Universal LLM Engine:** Audits **ANY** third-party library in **any language** dynamically — no hardcoded rules required. If a library has a breaking change, ApiPatch finds and fixes it.
-* 🌐 **Multi-Language Support:** Full support for `.py`, `.js`, `.ts`, `.jsx`, `.tsx`, `.mjs`, `.cjs` files in a single scan.
-* 🛡️ **AST & Safety Guard:** Validates every refactored Python file through AST syntax parsing before accepting it. JS/TS files are checked for truncation and structural integrity.
-* 📦 **Flexible CLI:** Rich terminal interface supporting `apipatch scan`, `apipatch fix --write`, `apipatch detect`, and `apipatch hunt`.
+* 🧠 **Universal LLM Engine:** Audits **ANY** third-party library in **any language** dynamically — no hardcoded rules required.
+* 🌐 **Multi-Language Support:** Full support for `.py`, `.js`, `.ts`, `.jsx`, `.tsx`, `.mjs`, `.cjs` files.
+* 🛡️ **AST & Safety Guard:** Validates every refactored Python file through AST syntax parsing. JS/TS files checked for truncation **and brace/bracket balance**.
+* 🔁 **Automatic Retry:** Exponential backoff retry (3 attempts) on transient LLM/network errors — no silent failures.
+* 📦 **Flexible CLI:** Rich terminal interface with `scan`, `fix --write`, `detect`, `hunt`, and now **`--output report.json`** for CI/CD pipelines.
 * 🔄 **Safe In-Place Refactoring:** Automatically generates `.bak` backups before modifying any files.
 * 🤖 **Proactive GitHub Hunter:** Searches public GitHub repositories for deprecated code patterns and drafts complete, structured Pull Requests.
 * 🔌 **Multi-Provider:** Works with **Google Gemini** (free tier), **OpenAI GPT-4o**, and **Anthropic Claude** — auto-detected from environment variables.
+* 📊 **JSON Report Output:** Save scan results with `--output report.json` for CI/CD integration.
 
 ---
 
@@ -55,16 +58,13 @@ ApiPatch is not limited to a fixed list of rules. The LLM engine can detect and 
 
 ### 1. Installation
 
-#### Direct install via Git:
 ```bash
-pip install git+https://github.com/MoradMoqbel/apipatch.git
+pip install apipatch
 ```
 
-#### Or clone and install in editable mode:
+#### Or install from Git (latest dev version):
 ```bash
-git clone https://github.com/MoradMoqbel/apipatch.git
-cd apipatch
-pip install -e .
+pip install git+https://github.com/MoradMoqbel/apipatch.git
 ```
 
 ---
@@ -154,8 +154,13 @@ All 23 tests are offline-safe (no API key required for the test suite).
 - [x] In-place refactoring with automatic backup (`--write`)
 - [x] Autonomous dependency discovery (requirements.txt / package.json / AST scan)
 - [x] Automated test suite (23/23 tests passing)
+- [x] **v0.4.0: Retry with exponential backoff on LLM errors**
+- [x] **v0.4.0: Token-limit protection (2500 line cap with warning)**
+- [x] **v0.4.0: JS/TS brace-balance structural validator**
+- [x] **v0.4.0: `--output report.json` for CI/CD pipelines**
+- [x] **v0.4.0: Robust GitHub raw URL builder**
+- [x] PyPI Release (`pip install apipatch`)
 - [ ] 1-Click Autonomous GitHub App Webhook Integration
-- [ ] PyPI Global Package Release (`pip install apipatch`)
 
 ---
 

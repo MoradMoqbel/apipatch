@@ -86,7 +86,7 @@ class CodeValidator:
 
     @staticmethod
     def validate_generic_integrity(original_code: str, refactored_code: str) -> ValidationResult:
-        """Sanity check for non-Python files (JS, TS, etc.) ensuring no severe truncation."""
+        """Sanity check for non-Python files (JS, TS, etc.) ensuring no severe truncation or structural corruption."""
         if not refactored_code or not refactored_code.strip():
             return ValidationResult(is_valid=False, error_message="Refactored code is empty")
 
@@ -97,7 +97,42 @@ class CodeValidator:
                 error_message="Refactored code appears abnormally truncated compared to original source."
             )
 
+        # Check brace/bracket/paren balance — imbalanced braces = structurally broken JS/TS
+        pairs = {'}': '{', ']': '[', ')': '('}
+        stack = []
+        in_single = False
+        in_double = False
+        i = 0
+        while i < len(refactored_code):
+            ch = refactored_code[i]
+            # Skip escape sequences inside strings
+            if ch == '\\' and (in_single or in_double):
+                i += 2
+                continue
+            if ch == "'" and not in_double:
+                in_single = not in_single
+            elif ch == '"' and not in_single:
+                in_double = not in_double
+            elif not in_single and not in_double:
+                if ch in ('{', '[', '('):
+                    stack.append(ch)
+                elif ch in ('}', ']', ')'):
+                    if not stack or stack[-1] != pairs[ch]:
+                        return ValidationResult(
+                            is_valid=False,
+                            error_message=f"Structural integrity check failed: unmatched '{ch}' in refactored code."
+                        )
+                    stack.pop()
+            i += 1
+
+        if stack:
+            return ValidationResult(
+                is_valid=False,
+                error_message=f"Structural integrity check failed: unclosed '{stack[-1]}' in refactored code."
+            )
+
         return ValidationResult(is_valid=True)
+
 
     @classmethod
     def validate(cls, original_code: str, refactored_code: str, file_extension: str = ".py") -> ValidationResult:

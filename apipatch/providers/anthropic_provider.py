@@ -30,8 +30,12 @@ class AnthropicProvider(BaseProvider):
 
         message = client.messages.create(
             model=self.model,
-            max_tokens=8192,
+            max_tokens=32768,
             temperature=0.0,
+            system=(
+                "You are ApiPatch, an autonomous code auditor. "
+                "Respond ONLY with a valid JSON object — no markdown, no preamble, no explanation."
+            ),
             messages=[{"role": "user", "content": prompt}]
         )
 

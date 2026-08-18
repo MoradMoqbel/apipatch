@@ -14,6 +14,48 @@ from apipatch.engine import ApiPatchEngine, Colors
 GITHUB_API_BASE = "https://api.github.com"
 
 
+def _build_raw_url(item: dict) -> str:
+    """
+    Builds a reliable raw.githubusercontent.com URL from a GitHub Code Search API item.
+
+    Priority:
+    1. Use 'raw_url' if the API provides it directly (most reliable).
+    2. Parse 'html_url' carefully with regex to handle:
+       - Branches with slashes (e.g. feature/my-branch)
+       - Repos whose name contains 'blob'
+       - Nested subdirectories
+    3. Last resort: simple string replacement (original behaviour).
+    """
+    # GitHub Code Search API sometimes includes 'raw_url' directly
+    raw_url = item.get("raw_url", "")
+    if raw_url:
+        return raw_url
+
+    html_url = item.get("html_url", "")
+    if not html_url:
+        return ""
+
+    # Pattern: https://github.com/{owner}/{repo}/blob/{ref}/{path}
+    import re
+    m = re.match(
+        r"https://github\.com/([^/]+/[^/]+)/blob/(.+)",
+        html_url
+    )
+    if m:
+        repo_path = m.group(1)   # e.g. "openai/openai-python"
+        ref_and_file = m.group(2)  # e.g. "main/src/openai/client.py"
+        return f"https://raw.githubusercontent.com/{repo_path}/{ref_and_file}"
+
+    # Fallback: simple replacement (may fail for edge cases)
+    return (
+        html_url
+        .replace("github.com", "raw.githubusercontent.com")
+        .replace("/blob/", "/")
+    )
+
+
+
+
 class GitHubPRHunter:
     def __init__(self, github_token: Optional[str] = None, engine: Optional[ApiPatchEngine] = None):
         self.github_token = github_token or os.getenv("GITHUB_TOKEN")
@@ -120,7 +162,7 @@ def get_answer(question):
         for item in results:
             repo_name = item.get("repository", {}).get("full_name", "Unknown/Repo")
             file_name = item.get("path", "")
-            raw_url = item.get("html_url", "").replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+            raw_url = _build_raw_url(item)
 
             print(f"\n🎯 Target: {Colors.BOLD}{repo_name}{Colors.ENDC} -> {Colors.OKCYAN}{file_name}{Colors.ENDC}")
             raw_code = self.fetch_raw_file_content(raw_url)

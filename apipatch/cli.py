@@ -4,6 +4,7 @@ Provides modern terminal commands for autonomous API code audits and automated r
 """
 
 import sys
+import json
 import argparse
 from typing import Optional
 from apipatch import __version__
@@ -33,6 +34,7 @@ def main():
     scan_parser.add_argument("--api-key", help="API key for chosen provider")
     scan_parser.add_argument("--model", help="Specific model name (e.g., gpt-4o, claude-3-7-sonnet)")
     scan_parser.add_argument("-c", "--concurrency", type=int, default=6, help="Number of parallel worker threads (default: 6)")
+    scan_parser.add_argument("-o", "--output", help="Save scan results as a JSON report to this file path")
 
     # Command: fix
     fix_parser = subparsers.add_parser("fix", help="Audit and generate modernized code refactors")
@@ -43,6 +45,7 @@ def main():
     fix_parser.add_argument("--api-key", help="API key for chosen provider")
     fix_parser.add_argument("--model", help="Specific model name")
     fix_parser.add_argument("-c", "--concurrency", type=int, default=6, help="Number of parallel worker threads (default: 6)")
+    fix_parser.add_argument("-o", "--output", help="Save fix results as a JSON report to this file path")
 
     # Command: detect
     detect_parser = subparsers.add_parser("detect", help="Auto-discover project dependencies and deprecation rules")
@@ -70,9 +73,13 @@ def main():
             concurrency=getattr(args, "concurrency", 6)
         )
         if os_is_file(args.path):
-            engine.process_file(args.path, write_in_place=False)
+            result = engine.process_file(args.path, write_in_place=False)
+            if getattr(args, "output", None):
+                _save_report({"results": [result]}, args.output)
         else:
-            engine.process_directory(args.path, write_in_place=False)
+            result = engine.process_directory(args.path, write_in_place=False)
+            if getattr(args, "output", None):
+                _save_report(result, args.output)
 
     elif args.command == "fix":
         engine = ApiPatchEngine(
@@ -83,9 +90,13 @@ def main():
             concurrency=getattr(args, "concurrency", 6)
         )
         if os_is_file(args.path):
-            engine.process_file(args.path, write_in_place=args.write)
+            result = engine.process_file(args.path, write_in_place=args.write)
+            if getattr(args, "output", None):
+                _save_report({"results": [result]}, args.output)
         else:
-            engine.process_directory(args.path, write_in_place=args.write)
+            result = engine.process_directory(args.path, write_in_place=args.write)
+            if getattr(args, "output", None):
+                _save_report(result, args.output)
 
     elif args.command == "detect":
         detector = AutoDeprecationDetector(target_dir=args.path)
@@ -99,6 +110,29 @@ def main():
 def os_is_file(path: str) -> bool:
     import os
     return os.path.isfile(path)
+
+
+def _save_report(data: dict, output_path: str) -> None:
+    """Saves the scan/fix result as a JSON report file."""
+    import os
+    import datetime
+    report = {
+        "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
+        "apipatch_version": __version__,
+        "total_scanned": data.get("total_scanned", len(data.get("results", []))),
+        "affected_files": data.get("affected_files", 0),
+        "results": [
+            {
+                "file": r.get("file", ""),
+                "status": r.get("status", ""),
+                "issues": r.get("issues", [])
+            }
+            for r in data.get("results", [])
+        ]
+    }
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2, ensure_ascii=False)
+    print(f"{Colors.OKGREEN}[✓] Report saved → {os.path.abspath(output_path)}{Colors.ENDC}")
 
 
 if __name__ == "__main__":

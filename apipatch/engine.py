@@ -17,6 +17,12 @@ from apipatch.validator import CodeValidator, ValidationResult
 from apipatch.providers.factory import ProviderFactory
 from apipatch.auto_detector import AutoDeprecationDetector
 
+# Maximum lines to send to LLM in a single request (prevents token-limit failures)
+_MAX_CODE_LINES = 2500
+# Retry settings for transient LLM/network errors
+_MAX_RETRIES = 3
+_RETRY_BACKOFF_BASE = 2.0  # seconds
+
 # Reconfigure stdout/stderr for safe Unicode / Windows encoding
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     try:
@@ -75,6 +81,35 @@ class ApiPatchEngine:
         self.concurrency = max(1, concurrency)
         self.detector = AutoDeprecationDetector()
 
+    def _call_with_retry(
+        self,
+        file_name: str,
+        code: str,
+        libs: List[str]
+    ) -> Dict[str, Any]:
+        """
+        Calls the LLM provider with exponential backoff retry on transient errors.
+        Raises the last exception if all retries are exhausted.
+        """
+        last_err: Exception = Exception("Unknown error")
+        for attempt in range(1, _MAX_RETRIES + 1):
+            try:
+                return self.provider.audit_code(file_name, code, detected_libraries=libs)
+            except Exception as e:
+                last_err = e
+                err_str = str(e).lower()
+                # Do not retry on hard errors (auth, invalid key, bad request)
+                if any(kw in err_str for kw in ("401", "403", "invalid", "api key", "400")):
+                    raise
+                if attempt < _MAX_RETRIES:
+                    wait = _RETRY_BACKOFF_BASE ** attempt
+                    safe_print(
+                        f"  {Colors.WARNING}[~] {file_name} LLM error (attempt {attempt}/{_MAX_RETRIES}), "
+                        f"retrying in {wait:.0f}s: {e}{Colors.ENDC}"
+                    )
+                    time.sleep(wait)
+        raise last_err
+
     def audit_code(
         self,
         file_path: str,
@@ -108,6 +143,15 @@ class ApiPatchEngine:
             )
             return empty_result
 
+        # Truncate very large files to avoid token-limit failures
+        code_lines = code.splitlines()
+        if len(code_lines) > _MAX_CODE_LINES:
+            safe_print(
+                f"  {Colors.WARNING}[~] {file_name} is large ({len(code_lines)} lines), "
+                f"truncating to {_MAX_CODE_LINES} lines for LLM analysis.{Colors.ENDC}"
+            )
+            code = "\n".join(code_lines[:_MAX_CODE_LINES])
+
         try:
             # Extract file-specific imports
             if ext in {".py", ".pyw"}:
@@ -117,12 +161,20 @@ class ApiPatchEngine:
             else:
                 file_imports = set()
 
-            # Fast path: If the file has 0 third-party imports and no dependencies detected, mark clean instantly
-            if not file_imports and not detected_libraries:
+            # Build the library hint list:
+            # Use file-specific imports if detected; fall back to project-wide deps.
+            # IMPORTANT: never skip a file just because file-level AST returned empty —
+            # AST can fail on valid code (e.g. encoding edge cases, TS syntax).  As long
+            # as we have project-level deps, we still send the file to the LLM.
+            if file_imports:
+                libs = list(file_imports)
+            elif detected_libraries:
+                libs = detected_libraries
+            else:
+                # Truly no import hints at all — safe to skip
                 return empty_result
 
-            libs = list(file_imports) if file_imports else (detected_libraries or [])
-            llm_res = self.provider.audit_code(file_name, code, detected_libraries=libs)
+            llm_res = self._call_with_retry(file_name, code, libs)
 
             if llm_res.get("has_breaking_changes") and llm_res.get("refactored_code"):
                 refactored = llm_res["refactored_code"]
@@ -139,7 +191,7 @@ class ApiPatchEngine:
             return llm_res if llm_res else empty_result
 
         except Exception as e:
-            safe_print(f"  {Colors.WARNING}[!] {file_name} provider notice: {e}{Colors.ENDC}")
+            safe_print(f"  {Colors.WARNING}[!] {file_name} audit failed: {e}{Colors.ENDC}")
             return empty_result
 
     def generate_diff(self, old_code: str, new_code: str, file_name: str) -> List[str]:
