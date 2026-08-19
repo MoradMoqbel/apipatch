@@ -77,6 +77,63 @@ class TestCLI(unittest.TestCase):
             )
             self.assertEqual(res.returncode, 0)
 
+    def test_cli_fix_with_verify_tests_flag(self):
+        """fix command with --verify-tests should execute cleanly."""
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".py", delete=False, encoding="utf-8"
+        ) as f:
+            f.write("def add(a, b):\n    return a + b\n")
+            temp_path = f.name
+        try:
+            res = subprocess.run(
+                [sys.executable, "-m", "apipatch.cli", "fix", temp_path, "--verify-tests"],
+                capture_output=True,
+                text=True
+            )
+            self.assertEqual(res.returncode, 0)
+        finally:
+            os.remove(temp_path)
+
+    def test_cli_hunt_help(self):
+        """hunt command help should list --submit and --no-fork options."""
+        res = subprocess.run(
+            [sys.executable, "-m", "apipatch.cli", "hunt", "--help"],
+            capture_output=True,
+            text=True
+        )
+        self.assertEqual(res.returncode, 0)
+        combined = res.stdout + res.stderr
+        self.assertIn("--submit", combined)
+        self.assertIn("--no-fork", combined)
+
+    def test_cli_pr_help(self):
+        """pr command help should list repo, --dry-run, --fork, --token."""
+        res = subprocess.run(
+            [sys.executable, "-m", "apipatch.cli", "pr", "--help"],
+            capture_output=True,
+            text=True
+        )
+        self.assertEqual(res.returncode, 0)
+        combined = res.stdout + res.stderr
+        self.assertIn("repo", combined)
+        self.assertIn("--dry-run", combined)
+        self.assertIn("--fork", combined)
+        self.assertIn("--token", combined)
+
+    def test_cli_webhook_help(self):
+        """webhook command help should list --port, --host, --secret."""
+        res = subprocess.run(
+            [sys.executable, "-m", "apipatch.cli", "webhook", "--help"],
+            capture_output=True,
+            text=True
+        )
+        self.assertEqual(res.returncode, 0)
+        combined = res.stdout + res.stderr
+        self.assertIn("--port", combined)
+        self.assertIn("--host", combined)
+        self.assertIn("--secret", combined)
+
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -1,6 +1,7 @@
 """
 ApiPatch Command Line Interface (CLI)
-Provides modern terminal commands for autonomous API code audits and automated refactoring.
+Provides modern terminal commands for autonomous API code audits, automated refactoring,
+sandbox test verification, live GitHub PR submission, and GitHub App Webhook daemon.
 """
 
 import sys
@@ -11,10 +12,15 @@ from apipatch import __version__
 from apipatch.engine import ApiPatchEngine, Colors
 from apipatch.auto_detector import AutoDeprecationDetector
 from apipatch.proactive_hunter import GitHubPRHunter
+from apipatch.github_client import resolve_github_token, mask_token
+from apipatch.webhook import run_webhook_server
 
 # Ensure UTF-8 console output on Windows
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 
 def main():
@@ -28,39 +34,68 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
     # Command: scan
-    scan_parser = subparsers.add_parser("scan", help="Scan a codebase for deprecated API signatures")
+    scan_parser = subparsers.add_parser("scan", help="Scan a codebase for deprecated API signatures with smart pre-filtering")
     scan_parser.add_argument("path", nargs="?", default=".", help="File or directory path to scan (default: current dir)")
     scan_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
     scan_parser.add_argument("--api-key", help="API key for chosen provider")
-    scan_parser.add_argument("--model", help="Specific model name (e.g., gpt-4o, claude-3-7-sonnet)")
+    scan_parser.add_argument("--model", help="Specific model name (e.g., gpt-4o, claude-3-5-sonnet, gemini-2.5-flash)")
     scan_parser.add_argument("-c", "--concurrency", type=int, default=6, help="Number of parallel worker threads (default: 6)")
     scan_parser.add_argument("-o", "--output", help="Save scan results as a JSON report to this file path")
 
     # Command: fix
-    fix_parser = subparsers.add_parser("fix", help="Audit and generate modernized code refactors")
+    fix_parser = subparsers.add_parser("fix", help="Audit, refactor, and self-heal deprecated code")
     fix_parser.add_argument("path", nargs="?", default=".", help="File or directory path to refactor")
     fix_parser.add_argument("-w", "--write", action="store_true", help="Apply fixes in-place to files on disk")
     fix_parser.add_argument("--no-backup", action="store_true", help="Disable automatic .bak file creation when writing")
+    fix_parser.add_argument("--verify-tests", "--run-tests", dest="verify_tests", action="store_true", help="Run project test suite (pytest/npm test) to verify fixes")
     fix_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
     fix_parser.add_argument("--api-key", help="API key for chosen provider")
     fix_parser.add_argument("--model", help="Specific model name")
     fix_parser.add_argument("-c", "--concurrency", type=int, default=6, help="Number of parallel worker threads (default: 6)")
     fix_parser.add_argument("-o", "--output", help="Save fix results as a JSON report to this file path")
 
+    # Command: pr (Autonomous GitHub Repository Audit & Live PR Submission)
+    pr_parser = subparsers.add_parser("pr", help="Audit an entire GitHub repository and submit an autonomous live Pull Request")
+    pr_parser.add_argument("repo", help="Target GitHub repository (e.g., owner/repo or https://github.com/owner/repo)")
+    pr_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered from github_token.txt or GITHUB_TOKEN if omitted)")
+    pr_parser.add_argument("--branch", help="Target base branch on repository (default: repository default branch)")
+    pr_parser.add_argument("--new-branch", help="Custom name for the migration branch to create")
+    pr_parser.add_argument("--fork", dest="fork", action="store_true", default=None, help="Force forking the repository first")
+    pr_parser.add_argument("--no-fork", dest="fork", action="store_false", help="Push directly to target repository without forking")
+    pr_parser.add_argument("--dry-run", "--preview", dest="dry_run", action="store_true", help="Inspect and preview refactorings without pushing branch or PR")
+    pr_parser.add_argument("--max-files", type=int, default=50, help="Max repository files to inspect (default: 50)")
+    pr_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
+    pr_parser.add_argument("--api-key", help="API key for chosen provider")
+    pr_parser.add_argument("--model", help="Specific model name")
+
+    # Command: webhook (GitHub App Webhook Daemon)
+    webhook_parser = subparsers.add_parser("webhook", help="Start the autonomous GitHub App Webhook daemon server")
+    webhook_parser.add_argument("--host", default="0.0.0.0", help="Host interface to bind to (default: 0.0.0.0)")
+    webhook_parser.add_argument("--port", type=int, default=8080, help="Port to listen on (default: 8080)")
+    webhook_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered from github_token.txt if omitted)")
+    webhook_parser.add_argument("--secret", help="GitHub Webhook HMAC Secret (or GITHUB_WEBHOOK_SECRET env)")
+    webhook_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
+    webhook_parser.add_argument("--api-key", help="API key for chosen provider")
+    webhook_parser.add_argument("--model", help="Specific model name")
+
     # Command: detect
-    detect_parser = subparsers.add_parser("detect", help="Auto-discover project dependencies and deprecation rules")
+    detect_parser = subparsers.add_parser("detect", help="Auto-discover project dependencies and architecture context")
     detect_parser.add_argument("path", nargs="?", default=".", help="Project directory path (default: current dir)")
 
     # Command: hunt
-    hunt_parser = subparsers.add_parser("hunt", help="Proactively search GitHub for deprecated code and prepare PRs")
+    hunt_parser = subparsers.add_parser("hunt", help="Proactively search GitHub for deprecated code and submit PRs")
     hunt_parser.add_argument("query", nargs="?", default="openai.ChatCompletion.create language:python", help="GitHub Code Search query")
     hunt_parser.add_argument("--max", type=int, default=3, help="Max candidate repositories to inspect")
-    hunt_parser.add_argument("--token", help="GitHub Personal Access Token")
+    hunt_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered if omitted)")
+    hunt_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
+    hunt_parser.add_argument("--api-key", help="API key for chosen provider")
+    hunt_parser.add_argument("--model", help="Specific model name")
+    hunt_parser.add_argument("--submit", "--open-pr", dest="submit", action="store_true", help="Automatically submit live Pull Request to GitHub")
+    hunt_parser.add_argument("--no-fork", dest="fork", action="store_false", default=True, help="Submit directly without forking (if repository write access is available)")
 
     args = parser.parse_args()
 
     if not args.command:
-        # Default behavior if no subcommand passed: interactive help or scan
         parser.print_help()
         sys.exit(0)
 
@@ -87,24 +122,77 @@ def main():
             api_key=args.api_key,
             model=args.model,
             create_backup=not args.no_backup,
-            concurrency=getattr(args, "concurrency", 6)
+            concurrency=getattr(args, "concurrency", 6),
+            verify_tests=getattr(args, "verify_tests", False)
         )
         if os_is_file(args.path):
-            result = engine.process_file(args.path, write_in_place=args.write)
+            result = engine.process_file(
+                args.path,
+                write_in_place=args.write,
+                verify_tests=args.verify_tests
+            )
             if getattr(args, "output", None):
                 _save_report({"results": [result]}, args.output)
         else:
-            result = engine.process_directory(args.path, write_in_place=args.write)
+            result = engine.process_directory(
+                args.path,
+                write_in_place=args.write,
+                verify_tests=args.verify_tests
+            )
             if getattr(args, "output", None):
                 _save_report(result, args.output)
+
+    elif args.command == "pr":
+        engine = ApiPatchEngine(
+            provider_name=args.provider,
+            api_key=args.api_key,
+            model=args.model,
+            create_backup=False
+        )
+        hunter = GitHubPRHunter(github_token=args.token, engine=engine)
+        hunter.audit_and_pr_repository(
+            repo_name=args.repo,
+            fork=args.fork,
+            base_branch=args.branch,
+            branch_name=args.new_branch,
+            submit=not args.dry_run,
+            dry_run=args.dry_run,
+            max_files=args.max_files
+        )
+
+    elif args.command == "webhook":
+        engine = ApiPatchEngine(
+            provider_name=args.provider,
+            api_key=args.api_key,
+            model=args.model,
+            create_backup=False
+        )
+        run_webhook_server(
+            host=args.host,
+            port=args.port,
+            token=args.token,
+            secret=args.secret,
+            engine=engine
+        )
 
     elif args.command == "detect":
         detector = AutoDeprecationDetector(target_dir=args.path)
         detector.run_autonomous_discovery()
 
     elif args.command == "hunt":
-        hunter = GitHubPRHunter(github_token=args.token)
-        hunter.hunt_and_preview(query=args.query, max_results=args.max)
+        engine = ApiPatchEngine(
+            provider_name=args.provider,
+            api_key=args.api_key,
+            model=args.model,
+            create_backup=False
+        )
+        hunter = GitHubPRHunter(github_token=args.token, engine=engine)
+        hunter.hunt_and_preview(
+            query=args.query,
+            max_results=args.max,
+            submit=getattr(args, "submit", False),
+            fork=getattr(args, "fork", True)
+        )
 
 
 def os_is_file(path: str) -> bool:

@@ -2,6 +2,7 @@
 ApiPatch Autonomous Dependency & Import Detector
 Discovers all third-party libraries used in a project (Python, JavaScript, TypeScript)
 without any hardcoded rules — enabling the LLM engine to reason about ANY library.
+Also provides fast local pre-filtering and repository context generation.
 """
 
 import os
@@ -45,8 +46,292 @@ NODE_BUILTIN_MODULES = {
     "child_process", "cluster", "dgram", "dns", "domain", "net", "querystring",
     "readline", "repl", "string_decoder", "timers", "tls", "tty", "url",
     "v8", "vm", "worker_threads", "zlib", "buffer", "assert", "console",
-    "module", "process", "inspector", "perf_hooks", "async_hooks"
+    "module", "process", "inspector", "perf_hooks", "async_hooks", "node:fs",
+    "node:path", "node:http", "node:https", "node:os", "node:crypto",
+    "node:stream", "node:util", "node:events", "node:child_process", "node:buffer"
 }
+
+
+def _strip_js_comments(code: str) -> str:
+    """Removes single-line and multi-line comments from JS/TS code while preserving strings."""
+    def replacer(match):
+        s = match.group(0)
+        if s.startswith('/'):
+            return " "
+        return s
+    pattern = re.compile(
+        r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"|`(?:\\.|[^\\`])*`',
+        re.DOTALL | re.MULTILINE
+    )
+    return re.sub(pattern, replacer, code)
+
+
+def extract_imports_from_js_code(content: str) -> Set[str]:
+    """
+    Extracts third-party package names from JS/TS code string.
+    Supports ESM, CommonJS, dynamic imports, type imports, and re-exports.
+    """
+    imports: Set[str] = set()
+    cleaned = _strip_js_comments(content)
+
+    # 1. ESM: import ... from 'pkg' | import 'pkg' | import type ... from 'pkg'
+    esm_patterns = re.findall(
+        r"""(?:^|\n|;)\s*import\s+(?:type\s+|typeof\s+)?(?:[^'"]*?from\s+)?['"]([@\w][\w/.-]*)['"]""",
+        cleaned
+    )
+    # 2. Re-exports: export ... from 'pkg'
+    export_patterns = re.findall(
+        r"""(?:^|\n|;)\s*export\s+(?:[^'"]*?from\s+)?['"]([@\w][\w/.-]*)['"]""",
+        cleaned
+    )
+    # 3. Dynamic imports: import('pkg')
+    dyn_import_patterns = re.findall(
+        r"""import\s*\(\s*['"]([@\w][\w/.-]*)['"]\s*\)""",
+        cleaned
+    )
+    # 4. CJS: require('pkg')
+    cjs_patterns = re.findall(
+        r"""require\s*\(\s*['"]([@\w][\w/.-]*)['"]\s*\)""",
+        cleaned
+    )
+
+    all_raw = esm_patterns + export_patterns + dyn_import_patterns + cjs_patterns
+    for raw in all_raw:
+        raw = raw.strip()
+        if not raw or raw.startswith('.'):
+            continue
+        if raw.startswith('@'):
+            parts = raw.split('/')
+            pkg = '/'.join(parts[:2]) if len(parts) >= 2 else raw
+        else:
+            pkg = raw.split('/')[0]
+
+        if pkg and pkg not in NODE_BUILTIN_MODULES:
+            imports.add(pkg)
+
+    return imports
+
+
+def should_audit_file(
+    file_content: str,
+    file_path: str,
+    detected_libraries: Optional[List[str]] = None
+) -> bool:
+    """
+    Fast local pre-filter (runs in ~0.001s).
+    Determines whether a file references any of the detected project libraries.
+    If the file is completely clean of third-party references, returns False,
+    saving 100% of LLM tokens and API calls.
+    """
+    if not file_content or not file_content.strip():
+        return False
+
+    if not detected_libraries:
+        return True
+
+    normalized_libs = set()
+    for lib in detected_libraries:
+        lib_clean = lib.strip().lower()
+        if lib_clean:
+            normalized_libs.add(lib_clean)
+            normalized_libs.add(lib_clean.replace('-', '_'))
+            normalized_libs.add(lib_clean.replace('_', '-'))
+            if lib_clean.startswith('@') and '/' in lib_clean:
+                scoped_name = lib_clean.split('/')[1]
+                normalized_libs.add(scoped_name)
+
+    ext = os.path.splitext(file_path)[1].lower()
+
+    # 1. Python AST check
+    if ext in {".py", ".pyw"}:
+        try:
+            tree = ast.parse(file_content)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        top_pkg = alias.name.split('.')[0].lower()
+                        if top_pkg in normalized_libs or top_pkg.replace('_', '-') in normalized_libs:
+                            return True
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        top_pkg = node.module.split('.')[0].lower()
+                        if top_pkg in normalized_libs or top_pkg.replace('_', '-') in normalized_libs:
+                            return True
+        except Exception:
+            pass
+
+    # 2. JS / TS import extraction check
+    elif ext in {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}:
+        js_imports = extract_imports_from_js_code(file_content)
+        for imp in js_imports:
+            imp_lower = imp.lower()
+            if imp_lower in normalized_libs:
+                return True
+            if imp_lower.startswith('@') and '/' in imp_lower:
+                scoped_name = imp_lower.split('/')[1]
+                if scoped_name in normalized_libs:
+                    return True
+
+    # 3. Fast keyword / token scan for any direct mentions
+    lower_content = file_content.lower()
+    for lib in normalized_libs:
+        if not lib:
+            continue
+        escaped = re.escape(lib)
+        if re.search(r'(?<![a-zA-Z0-9_\-])' + escaped + r'(?![a-zA-Z0-9_\-])', lower_content):
+            return True
+
+    return False
+
+
+def _extract_pyproject_dependencies(target_dir: str) -> Dict[str, str]:
+    """Extracts declared package dependencies and versions from pyproject.toml."""
+    manifest_deps: Dict[str, str] = {}
+    pyproject_path = os.path.join(target_dir, "pyproject.toml")
+    if not os.path.exists(pyproject_path):
+        return manifest_deps
+
+    try:
+        try:
+            import tomllib
+            with open(pyproject_path, "rb") as f:
+                data = tomllib.load(f)
+            proj_deps = data.get("project", {}).get("dependencies", [])
+            for d in proj_deps:
+                parts = re.split(r"([><=~;!@\[].*)", d, maxsplit=1)
+                pkg = parts[0].strip().lower()
+                ver = parts[1].strip() if len(parts) > 1 else "latest"
+                if pkg and pkg not in {"apipatch", "setuptools", "wheel", "pytest", "python"}:
+                    manifest_deps[pkg] = ver
+
+            opt_deps = data.get("project", {}).get("optional-dependencies", {})
+            for group, d_list in opt_deps.items():
+                for d in d_list:
+                    parts = re.split(r"([><=~;!@\[].*)", d, maxsplit=1)
+                    pkg = parts[0].strip().lower()
+                    ver = parts[1].strip() if len(parts) > 1 else "latest"
+                    if pkg and pkg not in {"apipatch", "setuptools", "wheel", "pytest", "python"}:
+                        manifest_deps[pkg] = ver
+            return manifest_deps
+        except Exception:
+            pass
+
+        # Fallback to targeted regex inside dependencies blocks
+        with open(pyproject_path, "r", encoding="utf-8", errors="ignore") as f:
+            content = f.read()
+        dep_blocks = re.findall(r'(?:dependencies|optional-dependencies)[\s\S]*?\]', content)
+        for block in dep_blocks:
+            for match in re.findall(r'"([a-zA-Z0-9_\-]+(?:[><=~;].*)?)"', block):
+                m = match.strip().lower()
+                parts = re.split(r"([><=~;!@].*)", m, maxsplit=1)
+                pkg = parts[0].strip()
+                ver = parts[1].strip() if len(parts) > 1 else "latest"
+                if pkg and pkg not in {"apipatch", "setuptools", "wheel", "pytest", "python"}:
+                    manifest_deps[pkg] = ver
+    except Exception:
+        pass
+    return manifest_deps
+
+
+def build_project_context(target_dir: str, max_file_tree: int = 30) -> str:
+    """
+    Generates a concise architectural summary of the target project
+    (frameworks, declared dependency versions, top-level structure)
+    to provide high-precision context for LLM migration reasoning.
+    """
+    target_dir = os.path.abspath(target_dir)
+    context_lines: List[str] = []
+
+    frameworks: List[str] = []
+    manifest_deps: Dict[str, str] = {}
+
+    # Check requirements.txt
+    req_path = os.path.join(target_dir, "requirements.txt")
+    if os.path.exists(req_path):
+        try:
+            with open(req_path, "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and not line.startswith("-"):
+                        parts = re.split(r"([><=~;!@].*)", line, maxsplit=1)
+                        pkg = parts[0].strip().lower()
+                        ver = parts[1].strip() if len(parts) > 1 else "latest"
+                        manifest_deps[pkg] = ver
+        except Exception:
+            pass
+
+    # Check pyproject.toml
+    manifest_deps.update(_extract_pyproject_dependencies(target_dir))
+
+    # Check package.json
+    pkg_json = os.path.join(target_dir, "package.json")
+    if os.path.exists(pkg_json):
+        try:
+            with open(pkg_json, "r", encoding="utf-8", errors="ignore") as f:
+                data = json.load(f)
+            for k in ("dependencies", "devDependencies"):
+                if k in data and isinstance(data[k], dict):
+                    for pkg, ver in data[k].items():
+                        manifest_deps[pkg.lower()] = str(ver)
+        except Exception:
+            pass
+
+    # Infer frameworks
+    dep_keys = set(manifest_deps.keys())
+    if "fastapi" in dep_keys:
+        frameworks.append("FastAPI")
+    if "django" in dep_keys:
+        frameworks.append("Django")
+    if "flask" in dep_keys:
+        frameworks.append("Flask")
+    if "next" in dep_keys or os.path.exists(os.path.join(target_dir, "next.config.js")):
+        frameworks.append("Next.js")
+    if "react" in dep_keys:
+        frameworks.append("React")
+    if "express" in dep_keys:
+        frameworks.append("Express.js")
+    if "pydantic" in dep_keys:
+        frameworks.append("Pydantic")
+    if "langchain" in dep_keys or "langchain-core" in dep_keys:
+        frameworks.append("LangChain")
+    if "openai" in dep_keys:
+        frameworks.append("OpenAI SDK")
+    if "stripe" in dep_keys:
+        frameworks.append("Stripe SDK")
+
+    if frameworks:
+        context_lines.append(f"Detected Frameworks/Stack: {', '.join(frameworks)}")
+
+    if manifest_deps:
+        sample_deps = [f"{k}{' ' + v if v != 'latest' else ''}" for k, v in list(manifest_deps.items())[:15]]
+        context_lines.append(f"Key Dependencies: {', '.join(sample_deps)}")
+
+    # Summarize top project structure
+    ignore_dirs = {
+        ".git", "node_modules", "venv", ".venv", "__pycache__",
+        ".gemini", "dist", "build", ".next", ".nuxt", "out", "coverage"
+    }
+    top_files: List[str] = []
+    for root, dirs, files in os.walk(target_dir):
+        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+        for f in files:
+            rel = os.path.relpath(os.path.join(root, f), target_dir)
+            ext = os.path.splitext(f)[1].lower()
+            if ext in {".py", ".js", ".ts", ".jsx", ".tsx", ".json", ".toml"}:
+                top_files.append(rel.replace("\\", "/"))
+            if len(top_files) >= max_file_tree:
+                break
+        if len(top_files) >= max_file_tree:
+            break
+
+    if top_files:
+        context_lines.append("Project Structure Preview:")
+        for tf in top_files[:10]:
+            context_lines.append(f"  - {tf}")
+        if len(top_files) > 10:
+            context_lines.append(f"  ... (+{len(top_files) - 10} more files)")
+
+    return "\n".join(context_lines)
 
 
 class AutoDeprecationDetector:
@@ -65,27 +350,34 @@ class AutoDeprecationDetector:
 
     def extract_imports_from_file(self, file_path: str) -> Set[str]:
         """
-        Uses Python AST to extract all third-party imported module names
-        from a .py or .pyw source file.
+        Extracts all third-party imported module names from a .py or .pyw source file.
+        Uses Python AST with automatic regex fallback for syntax/encoding edge cases.
         """
         imports: Set[str] = set()
         if not file_path.endswith((".py", ".pyw")):
             return imports
         try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                content = f.read()
-            tree = ast.parse(content)
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Import):
-                    for alias in node.names:
-                        top_pkg = alias.name.split('.')[0]
-                        if top_pkg not in STANDARD_LIB_MODULES:
-                            imports.add(top_pkg)
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        top_pkg = node.module.split('.')[0]
-                        if top_pkg not in STANDARD_LIB_MODULES:
-                            imports.add(top_pkg)
+            with open(file_path, "r", encoding="utf-8-sig", errors="ignore") as f:
+                content = f.read().lstrip('\ufeff')
+            try:
+                tree = ast.parse(content)
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        for alias in node.names:
+                            top_pkg = alias.name.split('.')[0]
+                            if top_pkg not in STANDARD_LIB_MODULES:
+                                imports.add(top_pkg)
+                    elif isinstance(node, ast.ImportFrom):
+                        if node.module:
+                            top_pkg = node.module.split('.')[0]
+                            if top_pkg not in STANDARD_LIB_MODULES:
+                                imports.add(top_pkg)
+            except Exception:
+                # Regex fallback if AST parsing fails
+                for match in re.finditer(r'(?:^|\n)\s*(?:from|import)\s+([a-zA-Z0-9_]+)', content):
+                    pkg = match.group(1).split('.')[0]
+                    if pkg and pkg not in STANDARD_LIB_MODULES:
+                        imports.add(pkg)
         except Exception:
             pass
         return imports
@@ -94,39 +386,18 @@ class AutoDeprecationDetector:
 
     def extract_imports_from_js_file(self, file_path: str) -> Set[str]:
         """
-        Uses regex to extract third-party package names from
-        JS / TS / JSX / TSX / MJS / CJS source files.
+        Uses regex and comment stripping to extract third-party package names
+        from JS / TS / JSX / TSX / MJS / CJS source files.
         """
-        imports: Set[str] = set()
         ext = os.path.splitext(file_path)[1].lower()
         if ext not in {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}:
-            return imports
+            return set()
         try:
             with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                 content = f.read()
-
-            # ESM: import ... from 'pkg'  /  import 'pkg'
-            esm_patterns = re.findall(
-                r"""(?:^|\n)\s*import\s+(?:[^'"]*?from\s+)?['"]([@\w][\w/.-]*)['"]""",
-                content
-            )
-            # CJS: require('pkg')
-            cjs_patterns = re.findall(r"""require\s*\(\s*['"]([@\w][\w/.-]*)['"]\s*\)""", content)
-
-            for raw in esm_patterns + cjs_patterns:
-                # Normalise scoped packages: @org/pkg -> @org/pkg
-                # Strip sub-paths: lodash/merge -> lodash
-                if raw.startswith('@'):
-                    parts = raw.split('/')
-                    pkg = '/'.join(parts[:2]) if len(parts) >= 2 else raw
-                else:
-                    pkg = raw.split('/')[0]
-
-                if pkg and pkg not in NODE_BUILTIN_MODULES and not pkg.startswith('.'):
-                    imports.add(pkg)
+            return extract_imports_from_js_code(content)
         except Exception:
-            pass
-        return imports
+            return set()
 
     # ─── Manifest-based Dependency Discovery ─────────────────────────────────
 
@@ -158,19 +429,7 @@ class AutoDeprecationDetector:
         return deps
 
     def _parse_pyproject_toml(self) -> Set[str]:
-        deps: Set[str] = set()
-        pyproject = os.path.join(self.target_dir, "pyproject.toml")
-        if os.path.exists(pyproject):
-            try:
-                with open(pyproject, "r", encoding="utf-8", errors="ignore") as f:
-                    content = f.read()
-                # Extract quoted package names from dependency lists
-                for match in re.findall(r'"([a-zA-Z0-9_\-]+)(?:[><=~;].*)?[">\s]', content):
-                    m = match.strip().lower()
-                    if m and m not in {"apipatch", "setuptools", "wheel", "pytest", "python"}:
-                        deps.add(m)
-            except Exception:
-                pass
+        deps = set(_extract_pyproject_dependencies(self.target_dir).keys())
         return deps
 
     # ─── Main Detection API ───────────────────────────────────────────────────
@@ -207,6 +466,14 @@ class AutoDeprecationDetector:
 
         return sorted(dependencies)
 
+    def should_audit_file(self, file_content: str, file_path: str, detected_libraries: Optional[List[str]] = None) -> bool:
+        """Instance method shortcut for should_audit_file."""
+        return should_audit_file(file_content, file_path, detected_libraries)
+
+    def get_project_context(self) -> str:
+        """Returns the project architectural and manifest context string."""
+        return build_project_context(self.target_dir)
+
     def run_autonomous_discovery(self) -> Dict[str, Any]:
         """Runs end-to-end autonomous dependency discovery and prints a summary."""
         deps = self.detect_dependencies()
@@ -220,4 +487,5 @@ class AutoDeprecationDetector:
         return {
             "target_directory": self.target_dir,
             "detected_packages": deps,
+            "project_context": self.get_project_context()
         }

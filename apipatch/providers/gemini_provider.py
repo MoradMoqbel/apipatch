@@ -52,18 +52,8 @@ class GeminiProvider(BaseProvider):
                     return parts[0].get("text", "")
         return None
 
-    def audit_code(
-        self, file_name: str, code: str, detected_libraries: List[str]
-    ) -> Dict[str, Any]:
-        if not self.api_key:
-            raise ValueError(
-                "No Gemini API key found. Set GEMINI_API_KEY or GOOGLE_API_KEY "
-                "environment variable, or pass --api-key via CLI."
-            )
-
-        prompt = self.build_prompt(file_name, code, detected_libraries)
+    def _execute_with_fallbacks(self, prompt: str) -> Dict[str, Any]:
         models_to_try = [self.model] + [m for m in self.fallback_models if m != self.model]
-
         last_err = None
         for current_model in models_to_try:
             try:
@@ -76,7 +66,6 @@ class GeminiProvider(BaseProvider):
                 err_body = e.read().decode("utf-8", errors="ignore")
                 last_err = f"HTTP {e.code}: {err_body}"
                 if e.code == 429:
-                    # Model quota exhausted, seamlessly try next fallback model
                     continue
                 raise ValueError(f"Gemini API HTTP {e.code}: {err_body}")
 
@@ -88,3 +77,42 @@ class GeminiProvider(BaseProvider):
             raise ValueError("All Gemini free-tier models currently rate-limited. Please retry shortly.")
 
         return {"has_breaking_changes": False, "detected_issues": [], "refactored_code": ""}
+
+    def audit_code(
+        self,
+        file_name: str,
+        code: str,
+        detected_libraries: List[str],
+        project_context: Optional[str] = None
+    ) -> Dict[str, Any]:
+        if not self.api_key:
+            raise ValueError(
+                "No Gemini API key found. Set GEMINI_API_KEY or GOOGLE_API_KEY "
+                "environment variable, or pass --api-key via CLI."
+            )
+        prompt = self.build_prompt(file_name, code, detected_libraries, project_context=project_context)
+        return self._execute_with_fallbacks(prompt)
+
+    def heal_code(
+        self,
+        file_name: str,
+        original_code: str,
+        broken_code: str,
+        validation_error: str,
+        detected_libraries: Optional[List[str]] = None,
+        project_context: Optional[str] = None
+    ) -> Dict[str, Any]:
+        if not self.api_key:
+            raise ValueError(
+                "No Gemini API key found. Set GEMINI_API_KEY or GOOGLE_API_KEY "
+                "environment variable, or pass --api-key via CLI."
+            )
+        prompt = self.build_healing_prompt(
+            file_name=file_name,
+            original_code=original_code,
+            broken_code=broken_code,
+            validation_error=validation_error,
+            detected_libraries=detected_libraries,
+            project_context=project_context
+        )
+        return self._execute_with_fallbacks(prompt)

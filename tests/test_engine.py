@@ -65,7 +65,7 @@ class TestApiPatchEngineOffline(unittest.TestCase):
             f.write(original)
 
         # Manually inject a fake audit result to bypass LLM
-        def fake_audit(fp, code, detected_libraries=None):
+        def fake_audit(fp, code, detected_libraries=None, **kwargs):
             return {
                 "has_breaking_changes": True,
                 "detected_issues": [{

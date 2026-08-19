@@ -2,6 +2,7 @@
 DEVELOPMENT_PLAN.md
 yc_answers.md
 implementation_plan.md
+implementation_plan_*.md
 Apply to Y Combinator.pdf
 
 # Frontend Assets (Hosted Separately)
@@ -16,14 +17,17 @@ __pycache__/
 *_fixed.py
 temp_*.py
 
-# Environments & IDE settings
+# Sensitive Credentials & Tokens
+github_token.txt
+*.token
 .env
-.venv
-env/
-venv/
-.vscode/
-.idea/
-.gemini/
+.env.*
+
+# Distribution / Packaging / Test artifacts
+dist/
+build/
+*.egg-info/
+.pytest_cache/
 
 # OS specific
 .DS_Store

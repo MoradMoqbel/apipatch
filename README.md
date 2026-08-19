@@ -30,13 +30,15 @@ Tools like **Dependabot** and **Renovate** only bump version numbers in `require
 
 ## 🚀 Key Features
 
+* 🤖 **Autonomous GitHub PR Pipeline (`apipatch pr`):** Scans an entire remote repository, auto-forks/branches, commits refactorings, and opens live Pull Requests with rich Markdown summaries.
+* ⚡ **GitHub App & Webhook Daemon (`apipatch webhook`):** Listens for repository `push` events, verifies HMAC signatures, and autonomously runs the audit & PR pipeline in the background.
+* 🔑 **Smart Token Discovery:** Automatically resolves GitHub tokens from CLI flags, `GITHUB_TOKEN` / `GH_TOKEN` env, `github_token.txt` file, or `.env`.
 * 🧠 **Universal LLM Engine:** Audits **ANY** third-party library in **any language** dynamically — no hardcoded rules required.
 * 🌐 **Multi-Language Support:** Full support for `.py`, `.js`, `.ts`, `.jsx`, `.tsx`, `.mjs`, `.cjs` files.
 * 🛡️ **AST & Safety Guard:** Validates every refactored Python file through AST syntax parsing. JS/TS files checked for truncation **and brace/bracket balance**.
 * 🔁 **Automatic Retry:** Exponential backoff retry (3 attempts) on transient LLM/network errors — no silent failures.
-* 📦 **Flexible CLI:** Rich terminal interface with `scan`, `fix --write`, `detect`, `hunt`, and now **`--output report.json`** for CI/CD pipelines.
+* 📦 **Flexible CLI:** Rich terminal interface with `scan`, `fix --write`, `detect`, `hunt`, `pr`, `webhook`, and **`--output report.json`**.
 * 🔄 **Safe In-Place Refactoring:** Automatically generates `.bak` backups before modifying any files.
-* 🤖 **Proactive GitHub Hunter:** Searches public GitHub repositories for deprecated code patterns and drafts complete, structured Pull Requests.
 * 🔌 **Multi-Provider:** Works with **Google Gemini** (free tier), **OpenAI GPT-4o**, and **Anthropic Claude** — auto-detected from environment variables.
 * 📊 **JSON Report Output:** Save scan results with `--output report.json` for CI/CD integration.
 
@@ -69,12 +71,9 @@ pip install git+https://github.com/MoradMoqbel/apipatch.git
 
 ---
 
-## 🔑 Setting Up AI Provider Keys
+## 🔑 Setting Up AI & GitHub Tokens
 
-ApiPatch requires an LLM provider key for full analysis.
-
-### Option A: Environment Variables (Recommended)
-
+### AI Provider Keys
 ```bash
 # Google Gemini (Fast & Free Tier Available)
 export GEMINI_API_KEY="your-gemini-api-key-here"
@@ -86,24 +85,37 @@ export OPENAI_API_KEY="sk-..."
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
-**Windows (PowerShell):**
-```powershell
-$env:GEMINI_API_KEY = "your-gemini-api-key-here"
-```
-
-### Option B: CLI Flags
-
-```bash
-apipatch scan ./project --provider gemini --api-key "your-key"
-apipatch scan ./project --provider openai  --api-key "sk-..."
-apipatch scan ./project --provider anthropic --api-key "sk-ant-..."
-```
+### GitHub Token Setup
+ApiPatch automatically resolves your GitHub token in this priority:
+1. `--token <ghp_...>` CLI option
+2. `GITHUB_TOKEN` or `GH_TOKEN` environment variable
+3. `github_token.txt` in your working directory or project root
+4. `.env` file
 
 ---
 
 ## 💻 CLI Commands & Usage
 
-### 1. 🔍 Scan a Codebase (Dry Run)
+### 1. 🚀 Autonomous Live GitHub Pull Request
+Audits an entire GitHub repository, forks if needed, commits modernized files, and opens a real live PR:
+```bash
+# Open live PR on repository
+apipatch pr owner/repo
+
+# Dry run / preview changes without opening PR
+apipatch pr owner/repo --dry-run
+
+# Specify custom base branch
+apipatch pr owner/repo --branch main
+```
+
+### 2. ⚡ GitHub App Webhook Daemon
+Runs the continuous webhook server to trigger autonomous PRs on every repository `push`:
+```bash
+apipatch webhook --port 8080 --secret "my_webhook_secret"
+```
+
+### 3. 🔍 Scan a Codebase Locally (Dry Run)
 Audits files recursively (`.py`, `.js`, `.ts`, `.jsx`, `.tsx`, `.mjs`, `.cjs`),
 detects deprecated calls, and outputs colorized diff previews without modifying files:
 ```bash
@@ -111,7 +123,7 @@ apipatch scan /path/to/project
 apipatch scan /path/to/project --provider gemini
 ```
 
-### 2. ⚡ Refactor and Apply Fixes In-Place
+### 4. ⚡ Refactor and Apply Fixes In-Place
 Automatically updates the code and generates `.bak` safety backups:
 ```bash
 apipatch fix /path/to/project --write
@@ -119,17 +131,17 @@ apipatch fix /path/to/single/file.py --write --provider openai
 ```
 *(Add `--no-backup` to skip automatic `.bak` backup creation.)*
 
-### 3. 📦 Discover All Project Dependencies
+### 5. 📦 Discover All Project Dependencies
 Inspects `requirements.txt`, `package.json`, `pyproject.toml`, and all source file
 imports (Python AST + JS/TS regex) to list every third-party library in use:
 ```bash
 apipatch detect /path/to/project
 ```
 
-### 4. 🎯 Hunt for Deprecated Code on GitHub & Prepare PRs
-Searches GitHub for legacy patterns and prepares ready-to-merge Pull Requests:
+### 6. 🎯 Hunt for Deprecated Code on GitHub & Submit PRs
+Searches GitHub for legacy patterns and prepares/submits ready-to-merge Pull Requests:
 ```bash
-apipatch hunt "openai.ChatCompletion.create language:python"
+apipatch hunt "openai.ChatCompletion.create language:python" --submit
 apipatch hunt "stripe.Charge.create language:javascript"
 ```
 
@@ -138,10 +150,10 @@ apipatch hunt "stripe.Charge.create language:javascript"
 ## 🧪 Testing
 
 ```bash
-python -m pytest tests/ -v
+pytest
 ```
 
-All 23 tests are offline-safe (no API key required for the test suite).
+All 76 tests are offline-safe and mocked (no external network or live LLM required for the test suite).
 
 ---
 
@@ -153,14 +165,12 @@ All 23 tests are offline-safe (no API key required for the test suite).
 - [x] Multi-LLM Provider (Gemini, OpenAI, Claude) with auto-discovery
 - [x] In-place refactoring with automatic backup (`--write`)
 - [x] Autonomous dependency discovery (requirements.txt / package.json / AST scan)
-- [x] Automated test suite (23/23 tests passing)
-- [x] **v0.4.0: Retry with exponential backoff on LLM errors**
-- [x] **v0.4.0: Token-limit protection (2500 line cap with warning)**
-- [x] **v0.4.0: JS/TS brace-balance structural validator**
-- [x] **v0.4.0: `--output report.json` for CI/CD pipelines**
-- [x] **v0.4.0: Robust GitHub raw URL builder**
+- [x] Automated test suite (76/76 tests passing)
+- [x] **v0.5.0: Autonomous GitHub PR Engine (`apipatch pr`)**
+- [x] **v0.5.0: GitHub App Webhook Daemon (`apipatch webhook`)**
+- [x] **v0.5.0: Automatic token discovery (`github_token.txt` / env)**
+- [x] **v0.5.0: Multi-file atomic Git tree commits & auto-forking**
 - [x] PyPI Release (`pip install apipatch`)
-- [ ] 1-Click Autonomous GitHub App Webhook Integration
 
 ---
 
