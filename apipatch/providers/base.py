@@ -30,16 +30,15 @@ Audit scope — look for ALL of the following:
   • Lifecycle/hook renames (e.g. FastAPI on_event → lifespan, React componentDidMount → useEffect)
   • Any other breaking change in ANY library version migration
 
-Rules:
-  1. ONLY refactor genuine breaking changes and deprecated APIs in third-party libraries (or removed stdlib modules like cgi/distutils).
-  2. NEVER refactor standard library modules like posixpath, ntpath, os.path, urllib, or tempfile. (e.g., posixpath is intentionally required for cross-platform POSIX archive/docx/zip paths; DO NOT replace posixpath with pathlib).
-  3. NEVER perform cosmetic style changes (do NOT convert working posixpath to pathlib, do NOT rewrite string formatters).
-  4. Always produce a fully functional, modernized working implementation using the latest official SDK methods.
-  5. Preserve 100%% of the original business logic, variable names, function signatures, and string literals (e.g. `if "\\\\" in target:` must remain unchanged).
-  6. Preserve all imports that are still needed; update or add imports as required.
-  7. If NO breaking changes exist, return has_breaking_changes=false and refactored_code="".
-  8. Never truncate the refactored code — return the COMPLETE modernized file.
-  9. Respond ONLY with a valid JSON object matching the exact schema below.
+Rules (STRICT ZERO-TOLERANCE FOR HALLUCINATIONS & OVER-REFACTORING):
+  1. HIGH PRECISION & ZERO FALSE POSITIVES: If you are not 100%% certain that an API method or import has been officially deprecated or removed in a published library release, DO NOT TOUCH IT. Return has_breaking_changes=false and refactored_code="".
+  2. NEVER SWAP FRAMEWORKS: Never replace a project's native framework components with a competing framework (e.g. In Haystack, LlamaIndex, LiteLLM, or custom AI projects, NEVER replace their native generators/components with LangChain or other third-party libraries).
+  3. NEVER RENAME INTERNAL VARIABLES/CONSTANTS: Never modify internal property names, configuration keys, or constants (e.g. leave GROQ_BASE_URL, ollama_base_url, model identifiers, and config attributes exactly as written).
+  4. NO COSMETIC OR STYLE CHANGES: Do NOT reformat strings, do NOT adjust whitespace/docstrings, do NOT change `dict[...]` to `dict.get(...)`, and do NOT rewrite working file loaders (like toml.load).
+  5. NEVER REFACTOR STANDARD LIBRARY: posixpath, ntpath, os.path, urllib, sys, json, re, math, and tempfile are Python standard library modules. NEVER replace them with pathlib or third-party packages.
+  6. PRESERVE 100%% OF ORIGINAL BUSINESS LOGIC: Function signatures, class structures, variable names, and string literals must remain completely intact.
+  7. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
+  8. Respond ONLY with a valid JSON object matching the exact schema below.
      Do NOT include any preamble, explanation, markdown fences, or commentary.
 
 Response schema:

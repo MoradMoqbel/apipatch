@@ -238,6 +238,16 @@ class ApiPatchEngine:
 
             if llm_res.get("has_breaking_changes") and llm_res.get("refactored_code"):
                 refactored = llm_res["refactored_code"]
+
+                # Discard pure cosmetic / formatting changes that have zero AST difference
+                if ext in {".py", ".pyw"}:
+                    try:
+                        import ast
+                        if ast.dump(ast.parse(code)) == ast.dump(ast.parse(refactored)):
+                            return empty_result
+                    except Exception:
+                        pass
+
                 val = CodeValidator.validate(code, refactored, file_extension=ext)
 
                 if val.is_valid:
@@ -267,6 +277,14 @@ class ApiPatchEngine:
                         )
                         if healed_res.get("has_breaking_changes") and healed_res.get("refactored_code"):
                             healed_code = healed_res["refactored_code"]
+                            if ext in {".py", ".pyw"}:
+                                try:
+                                    import ast
+                                    if ast.dump(ast.parse(code)) == ast.dump(ast.parse(healed_code)):
+                                        return empty_result
+                                except Exception:
+                                    pass
+
                             val_healed = CodeValidator.validate(code, healed_code, file_extension=ext)
                             if val_healed.is_valid:
                                 safe_print(
