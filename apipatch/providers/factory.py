@@ -10,6 +10,25 @@ from apipatch.providers.anthropic_provider import AnthropicProvider
 from apipatch.providers.gemini_provider import GeminiProvider
 
 
+def _load_env_file():
+    """Lightweight .env loader without external dependencies."""
+    pkg_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    for env_path in [os.path.join(os.getcwd(), ".env"), os.path.join(pkg_dir, ".env")]:
+        if os.path.isfile(env_path):
+            try:
+                with open(env_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            k = k.strip()
+                            v = v.strip().strip('"').strip("'")
+                            if k and k not in os.environ:
+                                os.environ[k] = v
+            except Exception:
+                pass
+
+
 class ProviderFactory:
     @staticmethod
     def get_provider(
@@ -21,6 +40,8 @@ class ProviderFactory:
         Instantiates appropriate LLM provider.
         If provider_name is not specified, auto-discovers based on available API keys.
         """
+        _load_env_file()
+
         # Explicit provider selection
         if provider_name:
             provider_name = provider_name.lower().strip()

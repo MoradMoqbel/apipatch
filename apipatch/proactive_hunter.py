@@ -94,18 +94,84 @@ class GitHubPRHunter:
 
     # ── Discovery & Search ───────────────────────────────────────────────────
 
-    def search_deprecated_code(self, query: str, max_results: int = 5) -> List[Dict[str, Any]]:
-        """Searches GitHub Code API for legacy code patterns."""
+    def search_deprecated_code(
+        self,
+        query: str,
+        max_results: int = 5,
+        recent_days: Optional[int] = 30,
+        min_stars: int = 0
+    ) -> List[Dict[str, Any]]:
+        """
+        Searches GitHub Code API sorted by 'indexed' (newest first).
+        Optionally filters results to repositories updated within the last `recent_days` (default: 30)
+        and with at least `min_stars`.
+        """
         encoded_query = urllib.parse.quote(query)
-        endpoint = f"/search/code?q={encoded_query}&per_page={max_results}"
+        fetch_limit = min(50, max(max_results * 4, 20)) if recent_days is not None or min_stars > 0 else max_results
+        endpoint = f"/search/code?q={encoded_query}&sort=indexed&order=desc&per_page={fetch_limit}"
 
-        print(f"{Colors.OKCYAN}[*] Searching GitHub for: '{query}'...{Colors.ENDC}")
+        days_info = f" (Updated in last {recent_days} days)" if recent_days else ""
+        stars_info = f" [Min stars: {min_stars}]" if min_stars > 0 else ""
+        print(f"{Colors.OKCYAN}[*] Searching GitHub for: '{query}'{days_info}{stars_info}...{Colors.ENDC}")
         data = self._request(endpoint)
-        if data and isinstance(data, dict):
-            items = data.get("items", [])
-            print(f"{Colors.OKGREEN}[✓] Found {len(items)} matching candidate file(s) on GitHub!{Colors.ENDC}\n")
-            return items
-        return []
+        if not data or not isinstance(data, dict):
+            return []
+
+        raw_items = data.get("items", [])
+        if not raw_items:
+            print(f"{Colors.WARNING}[!] No search matches found on GitHub.{Colors.ENDC}")
+            return []
+
+        if recent_days is None and min_stars <= 0:
+            print(f"{Colors.OKGREEN}[✓] Found {len(raw_items[:max_results])} matching candidate file(s) on GitHub!{Colors.ENDC}\n")
+            return raw_items[:max_results]
+
+        # Filter strictly by recency and stars
+        import datetime
+        now = datetime.datetime.now(datetime.timezone.utc)
+        filtered_items = []
+        seen_repos = set()
+
+        for item in raw_items:
+            repo_name = item.get("repository", {}).get("full_name")
+            if not repo_name or repo_name in seen_repos:
+                continue
+
+            repo_info = self.client.get_repository(repo_name)
+            if not repo_info or not isinstance(repo_info, dict):
+                continue
+
+            if repo_info.get("archived", False):
+                continue
+
+            stars = repo_info.get("stargazers_count", 0)
+            if stars < min_stars:
+                continue
+
+            pushed_at_str = repo_info.get("pushed_at", "")
+            days_ago = None
+            if pushed_at_str:
+                try:
+                    pushed_dt = datetime.datetime.fromisoformat(pushed_at_str.replace("Z", "+00:00"))
+                    days_ago = (now - pushed_dt).days
+                except Exception:
+                    pass
+
+            if recent_days is not None:
+                if days_ago is None or days_ago > recent_days:
+                    continue
+
+            seen_repos.add(repo_name)
+            item["_stars"] = stars
+            item["_pushed_at"] = pushed_at_str[:10] if pushed_at_str else "Unknown"
+            item["_days_ago"] = days_ago if days_ago is not None else 0
+            filtered_items.append(item)
+
+            if len(filtered_items) >= max_results:
+                break
+
+        print(f"{Colors.OKGREEN}[✓] Found {len(filtered_items)} strictly recent & active candidate file(s) on GitHub!{Colors.ENDC}\n")
+        return filtered_items
 
     def fetch_raw_file_content(self, raw_url: str) -> Optional[str]:
         """Fetches raw code content from repository file URL."""
@@ -370,28 +436,43 @@ class GitHubPRHunter:
                 ])
             ][:max_files]
 
-            print(f"[*] Inspecting {len(candidate_files)} supported candidate code files...")
+            print(f"[*] Inspecting {len(candidate_files)} supported candidate code files in parallel...")
 
-            for path in candidate_files:
-                content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
-                if not content:
-                    continue
+            def _inspect_single_file(path: str):
+                try:
+                    content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
+                    if not content:
+                        return None
+                    if not should_audit_file(content, path):
+                        return None
+                    audit = self.engine.audit_code(path, content)
+                    if audit.get("has_breaking_changes") and audit.get("refactored_code"):
+                        diff = self.engine.generate_diff(content, audit["refactored_code"], path)
+                        return {
+                            "file": path,
+                            "refactored_code": audit["refactored_code"],
+                            "detected_issues": audit.get("detected_issues", []),
+                            "diff": diff
+                        }
+                except Exception:
+                    pass
+                return None
 
-                if not should_audit_file(path, content):
-                    continue
-
-                audit = self.engine.audit_code(path, content)
-                if audit.get("has_breaking_changes") and audit.get("refactored_code"):
-                    print(f"  {Colors.WARNING}⚡ Breaking changes detected in {path}{Colors.ENDC}")
-                    diff = self.engine.generate_diff(content, audit["refactored_code"], path)
-                    self.engine.print_diff(diff)
-                    audit_results.append({
-                        "file": path,
-                        "refactored_code": audit["refactored_code"],
-                        "detected_issues": audit.get("detected_issues", []),
-                        "diff": diff
-                    })
-                    files_to_commit[path] = audit["refactored_code"]
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+            with ThreadPoolExecutor(max_workers=min(3, len(candidate_files) or 1)) as executor:
+                futures = {executor.submit(_inspect_single_file, path): path for path in candidate_files}
+                for fut in as_completed(futures):
+                    res = fut.result()
+                    if res:
+                        print(f"  {Colors.WARNING}⚡ Breaking changes detected in {res['file']}{Colors.ENDC}", flush=True)
+                        self.engine.print_diff(res["diff"])
+                        audit_results.append({
+                            "file": res["file"],
+                            "refactored_code": res["refactored_code"],
+                            "detected_issues": res["detected_issues"],
+                            "diff": res["diff"]
+                        })
+                        files_to_commit[res["file"]] = res["refactored_code"]
 
         if not audit_results:
             print(f"\n{Colors.OKGREEN}[✓] No deprecated or breaking API calls detected. Codebase is modern and clean!{Colors.ENDC}\n")
@@ -551,28 +632,28 @@ class GitHubPRHunter:
         self,
         query: str = "openai.ChatCompletion.create language:python",
         max_results: int = 3,
+        recent_days: Optional[int] = 30,
+        min_stars: int = 0,
         submit: bool = False,
         fork: bool = True
     ):
         """Runs the discovery and generates PR preview packages or submits live PRs."""
         print(f"{Colors.HEADER}{Colors.BOLD}=== ApiPatch: Proactive Open-Source PR Hunter ==={Colors.ENDC}\n")
-        results = self.search_deprecated_code(query, max_results=max_results)
+        results = self.search_deprecated_code(
+            query=query,
+            max_results=max_results,
+            recent_days=recent_days,
+            min_stars=min_stars
+        )
 
         if not results:
-            print(f"{Colors.OKCYAN}[*] Simulating live candidate repository audit...{Colors.ENDC}")
-            sample_code = """import openai
-
-def get_answer(question):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": question}]
-    )
-    return response['choices'][0]['message']['content']
-"""
-            audit = self.engine.audit_code("services/llm.py", sample_code)
-            pr_data = self.generate_pr_payload("sample/repo", "services/llm.py", {"issues": audit["detected_issues"]})
-            print(f"\n{Colors.HEADER}PR Title:{Colors.ENDC} {pr_data['title']}")
-            print(f"{Colors.HEADER}PR Body:{Colors.ENDC}\n{pr_data['body']}")
+            print(f"{Colors.WARNING}[!] No candidate repositories matched your strict filters.{Colors.ENDC}")
+            print(f"💡 Tips to find matching repositories:")
+            print(f"  • Try lowering `--min-stars` (e.g., `--min-stars 10` or `--min-stars 20`)")
+            print(f"  • Try expanding `--days` (e.g., `--days 90` or `--days 180`)")
+            print(f"  • Try other breaking library changes like Pydantic, LangChain, or Stripe:\n")
+            print(f"    apipatch hunt \"from pydantic import validator language:python\" --days 60")
+            print(f"    apipatch hunt \"from langchain.chains import LLMChain language:python\" --days 90\n")
             return
 
         for item in results:
@@ -580,7 +661,11 @@ def get_answer(question):
             file_name = item.get("path", "")
             raw_url = _build_raw_url(item)
 
-            print(f"\n🎯 Target: {Colors.BOLD}{repo_name}{Colors.ENDC} -> {Colors.OKCYAN}{file_name}{Colors.ENDC}")
+            meta_str = ""
+            if "_stars" in item and "_days_ago" in item:
+                meta_str = f" (⭐ {item['_stars']} | 🕒 {item['_days_ago']}d ago / {item['_pushed_at']})"
+
+            print(f"\n🎯 Target: {Colors.BOLD}{repo_name}{Colors.ENDC}{meta_str} -> {Colors.OKCYAN}{file_name}{Colors.ENDC}")
             raw_code = self.fetch_raw_file_content(raw_url)
             if raw_code:
                 audit = self.engine.audit_code(file_name, raw_code)
@@ -598,3 +683,92 @@ def get_answer(question):
                             audit_result={"issues": audit["detected_issues"]},
                             fork=fork
                         )
+
+    def search_recent_repositories(
+        self,
+        topic_or_query: str = "topic:ai language:python",
+        days: int = 30,
+        min_stars: int = 10,
+        max_stars: Optional[int] = 500,
+        max_repos: int = 5
+    ) -> List[Dict[str, Any]]:
+        """
+        Finds strictly recent, active, non-fork, non-archived repositories
+        pushed within the last `days` days.
+        """
+        import datetime
+        cutoff_date = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=days)).strftime("%Y-%m-%d")
+
+        qualifiers = [
+            topic_or_query,
+            f"pushed:>{cutoff_date}",
+            f"stars:{min_stars}..{max_stars}" if max_stars else f"stars:>={min_stars}",
+            "fork:false",
+            "archived:false"
+        ]
+        full_query = " ".join(qualifiers)
+        encoded = urllib.parse.quote(full_query)
+        fetch_limit = min(30, max_repos * 3)
+        endpoint = f"/search/repositories?q={encoded}&sort=updated&order=desc&per_page={fetch_limit}"
+
+        print(f"{Colors.OKCYAN}[*] Discovering active repositories ({days}d recency, {min_stars}+ stars): '{topic_or_query}'...{Colors.ENDC}", flush=True)
+        data = self._request(endpoint)
+        if not data or not isinstance(data, dict):
+            return []
+
+        raw_items = data.get("items", [])
+        filtered = []
+        for item in raw_items:
+            name = item.get("name", "").lower()
+            desc = (item.get("description") or "").lower()
+            # Exclude documentation, awesome-lists, markdown collections
+            if any(term in name for term in ["docs", "documentation", "awesome-", "cheat-sheet", "tutorial"]):
+                continue
+            if any(term in desc for term in ["curated list", "collection of", "documentation for"]):
+                continue
+            filtered.append(item)
+            if len(filtered) >= max_repos:
+                break
+
+        return filtered
+
+    def discover_and_audit(
+        self,
+        query: str = "topic:ai language:python",
+        days: int = 30,
+        min_stars: int = 10,
+        max_repos: int = 3,
+        dry_run: bool = True
+    ):
+        """
+        Discovers trending fresh repositories and audits their files for breaking changes.
+        """
+        print(f"\n{Colors.HEADER}{Colors.BOLD}=== ApiPatch: Smart Repository Discovery Engine ==={Colors.ENDC}\n")
+        repos = self.search_recent_repositories(
+            topic_or_query=query,
+            days=days,
+            min_stars=min_stars,
+            max_repos=max_repos
+        )
+
+        if not repos:
+            print(f"{Colors.WARNING}[!] No active repositories matched the query. Try adjusting query or stars.{Colors.ENDC}")
+            return
+
+        print(f"{Colors.OKGREEN}[✓] Discovered {len(repos)} fresh, active candidate repositories!{Colors.ENDC}\n")
+
+        for repo in repos:
+            full_name = repo["full_name"]
+            stars = repo.get("stargazers_count", 0)
+            pushed_at = repo.get("pushed_at", "")[:10]
+            desc = (repo.get("description") or "No description")[:70]
+
+            print(f"\n📁 {Colors.BOLD}{Colors.HEADER}[ {full_name} ]{Colors.ENDC} (⭐ {stars} stars | 🕒 Updated: {pushed_at})")
+            print(f"   Description: {desc}")
+
+            self.audit_and_pr_repository(
+                repo_name=full_name,
+                dry_run=dry_run,
+                submit=not dry_run,
+                max_files=10
+            )

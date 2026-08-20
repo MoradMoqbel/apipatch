@@ -19,10 +19,10 @@ class GeminiProvider(BaseProvider):
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         super().__init__(
             api_key=api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"),
-            model=model or "gemini-2.5-flash"
+            model=model or "gemini-2.5-flash-lite"
         )
-        # Alternate fallback models if primary hits quota or is unavailable
-        self.fallback_models = ["gemini-3.6-flash", "gemini-1.5-flash"]
+        # Alternate fallback models: strictly 2.5-flash-lite and 2.5-flash
+        self.fallback_models = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-flash-latest"]
 
     def _call_model(self, model_name: str, prompt: str) -> Optional[str]:
         clean_model = model_name[7:] if model_name.startswith("models/") else model_name
@@ -43,7 +43,7 @@ class GeminiProvider(BaseProvider):
             headers={"Content-Type": "application/json"},
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=180) as response:
+        with urllib.request.urlopen(req, timeout=30) as response:
             data = json.loads(response.read().decode("utf-8"))
             candidates = data.get("candidates", [])
             if candidates:
@@ -65,7 +65,8 @@ class GeminiProvider(BaseProvider):
             except urllib.error.HTTPError as e:
                 err_body = e.read().decode("utf-8", errors="ignore")
                 last_err = f"HTTP {e.code}: {err_body}"
-                if e.code == 429:
+                if e.code in {429, 503, 500, 404, 502, 504}:
+                    time.sleep(2.0)
                     continue
                 raise ValueError(f"Gemini API HTTP {e.code}: {err_body}")
 
@@ -73,8 +74,8 @@ class GeminiProvider(BaseProvider):
                 last_err = str(e)
                 continue
 
-        if last_err and "429" in str(last_err):
-            raise ValueError("All Gemini free-tier models currently rate-limited. Please retry shortly.")
+        if last_err and any(code in str(last_err) for code in ("429", "503")):
+            raise ValueError(f"Gemini models temporarily busy or rate-limited: {last_err}")
 
         return {"has_breaking_changes": False, "detected_issues": [], "refactored_code": ""}
 

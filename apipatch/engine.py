@@ -16,8 +16,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, Any, List, Optional, Set
 from apipatch.validator import CodeValidator, ValidationResult
 from apipatch.providers.factory import ProviderFactory
-from apipatch.auto_detector import AutoDeprecationDetector, should_audit_file, build_project_context
 from apipatch.test_runner import SandboxTestRunner
+from apipatch.auto_detector import (
+    AutoDeprecationDetector,
+    should_audit_file,
+    build_project_context,
+    extract_imports_from_js_code
+)
 
 # Maximum lines to send to LLM in a single request (prevents token-limit failures)
 _MAX_CODE_LINES = 2500
@@ -204,9 +209,15 @@ class ApiPatchEngine:
         try:
             # Extract file-specific imports
             if ext in {".py", ".pyw"}:
-                file_imports = self.detector.extract_imports_from_file(file_path)
+                if os.path.isfile(file_path):
+                    file_imports = self.detector.extract_imports_from_file(file_path)
+                else:
+                    file_imports = self.detector.extract_imports_from_code(code)
             elif ext in {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}:
-                file_imports = self.detector.extract_imports_from_js_file(file_path)
+                if os.path.isfile(file_path):
+                    file_imports = self.detector.extract_imports_from_js_file(file_path)
+                else:
+                    file_imports = extract_imports_from_js_code(code)
             else:
                 file_imports = set()
 
@@ -215,7 +226,12 @@ class ApiPatchEngine:
             elif detected_libraries:
                 libs = detected_libraries
             else:
-                return empty_result
+                # Check if any known SDK keywords exist in code
+                found_kw = [kw for kw in ["openai", "pydantic", "langchain", "stripe", "anthropic", "fastapi"] if kw in code.lower()]
+                if found_kw:
+                    libs = found_kw
+                else:
+                    return empty_result
 
             # Primary LLM Audit
             llm_res = self._call_with_retry(file_name, code, libs, project_context=project_context)

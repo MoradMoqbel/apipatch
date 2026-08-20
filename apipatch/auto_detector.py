@@ -348,39 +348,47 @@ class AutoDeprecationDetector:
 
     # ─── Python Import Extraction ─────────────────────────────────────────────
 
+    def extract_imports_from_code(self, content: str) -> Set[str]:
+        """
+        Extracts all third-party imported module names directly from a Python source code string.
+        Uses Python AST with automatic regex fallback.
+        """
+        imports: Set[str] = set()
+        if not content:
+            return imports
+        try:
+            tree = ast.parse(content.lstrip('\ufeff'))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        top_pkg = alias.name.split('.')[0]
+                        if top_pkg not in STANDARD_LIB_MODULES:
+                            imports.add(top_pkg)
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        top_pkg = node.module.split('.')[0]
+                        if top_pkg not in STANDARD_LIB_MODULES:
+                            imports.add(top_pkg)
+        except Exception:
+            for match in re.finditer(r'(?:^|\n)\s*(?:from|import)\s+([a-zA-Z0-9_]+)', content):
+                pkg = match.group(1).split('.')[0]
+                if pkg and pkg not in STANDARD_LIB_MODULES:
+                    imports.add(pkg)
+        return imports
+
     def extract_imports_from_file(self, file_path: str) -> Set[str]:
         """
         Extracts all third-party imported module names from a .py or .pyw source file.
         Uses Python AST with automatic regex fallback for syntax/encoding edge cases.
         """
-        imports: Set[str] = set()
         if not file_path.endswith((".py", ".pyw")):
-            return imports
+            return set()
         try:
             with open(file_path, "r", encoding="utf-8-sig", errors="ignore") as f:
-                content = f.read().lstrip('\ufeff')
-            try:
-                tree = ast.parse(content)
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.Import):
-                        for alias in node.names:
-                            top_pkg = alias.name.split('.')[0]
-                            if top_pkg not in STANDARD_LIB_MODULES:
-                                imports.add(top_pkg)
-                    elif isinstance(node, ast.ImportFrom):
-                        if node.module:
-                            top_pkg = node.module.split('.')[0]
-                            if top_pkg not in STANDARD_LIB_MODULES:
-                                imports.add(top_pkg)
-            except Exception:
-                # Regex fallback if AST parsing fails
-                for match in re.finditer(r'(?:^|\n)\s*(?:from|import)\s+([a-zA-Z0-9_]+)', content):
-                    pkg = match.group(1).split('.')[0]
-                    if pkg and pkg not in STANDARD_LIB_MODULES:
-                        imports.add(pkg)
+                content = f.read()
+            return self.extract_imports_from_code(content)
         except Exception:
-            pass
-        return imports
+            return set()
 
     # ─── JS/TS Import Extraction ──────────────────────────────────────────────
 

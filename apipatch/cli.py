@@ -85,13 +85,29 @@ def main():
     # Command: hunt
     hunt_parser = subparsers.add_parser("hunt", help="Proactively search GitHub for deprecated code and submit PRs")
     hunt_parser.add_argument("query", nargs="?", default="openai.ChatCompletion.create language:python", help="GitHub Code Search query")
-    hunt_parser.add_argument("--max", type=int, default=3, help="Max candidate repositories to inspect")
+    hunt_parser.add_argument("--max", type=int, default=3, help="Max candidate repositories to inspect (default: 3)")
+    hunt_parser.add_argument("--days", type=int, default=30, help="Only include repositories updated in the last N days (default: 30)")
+    hunt_parser.add_argument("--all-time", dest="days", action="store_const", const=None, help="Disable recency filter and search all-time repositories")
+    hunt_parser.add_argument("--min-stars", type=int, default=0, help="Minimum stars filter for candidate repositories (default: 0)")
     hunt_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered if omitted)")
     hunt_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
     hunt_parser.add_argument("--api-key", help="API key for chosen provider")
     hunt_parser.add_argument("--model", help="Specific model name")
     hunt_parser.add_argument("--submit", "--open-pr", dest="submit", action="store_true", help="Automatically submit live Pull Request to GitHub")
     hunt_parser.add_argument("--no-fork", dest="fork", action="store_false", default=True, help="Submit directly without forking (if repository write access is available)")
+
+    # Command: discover (Smart Active Repository Discovery Engine)
+    discover_parser = subparsers.add_parser("discover", help="Discover trending, active GitHub repositories and audit them for breaking changes")
+    discover_parser.add_argument("query", nargs="?", default="topic:ai language:python", help="GitHub search topic or query (default: 'topic:ai language:python')")
+    discover_parser.add_argument("--days", type=int, default=30, help="Max days since last update (default: 30)")
+    discover_parser.add_argument("--min-stars", type=int, default=10, help="Minimum star count (default: 10)")
+    discover_parser.add_argument("--max-repos", type=int, default=3, help="Max repositories to audit (default: 3)")
+    discover_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered if omitted)")
+    discover_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini"], help="AI provider for dynamic reasoning")
+    discover_parser.add_argument("--api-key", help="API key for chosen provider")
+    discover_parser.add_argument("--model", help="Specific model name")
+    discover_parser.add_argument("--submit", "--open-pr", dest="submit", action="store_true", help="Submit live Pull Requests directly")
+    discover_parser.add_argument("--dry-run", dest="dry_run", action="store_true", default=True, help="Preview PRs without opening (default: True)")
 
     args = parser.parse_args()
 
@@ -190,8 +206,27 @@ def main():
         hunter.hunt_and_preview(
             query=args.query,
             max_results=args.max,
+            recent_days=args.days,
+            min_stars=getattr(args, "min_stars", 0),
             submit=getattr(args, "submit", False),
             fork=getattr(args, "fork", True)
+        )
+
+    elif args.command == "discover":
+        engine = ApiPatchEngine(
+            provider_name=args.provider,
+            api_key=args.api_key,
+            model=args.model,
+            create_backup=False
+        )
+        hunter = GitHubPRHunter(github_token=args.token, engine=engine)
+        dry_run = not getattr(args, "submit", False)
+        hunter.discover_and_audit(
+            query=args.query,
+            days=args.days,
+            min_stars=args.min_stars,
+            max_repos=args.max_repos,
+            dry_run=dry_run
         )
 
 
