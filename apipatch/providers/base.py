@@ -31,12 +31,15 @@ Audit scope — look for ALL of the following:
   • Any other breaking change in ANY library version migration
 
 Rules:
-  1. Always produce a fully functional, modernized working implementation using the latest official SDK methods (e.g. google.genai Client for Gemini, langchain_openai for LangChain, OpenAI() client). Avoid placeholder exceptions like NotImplementedError when an official migration target exists.
-  2. Preserve 100%% of the original business logic, variable names, and function signatures.
-  3. Preserve all imports that are still needed; update or add imports as required.
-  4. If NO breaking changes exist, return has_breaking_changes=false and refactored_code="".
-  5. Never truncate the refactored code — return the COMPLETE modernized file.
-  6. Respond ONLY with a valid JSON object matching the exact schema below.
+  1. ONLY refactor genuine breaking changes and deprecated APIs in third-party libraries (or removed stdlib modules like cgi/distutils).
+  2. NEVER refactor standard library modules like posixpath, ntpath, os.path, urllib, or tempfile. (e.g., posixpath is intentionally required for cross-platform POSIX archive/docx/zip paths; DO NOT replace posixpath with pathlib).
+  3. NEVER perform cosmetic style changes (do NOT convert working posixpath to pathlib, do NOT rewrite string formatters).
+  4. Always produce a fully functional, modernized working implementation using the latest official SDK methods.
+  5. Preserve 100%% of the original business logic, variable names, function signatures, and string literals (e.g. `if "\\\\" in target:` must remain unchanged).
+  6. Preserve all imports that are still needed; update or add imports as required.
+  7. If NO breaking changes exist, return has_breaking_changes=false and refactored_code="".
+  8. Never truncate the refactored code — return the COMPLETE modernized file.
+  9. Respond ONLY with a valid JSON object matching the exact schema below.
      Do NOT include any preamble, explanation, markdown fences, or commentary.
 
 Response schema:
