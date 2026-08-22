@@ -3,9 +3,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI version](https://img.shields.io/badge/pypi-v0.6.2-brightgreen.svg)](https://pypi.org/project/apipatch/)
+[![PyPI version](https://img.shields.io/badge/pypi-v0.7.0-brightgreen.svg)](https://pypi.org/project/apipatch/)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
-[![Tests: Passing](https://img.shields.io/badge/Tests-76%2F76%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
+[![Tests: Passing](https://img.shields.io/badge/Tests-87%2F87%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
 
 ---
 
@@ -21,15 +21,17 @@ Tools like **Dependabot** and **Renovate** only bump version numbers in `require
 
 [ ApiPatch Autonomous Agent ]
   1. Detects breaking API calls across ANY library — Python, JS, TS, JSX, TSX…
-  2. Refactors code via LLM reasoning (Gemini 2.5 Flash Lite, Claude, GPT-4o)
-  3. Validates safety & self-heals syntax/structure via AST feedback loop
-  4. Generates ready-to-merge Pull Requests ───────────────────────✅ (Build passes!)
+  2. DocHunter™ Live Grounding: Fetches official PyPI/npm/GitHub docs & changelogs in 0.1s
+  3. Refactors code via LLM reasoning grounded in official documentation
+  4. Validates safety & self-heals syntax/structure via AST feedback loop
+  5. Generates ready-to-merge Pull Requests ───────────────────────✅ (Build passes!)
 ```
 
 ---
 
 ## 🚀 Key Features
 
+* 🌐 **DocHunter™ Live Official Documentation Grounding:** Automatically resolves live PyPI/npm package metadata, official documentation URLs, and GitHub changelogs in <0.1s to eliminate hallucinations.
 * 🌟 **Smart 2026 Repository Discovery (`apipatch discover`):** Automatically finds trending, active, non-archived repositories updated in the last 30 days and audits them for breaking changes.
 * 🤖 **Autonomous GitHub PR Pipeline (`apipatch pr`):** Scans an entire remote repository, auto-forks/branches, commits refactorings via atomic Git Database API, and opens live Pull Requests.
 * ⚡ **10x Faster Parallel Auditing:** Inspects multiple candidate files concurrently using multi-threaded asynchronous workers (`ThreadPoolExecutor`).

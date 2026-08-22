@@ -129,19 +129,23 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
 }
 
 
+from apipatch.doc_hunter import DocHunter
+
+
 def get_relevant_knowledge(
     detected_libraries: Optional[List[str]] = None,
     file_content: Optional[str] = None
 ) -> str:
     """
-    Extracts authoritative, focused migration instructions for the libraries
-    actively detected in the target file or project.
+    Extracts authoritative, focused migration instructions and live package documentation
+    for the libraries actively detected in the target file or project.
     """
     selected_guidance: List[str] = []
     matched_keys: Set[str] = set()
 
     # Collect search tokens
     tokens: Set[str] = set()
+    raw_libs: List[str] = list(detected_libraries or [])
     if detected_libraries:
         for lib in detected_libraries:
             tokens.add(lib.lower().strip())
@@ -162,7 +166,17 @@ def get_relevant_knowledge(
                 matched_keys.add(key)
                 selected_guidance.append(entry["guidance"])
 
-    if not selected_guidance:
-        return ""
+    knowledge_text = ""
+    if selected_guidance:
+        knowledge_text = "### 📚 Authoritative Modern SDK Migration Rules:\n" + "\n".join(selected_guidance)
 
-    return "### 📚 Authoritative Modern SDK Migration Rules:\n" + "\n".join(selected_guidance)
+    # Append live package grounding from DocHunter
+    if raw_libs:
+        live_grounding = DocHunter.build_grounded_context(raw_libs)
+        if live_grounding:
+            if knowledge_text:
+                knowledge_text += "\n\n" + live_grounding
+            else:
+                knowledge_text = live_grounding
+
+    return knowledge_text

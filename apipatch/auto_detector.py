@@ -66,6 +66,25 @@ def _strip_js_comments(code: str) -> str:
     return re.sub(pattern, replacer, code)
 
 
+def extract_imports_from_code(content: str) -> Set[str]:
+    """
+    Extracts top-level module/package names from Python code string.
+    """
+    imports: Set[str] = set()
+    try:
+        tree = ast.parse(content)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    imports.add(alias.name.split('.')[0])
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    imports.add(node.module.split('.')[0])
+    except Exception:
+        pass
+    return imports
+
+
 def extract_imports_from_js_code(content: str) -> Set[str]:
     """
     Extracts third-party package names from JS/TS code string.
@@ -126,7 +145,17 @@ def should_audit_file(
     if not file_content or not file_content.strip():
         return False
 
+    ext = os.path.splitext(file_path)[1].lower()
+
     if not detected_libraries:
+        # Autonomous in-memory check: if file only imports standard library, skip LLM!
+        if ext in {".py", ".pyw"}:
+            file_imports = extract_imports_from_code(file_content)
+            third_party = file_imports - STANDARD_LIB_MODULES
+            return bool(third_party)
+        elif ext in {".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}:
+            js_imports = extract_imports_from_js_code(file_content)
+            return bool(js_imports)
         return True
 
     normalized_libs = set()
@@ -139,8 +168,6 @@ def should_audit_file(
             if lib_clean.startswith('@') and '/' in lib_clean:
                 scoped_name = lib_clean.split('/')[1]
                 normalized_libs.add(scoped_name)
-
-    ext = os.path.splitext(file_path)[1].lower()
 
     # 1. Python AST check
     if ext in {".py", ".pyw"}:

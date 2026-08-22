@@ -8,6 +8,7 @@ from apipatch.providers.base import BaseProvider
 from apipatch.providers.openai_provider import OpenAIProvider
 from apipatch.providers.anthropic_provider import AnthropicProvider
 from apipatch.providers.gemini_provider import GeminiProvider
+from apipatch.providers.bedrock_provider import BedrockProvider
 
 
 def _load_env_file():
@@ -27,6 +28,16 @@ def _load_env_file():
                                 os.environ[k] = v
             except Exception:
                 pass
+
+    # Normalize common AWS and Gemini variable aliases
+    if "gemini_api_key" in os.environ and "GEMINI_API_KEY" not in os.environ:
+        os.environ["GEMINI_API_KEY"] = os.environ["gemini_api_key"]
+    if "aws_access_key" in os.environ and "AWS_ACCESS_KEY_ID" not in os.environ:
+        os.environ["AWS_ACCESS_KEY_ID"] = os.environ["aws_access_key"]
+    if "aws_secret_client" in os.environ and "AWS_SECRET_ACCESS_KEY" not in os.environ:
+        os.environ["AWS_SECRET_ACCESS_KEY"] = os.environ["aws_secret_client"]
+    if "aws_region" in os.environ and "AWS_REGION" not in os.environ:
+        os.environ["AWS_REGION"] = os.environ["aws_region"]
 
 
 class ProviderFactory:
@@ -51,11 +62,15 @@ class ProviderFactory:
                 return AnthropicProvider(api_key=api_key, model=model)
             elif provider_name in {"gemini", "google"}:
                 return GeminiProvider(api_key=api_key, model=model)
+            elif provider_name in {"bedrock", "aws", "aws_bedrock"}:
+                return BedrockProvider(api_key=api_key, model=model)
             else:
-                raise ValueError(f"Unknown provider '{provider_name}'. Supported: openai, anthropic, gemini")
+                raise ValueError(f"Unknown provider '{provider_name}'. Supported: openai, anthropic, gemini, bedrock")
 
         # Auto-discovery by environment variables or passed API key
         if api_key:
+            if ":" in api_key:
+                return BedrockProvider(api_key=api_key, model=model)
             return OpenAIProvider(api_key=api_key, model=model)
 
         if os.getenv("OPENAI_API_KEY"):
@@ -64,5 +79,17 @@ class ProviderFactory:
             return AnthropicProvider(model=model)
         elif os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"):
             return GeminiProvider(model=model)
+        elif (
+            os.getenv("AWS_ACCESS_KEY_ID")
+            or os.getenv("AWS_ACCESS_KEY")
+            or os.getenv("aws_access_key")
+        ) and (
+            os.getenv("AWS_SECRET_ACCESS_KEY")
+            or os.getenv("AWS_SECRET_KEY")
+            or os.getenv("AWS_SECRET_CLIENT")
+            or os.getenv("aws_secret_client")
+        ):
+            return BedrockProvider(model=model)
 
         return None
+
