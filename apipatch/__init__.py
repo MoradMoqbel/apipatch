@@ -4,7 +4,7 @@ Detects and fixes deprecated third-party API calls in Python, JavaScript, TypeSc
 JSX, TSX, and any other language — powered by LLM reasoning.
 """
 
-__version__ = "0.7.3"
+__version__ = "0.7.4"
 __author__ = "Morad Moqbel"
 __license__ = "MIT"
 

@@ -86,11 +86,35 @@ class CodeValidator:
             pass
         return functions, classes
 
+    FRAMEWORK_RUNNER_SYMBOLS = {
+        "InMemoryRunner", "AgentRunner", "StateGraph", "Crew", "AgentExecutor",
+        "Workflow", "Flow", "Pipeline", "Swarm", "Orchestrator"
+    }
+
+    @staticmethod
+    def extract_imported_symbols(code: str) -> Set[str]:
+        """Extracts all imported module and symbol names from Python code."""
+        symbols = set()
+        try:
+            tree = ast.parse(code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        symbols.add(alias.name)
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        symbols.add(node.module)
+                    for alias in node.names:
+                        symbols.add(alias.name)
+        except Exception:
+            pass
+        return symbols
+
     @staticmethod
     def validate_business_logic_preservation(original_code: str, refactored_code: str) -> ValidationResult:
         """
-        Ensures that top-level classes and functions defined in original code
-        are preserved in the refactored code.
+        Ensures that top-level classes, functions, and framework runner components
+        defined in original code are preserved in the refactored code.
         """
         orig_funcs, orig_classes = CodeValidator.extract_python_symbols(original_code)
         new_funcs, new_classes = CodeValidator.extract_python_symbols(refactored_code)
@@ -108,6 +132,17 @@ class CodeValidator:
             return ValidationResult(
                 is_valid=False,
                 error_message=f"Refactored code dropped required class(es): {', '.join(sorted(missing_classes))}"
+            )
+
+        # Framework runner and agent preservation check
+        orig_imports = CodeValidator.extract_imported_symbols(original_code)
+        new_imports = CodeValidator.extract_imported_symbols(refactored_code)
+        
+        dropped_runners = (orig_imports & CodeValidator.FRAMEWORK_RUNNER_SYMBOLS) - new_imports
+        if dropped_runners:
+            return ValidationResult(
+                is_valid=False,
+                error_message=f"Refactored code dropped native agent framework runner(s): {', '.join(sorted(dropped_runners))}. Preserve the original runner architecture."
             )
 
         return ValidationResult(is_valid=True)

@@ -56,6 +56,32 @@ def different_func():
         self.assertFalse(res_bad.is_valid)
         self.assertIn("calculate_tax", res_bad.error_message)
 
+    def test_framework_runner_preservation(self):
+        orig = """
+from google.adk.runners import InMemoryRunner
+
+class Orchestrator:
+    def __init__(self, agent):
+        self.runner = InMemoryRunner(agent=agent)
+"""
+        # Refactored code that dropped InMemoryRunner
+        refactored_bad = """
+import google.generative_ai as genai
+
+class Orchestrator:
+    def __init__(self, agent):
+        self.model = genai.GenerativeModel("gemini")
+"""
+        res = CodeValidator.validate_business_logic_preservation(orig, refactored_bad)
+        self.assertFalse(res.is_valid)
+        self.assertIn("InMemoryRunner", res.error_message)
+
+    def test_hallucinated_import_detection(self):
+        bad_code = "from python_dotenv import load_dotenv\nload_dotenv()"
+        res = CodeValidator.validate_python_syntax(bad_code)
+        self.assertFalse(res.is_valid)
+        self.assertIn("python_dotenv", res.error_message)
+
     def test_generic_integrity(self):
         orig_js = "function add(a, b) { return a + b; }"
         good_js = "function add(a, b) { return Number(a) + Number(b); }"

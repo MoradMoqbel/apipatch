@@ -27,8 +27,8 @@ class DocHunter:
     @classmethod
     def fetch_pypi_metadata(cls, pkg_name: str, timeout: float = 3.0) -> Optional[Dict[str, Any]]:
         """
-        Fetches official package metadata from the official PyPI JSON API.
-        Returns package summary, latest version, documentation URL, and repo links.
+        Fetches official package metadata from the official PyPI JSON API
+        using smart hierarchical resolution (raw, hyphenated, dot-split).
         """
         clean_name = pkg_name.strip().lower()
         if not clean_name:
@@ -39,54 +39,63 @@ class DocHunter:
         if cache_key in _PACKAGE_METADATA_CACHE:
             return _PACKAGE_METADATA_CACHE[cache_key]
 
-        url = f"https://pypi.org/pypi/{clean_name}/json"
-        req = urllib.request.Request(
-            url,
-            headers={"User-Agent": "ApiPatch-DocHunter/1.0 (https://github.com/MoradMoqbel/apipatch)"}
-        )
+        # Generate candidates: [clean_name, hyphenated, underscore, dot-prefixes]
+        candidates = [clean_name, clean_name.replace(".", "-"), clean_name.replace("_", "-")]
+        if "." in clean_name:
+            parts = clean_name.split(".")
+            if len(parts) >= 2:
+                candidates.append(f"{parts[0]}-{parts[1]}")
+            candidates.append(parts[0])
 
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as response:
-                data = json.loads(response.read().decode("utf-8"))
-                info = data.get("info", {})
-                
-                project_urls = info.get("project_urls") or {}
-                doc_url = (
-                    project_urls.get("Documentation")
-                    or project_urls.get("Docs")
-                    or project_urls.get("Changelog")
-                    or info.get("home_page")
-                    or ""
-                )
-                repo_url = (
-                    project_urls.get("Source")
-                    or project_urls.get("Repository")
-                    or project_urls.get("GitHub")
-                    or info.get("home_page")
-                    or ""
-                )
-                changelog_url = project_urls.get("Changelog") or project_urls.get("Changes") or ""
+        seen = set()
+        for cand in candidates:
+            if cand in seen:
+                continue
+            seen.add(cand)
 
-                result = {
-                    "name": info.get("name", clean_name),
-                    "version": info.get("version", "unknown"),
-                    "summary": info.get("summary", ""),
-                    "documentation_url": doc_url,
-                    "repository_url": repo_url,
-                    "changelog_url": changelog_url,
-                    "is_active": True,
-                }
-                _PACKAGE_METADATA_CACHE[cache_key] = result
-                return result
+            url = f"https://pypi.org/pypi/{cand}/json"
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "ApiPatch-DocHunter/1.0 (https://github.com/MoradMoqbel/apipatch)"}
+            )
 
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                # Not found on PyPI
-                _PACKAGE_METADATA_CACHE[cache_key] = {}
-                return None
-        except Exception:
-            pass
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as response:
+                    data = json.loads(response.read().decode("utf-8"))
+                    info = data.get("info", {})
+                    
+                    project_urls = info.get("project_urls") or {}
+                    doc_url = (
+                        project_urls.get("Documentation")
+                        or project_urls.get("Docs")
+                        or project_urls.get("Changelog")
+                        or info.get("home_page")
+                        or ""
+                    )
+                    repo_url = (
+                        project_urls.get("Source")
+                        or project_urls.get("Repository")
+                        or project_urls.get("GitHub")
+                        or info.get("home_page")
+                        or ""
+                    )
+                    changelog_url = project_urls.get("Changelog") or project_urls.get("Changes") or ""
 
+                    result = {
+                        "name": info.get("name", cand),
+                        "version": info.get("version", "unknown"),
+                        "summary": info.get("summary", ""),
+                        "documentation_url": doc_url,
+                        "repository_url": repo_url,
+                        "changelog_url": changelog_url,
+                        "is_active": True,
+                    }
+                    _PACKAGE_METADATA_CACHE[cache_key] = result
+                    return result
+            except Exception:
+                continue
+
+        _PACKAGE_METADATA_CACHE[cache_key] = {}
         return None
 
     @classmethod
