@@ -60,16 +60,38 @@ class Colors:
 _PRINT_LOCK = threading.Lock()
 
 
-def safe_print(text: str):
-    """Safely prints to stdout with thread synchronization."""
-    with _PRINT_LOCK:
+def is_meaningful_code_change(original_code: str, refactored_code: str, ext: str) -> bool:
+    """
+    Determines if the refactoring contains a genuine semantic/structural code change
+    rather than cosmetic formatting, blank line insertions, or docstring/string spacing tweaks.
+    """
+    if not refactored_code or original_code.strip() == refactored_code.strip():
+        return False
+
+    if ext in {".py", ".pyw"}:
         try:
-            print(text)
-        except UnicodeEncodeError:
-            try:
-                print(text.encode("ascii", errors="replace").decode("ascii"))
-            except Exception:
-                pass
+            import ast
+            tree_orig = ast.parse(original_code)
+            tree_ref = ast.parse(refactored_code)
+
+            # 1. Exact AST dump match
+            if ast.dump(tree_orig) == ast.dump(tree_ref):
+                return False
+
+            # 2. Normalize whitespace inside string literals, prompt templates, and docstrings
+            for n in ast.walk(tree_orig):
+                if isinstance(n, ast.Constant) and isinstance(n.value, str):
+                    n.value = " ".join(n.value.split())
+            for n in ast.walk(tree_ref):
+                if isinstance(n, ast.Constant) and isinstance(n.value, str):
+                    n.value = " ".join(n.value.split())
+
+            if ast.dump(tree_orig) == ast.dump(tree_ref):
+                return False
+        except Exception:
+            pass
+
+    return True
 
 
 class ApiPatchEngine:
@@ -239,14 +261,9 @@ class ApiPatchEngine:
             if llm_res.get("has_breaking_changes") and llm_res.get("refactored_code"):
                 refactored = llm_res["refactored_code"]
 
-                # Discard pure cosmetic / formatting changes that have zero AST difference
-                if ext in {".py", ".pyw"}:
-                    try:
-                        import ast
-                        if ast.dump(ast.parse(code)) == ast.dump(ast.parse(refactored)):
-                            return empty_result
-                    except Exception:
-                        pass
+                # Discard pure cosmetic / formatting / string whitespace changes
+                if not is_meaningful_code_change(code, refactored, ext):
+                    return empty_result
 
                 val = CodeValidator.validate(code, refactored, file_extension=ext)
 
@@ -277,13 +294,8 @@ class ApiPatchEngine:
                         )
                         if healed_res.get("has_breaking_changes") and healed_res.get("refactored_code"):
                             healed_code = healed_res["refactored_code"]
-                            if ext in {".py", ".pyw"}:
-                                try:
-                                    import ast
-                                    if ast.dump(ast.parse(code)) == ast.dump(ast.parse(healed_code)):
-                                        return empty_result
-                                except Exception:
-                                    pass
+                            if not is_meaningful_code_change(code, healed_code, ext):
+                                return empty_result
 
                             val_healed = CodeValidator.validate(code, healed_code, file_extension=ext)
                             if val_healed.is_valid:
