@@ -60,6 +60,18 @@ class Colors:
 _PRINT_LOCK = threading.Lock()
 
 
+def safe_print(text: str):
+    """Safely prints to stdout with thread synchronization."""
+    with _PRINT_LOCK:
+        try:
+            print(text)
+        except UnicodeEncodeError:
+            try:
+                print(text.encode("ascii", errors="replace").decode("ascii"))
+            except Exception:
+                pass
+
+
 def is_meaningful_code_change(original_code: str, refactored_code: str, ext: str) -> bool:
     """
     Determines if the refactoring contains a genuine semantic/structural code change

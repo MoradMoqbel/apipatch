@@ -124,24 +124,40 @@ class GitHubClient:
         data = json.dumps(payload).encode("utf-8") if payload is not None else None
         req = urllib.request.Request(url, data=data, headers=headers, method=method)
 
-        try:
-            with urllib.request.urlopen(req, timeout=30) as response:
-                body = response.read().decode("utf-8")
-                if not body.strip():
-                    return {"status": "ok", "code": response.status}
-                return json.loads(body)
-        except urllib.error.HTTPError as e:
-            err_msg = e.read().decode("utf-8", errors="ignore")
-            if e.code == 404:
+        for attempt in range(1, 4):
+            try:
+                with urllib.request.urlopen(req, timeout=45) as response:
+                    chunks = []
+                    while True:
+                        try:
+                            chunk = response.read(65536)
+                            if not chunk:
+                                break
+                            chunks.append(chunk)
+                        except Exception as read_err:
+                            if "IncompleteRead" in type(read_err).__name__ and hasattr(read_err, "partial"):
+                                chunks.append(read_err.partial)
+                                break
+                            raise read_err
+                    body = b"".join(chunks).decode("utf-8", errors="replace")
+                    if not body.strip():
+                        return {"status": "ok", "code": response.status}
+                    return json.loads(body)
+            except urllib.error.HTTPError as e:
+                err_msg = e.read().decode("utf-8", errors="ignore")
+                if e.code == 404:
+                    return None
+                elif e.code == 403 and "rate limit" in err_msg.lower():
+                    print(f"[!] GitHub API rate limit reached.")
+                elif e.code != 404:
+                    print(f"[!] GitHub API HTTP {e.code} on {method} {url}: {err_msg}")
                 return None
-            elif e.code == 403 and "rate limit" in err_msg.lower():
-                print(f"[!] GitHub API rate limit reached.")
-            elif e.code != 404:
-                print(f"[!] GitHub API HTTP {e.code} on {method} {url}: {err_msg}")
-            return None
-        except Exception as e:
-            print(f"[!] Network error on GitHub API request ({method} {url}): {e}")
-            return None
+            except Exception as e:
+                if attempt < 3:
+                    time.sleep(1.0 * attempt)
+                    continue
+                print(f"[!] Network error on GitHub API request ({method} {url}): {e}")
+                return None
 
     # ── User & Repository Metadata ──────────────────────────────────────────
 

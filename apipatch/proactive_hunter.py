@@ -400,8 +400,8 @@ class GitHubPRHunter:
 
         auth_user = self.get_authenticated_user()
         if not auth_user:
-            print(f"{Colors.FAIL}[!] Invalid GitHub token. Failed to authenticate.{Colors.ENDC}")
-            return {"status": "error", "error": "Authentication failed"}
+            print(f"{Colors.FAIL}[!] Could not authenticate with GitHub API (Check your token or internet connection).{Colors.ENDC}")
+            return {"status": "error", "error": "Authentication or network failed"}
 
         print(f"Authenticated As: {Colors.OKGREEN}@{auth_user}{Colors.ENDC}")
 
