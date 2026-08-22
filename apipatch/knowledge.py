@@ -112,6 +112,18 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
 """
     },
 
+    "dotenv": {
+        "aliases": ["dotenv", "python-dotenv", "python_dotenv"],
+        "description": "Python Dotenv (python-dotenv)",
+        "guidance": """\
+• Python-Dotenv Guidelines:
+  - Import: 'from dotenv import load_dotenv' or 'import dotenv'
+  - Standard Usage: 'load_dotenv()' is the official, fully supported method.
+  - DO NOT replace 'load_dotenv()' with 'dotenv_values()' or manual os.environ dictionary loops.
+  - Leave 'load_dotenv()' untouched if it is already present.
+"""
+    },
+
     "fastapi": {
         "aliases": ["fastapi"],
         "description": "FastAPI Lifespan Events Modernization",

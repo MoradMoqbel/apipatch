@@ -1,8 +1,8 @@
 """
 ApiPatch Live Documentation & Official Grounding Hunter (DocHunter)
 Dynamically fetches verified package metadata, official documentation URLs,
-and changelog summaries from PyPI and npm registries to ground the LLM
-with authoritative release information and eliminate false positives.
+and changelog summaries from PyPI, npm, and GitHub registries to ground the LLM
+with authoritative real-time release information and eliminate false positives.
 """
 
 import json
@@ -14,13 +14,14 @@ from typing import Dict, Any, Optional, List, Set
 
 # In-memory cache to prevent redundant HTTP requests across multi-file audits
 _PACKAGE_METADATA_CACHE: Dict[str, Dict[str, Any]] = {}
+_GITHUB_RELEASE_CACHE: Dict[str, str] = {}
 
 
 class DocHunter:
     """
     Autonomous Package Inspector and Live Documentation Hunter.
     Resolves official documentation, repositories, and release status
-    for any third-party library in Python or JavaScript/TypeScript.
+    for any third-party library dynamically without hardcoded static rules.
     """
 
     @classmethod
@@ -133,6 +134,52 @@ class DocHunter:
         return None
 
     @classmethod
+    def fetch_github_release_summary(cls, repo_url: str, timeout: float = 3.0) -> str:
+        """
+        Fetches the latest official release notes and changelog from GitHub Releases.
+        """
+        if not repo_url or "github.com" not in repo_url:
+            return ""
+
+        # Extract owner/repo
+        m = re.search(r"github\.com/([^/]+)/([^/#?]+)", repo_url)
+        if not m:
+            return ""
+
+        owner, repo = m.group(1), m.group(2).replace(".git", "")
+        cache_key = f"{owner}/{repo}".lower()
+        if cache_key in _GITHUB_RELEASE_CACHE:
+            return _GITHUB_RELEASE_CACHE[cache_key]
+
+        from apipatch.github_client import resolve_github_token
+        token = resolve_github_token()
+        headers = {
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "ApiPatch-DocHunter/1.0"
+        }
+        if token:
+            headers["Authorization"] = f"token {token}"
+
+        api_url = f"https://api.github.com/repos/{owner}/{repo}/releases?per_page=1"
+        req = urllib.request.Request(api_url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                releases = json.loads(response.read().decode("utf-8"))
+                if releases and isinstance(releases, list):
+                    rel = releases[0]
+                    tag = rel.get("tag_name", "")
+                    body = rel.get("body", "") or ""
+                    # Keep first 200 characters of release notes
+                    short_body = body.split("\n")[0][:150] if body else ""
+                    res = f"Latest Release {tag}: {short_body}"
+                    _GITHUB_RELEASE_CACHE[cache_key] = res
+                    return res
+        except Exception:
+            pass
+
+        return ""
+
+    @classmethod
     def get_package_grounding(cls, pkg_name: str) -> Optional[Dict[str, Any]]:
         """
         Tries PyPI first, then npm. Returns unified metadata.
@@ -172,12 +219,18 @@ class DocHunter:
 
                 line = f"  • Package '{name}' (Latest Official Release: v{ver}):"
                 if summary:
-                    # Truncate summary if too long
                     short_sum = summary[:120] + "..." if len(summary) > 120 else summary
                     line += f" {short_sum}."
                 if doc or repo:
                     target_url = doc or repo
                     line += f" [Official Docs/Source: {target_url}]"
+
+                # Check latest GitHub release notes live
+                if repo:
+                    rel_summary = cls.fetch_github_release_summary(repo)
+                    if rel_summary:
+                        line += f" ({rel_summary})"
+
                 grounding_lines.append(line)
 
         if not grounding_lines:
@@ -188,5 +241,6 @@ class DocHunter:
             + "\n".join(grounding_lines)
             + "\nCRITICAL: These packages are verified active third-party dependencies. "
             "Do NOT replace them with competing frameworks (e.g. do not replace agno with LangChain), "
+            "do NOT downgrade modern model names (e.g. do NOT change Gemini 3 or 2.5 to 1.5), "
             "and only refactor methods that are officially deprecated.\n"
         )

@@ -26,11 +26,37 @@ class ValidationResult:
 
 
 class CodeValidator:
+    KNOWN_INVALID_IMPORT_NAMES = {
+        "python_dotenv": "dotenv (e.g. 'from dotenv import load_dotenv')",
+        "pyyaml": "yaml (e.g. 'import yaml')",
+        "beautifulsoup4": "bs4 (e.g. 'from bs4 import BeautifulSoup')",
+        "pillow": "PIL (e.g. 'from PIL import Image')",
+        "scikit_learn": "sklearn (e.g. 'import sklearn')",
+    }
+
     @staticmethod
     def validate_python_syntax(code: str) -> ValidationResult:
-        """Parses code with Python AST parser to catch any SyntaxError or IndentationError."""
+        """Parses code with Python AST parser to catch any SyntaxError, IndentationError, or hallucinated import names."""
         try:
-            ast.parse(code)
+            tree = ast.parse(code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        if alias.name in CodeValidator.KNOWN_INVALID_IMPORT_NAMES:
+                            correct = CodeValidator.KNOWN_INVALID_IMPORT_NAMES[alias.name]
+                            return ValidationResult(
+                                is_valid=False,
+                                error_message=f"Invalid import '{alias.name}'. The package must be imported as '{correct}'.",
+                                error_line=node.lineno
+                            )
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module in CodeValidator.KNOWN_INVALID_IMPORT_NAMES:
+                        correct = CodeValidator.KNOWN_INVALID_IMPORT_NAMES[node.module]
+                        return ValidationResult(
+                            is_valid=False,
+                            error_message=f"Invalid import from '{node.module}'. The package must be imported as '{correct}'.",
+                            error_line=node.lineno
+                        )
             return ValidationResult(is_valid=True)
         except SyntaxError as e:
             return ValidationResult(

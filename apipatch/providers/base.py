@@ -37,9 +37,12 @@ Rules (STRICT ZERO-TOLERANCE FOR HALLUCINATIONS & OVER-REFACTORING):
   4. NO COSMETIC OR STYLE CHANGES: Do NOT reformat strings, do NOT adjust whitespace/docstrings, do NOT change `dict[...]` to `dict.get(...)`, and do NOT rewrite working file loaders (like toml.load).
   5. NEVER REFACTOR STANDARD LIBRARY: posixpath, ntpath, os.path, urllib, sys, json, re, math, and tempfile are Python standard library modules. NEVER replace them with pathlib or third-party packages.
   6. PRESERVE 100%% OF ORIGINAL BUSINESS LOGIC: Function signatures, class structures, variable names, and string literals must remain completely intact.
-  7. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
-  8. Respond ONLY with a valid JSON object matching the exact schema below.
-     Do NOT include any preamble, explanation, markdown fences, or commentary.
+  7. NEVER DOWNGRADE MODELS OR SDK VERSIONS: If a model name (e.g. `gemini-3-flash`, `gemini-3-pro-image`, `gemini-2.5`, `gpt-4o`, `claude-3-7`) or API pattern is newer or unfamiliar, DO NOT TOUCH IT. NEVER downgrade a modern/preview model to an older legacy model (e.g. NEVER change Gemini 3.x/2.x to Gemini 1.5). Treat newer models and APIs as valid and modern.
+  8. DO NOT CONFUSE PYPI PACKAGE NAMES WITH PYTHON IMPORT NAMES: Many packages on PyPI use different names than their Python import statements. For example, `python-dotenv` MUST be imported as `dotenv` (NEVER `import python_dotenv`), `pillow` is imported as `PIL`, `pyyaml` is imported as `yaml`, and `beautifulsoup4` is imported as `bs4`. Keep the valid import name.
+  9. NEVER REPLACE CODE WITH COMMENTS: Never comment out working code or replace implementation with `# Example for ...` placeholder comments.
+  10. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
+  11. Respond ONLY with a valid JSON object matching the exact schema below.
+      Do NOT include any preamble, explanation, markdown fences, or commentary.
 
 Response schema:
 {{
