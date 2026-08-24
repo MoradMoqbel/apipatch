@@ -473,7 +473,6 @@ class GitHubPRHunter:
                             "diff": res["diff"]
                         })
                         files_to_commit[res["file"]] = res["refactored_code"]
-
         if not audit_results:
             print(f"\n{Colors.OKGREEN}[✓] No deprecated or breaking API calls detected. Codebase is modern and clean!{Colors.ENDC}\n")
             return {
@@ -483,7 +482,34 @@ class GitHubPRHunter:
                 "audit_results": []
             }
 
-        print(f"\n{Colors.OKGREEN}[✓] Identified {len(audit_results)} file(s) requiring modernization.{Colors.ENDC}")
+        # ── Synchronize Remote Manifest Files ──
+        from apipatch.manifest_bumper import ManifestBumper
+        modernized_libs: Set[str] = set()
+        for r in audit_results:
+            for issue in r.get("detected_issues", []):
+                if issue.get("library"):
+                    modernized_libs.add(issue["library"])
+
+        if modernized_libs and not precomputed_results and 'tree_items' in locals():
+            for item in tree_items:
+                path = item.get("path", "")
+                base = os.path.basename(path).lower()
+                if base in ("requirements.txt", "pyproject.toml", "package.json"):
+                    content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
+                    if content:
+                        if base == "requirements.txt":
+                            new_c, changed = ManifestBumper.bump_requirements_txt(content, modernized_libs)
+                        elif base == "package.json":
+                            new_c, changed = ManifestBumper.bump_package_json(content, modernized_libs)
+                        elif base == "pyproject.toml":
+                            new_c, changed = ManifestBumper.bump_pyproject_toml(content, modernized_libs)
+                        else:
+                            changed = False
+                        if changed:
+                            print(f"  {Colors.OKGREEN}[✓] Automatically synced dependency version in {path}{Colors.ENDC}")
+                            files_to_commit[path] = new_c
+
+        print(f"\n{Colors.OKGREEN}[✓] Identified {len(audit_results)} file(s) requiring modernization ({len(files_to_commit)} total files to commit).{Colors.ENDC}")
 
         # 2. Generate PR Markdown Payload
         pr_payload = self.client.generate_pr_markdown(repo_name, audit_results)

@@ -9,6 +9,7 @@ import json
 import urllib.request
 import urllib.error
 import re
+import sys
 from typing import Dict, Any, Optional, List, Set
 
 
@@ -253,3 +254,155 @@ class DocHunter:
             "do NOT downgrade modern model names (e.g. do NOT change Gemini 3 or 2.5 to 1.5), "
             "and only refactor methods that are officially deprecated.\n"
         )
+
+    # ── Autonomous Dynamic Registry & Import Fact-Checking ──────────────────────
+    PYTHON_STDLIB_MODULES: Set[str] = (
+        set(getattr(sys, "stdlib_module_names", set()))
+        if hasattr(sys, "stdlib_module_names")
+        else {
+            "abc", "argparse", "array", "ast", "asyncio", "base64", "bisect", "builtins",
+            "calendar", "collections", "concurrent", "configparser", "contextlib", "copy",
+            "csv", "ctypes", "dataclasses", "datetime", "decimal", "difflib", "dis",
+            "email", "enum", "errno", "exceptions", "faulthandler", "filecmp", "fileinput",
+            "fnmatch", "fractions", "functools", "gc", "getopt", "getpass", "glob",
+            "gzip", "hashlib", "heapq", "hmac", "html", "http", "imaplib", "imghdr",
+            "importlib", "inspect", "io", "ipaddress", "itertools", "json", "keyword",
+            "linecache", "locale", "logging", "lzma", "math", "mimetypes", "mmap",
+            "modulefinder", "multiprocessing", "netrc", "numbers", "operator", "os",
+            "pathlib", "pickle", "pkgutil", "platform", "plistlib", "poplib", "posix",
+            "pprint", "profile", "pstats", "pty", "pwd", "py_compile", "pyclbr", "pydoc",
+            "queue", "quopri", "random", "re", "readline", "reprlib", "resource", "rlcompleter",
+            "sched", "secrets", "select", "selectors", "shelve", "shlex", "shutil", "signal",
+            "site", "smtpd", "smtplib", "sndhdr", "socket", "socketserver", "sqlite3", "ssl",
+            "stat", "statistics", "string", "stringprep", "struct", "subprocess", "symtable",
+            "sys", "sysconfig", "tabnanny", "tarfile", "telnetlib", "tempfile", "termios",
+            "test", "textwrap", "threading", "time", "timeit", "tkinter", "token", "tokenize",
+            "trace", "traceback", "tracemalloc", "tty", "turtle", "turtledemo", "types",
+            "typing", "unicodedata", "unittest", "urllib", "uu", "uuid", "venv", "warnings",
+            "wave", "weakref", "webbrowser", "winreg", "winsound", "wsgiref", "xdrlib",
+            "xml", "xmlrpc", "zipapp", "zipfile", "zipimport", "zlib", "_thread", "typing_extensions"
+        }
+    )
+
+    # Common well-known top-level namespace mappings (module_import -> pypi_package)
+    KNOWN_IMPORT_TO_PACKAGE_MAP: Dict[str, str] = {
+        "dotenv": "python-dotenv",
+        "yaml": "pyyaml",
+        "PIL": "pillow",
+        "cv2": "opencv-python",
+        "bs4": "beautifulsoup4",
+        "sklearn": "scikit-learn",
+        "dateutil": "python-dateutil",
+        "jwt": "pyjwt",
+        "serial": "pyserial",
+        "magic": "python-magic",
+        "fitz": "pymupdf",
+        "docx": "python-docx",
+        "pptx": "python-pptx",
+        "google.genai": "google-genai",
+        "google.adk": "google-adk",
+        "google.generativeai": "google-generativeai",
+        "google.cloud": "google-cloud-core",
+        "azure.storage": "azure-storage-blob",
+        "azure.identity": "azure-identity",
+    }
+
+    # Known invalid / hallucinated root import names (e.g. underscore hallucinations for dotted or hyphens)
+    KNOWN_HALLUCINATED_ROOT_MODULES: Set[str] = {
+        "google_generativeai", "google_genai", "langchain_openai_client", "openai_client"
+    }
+
+    @classmethod
+    def is_valid_registry_import(cls, module_name: str, ecosystem: str = "python", timeout: float = 2.0) -> bool:
+        """
+        Dynamically verifies whether an imported root or sub-module exists
+        in the standard library, known package mappings, or is a registered PyPI/npm package.
+        Returns False if the module name is an ungrounded hallucination.
+        """
+        clean = module_name.strip()
+        if not clean:
+            return True
+
+        # Extract root module
+        root = clean.split(".")[0]
+
+        # 1. Reject explicit hallucinated root modules
+        if root in cls.KNOWN_HALLUCINATED_ROOT_MODULES:
+            return False
+
+        # 2. Check Standard Library
+        if ecosystem == "python" and (root in cls.PYTHON_STDLIB_MODULES or clean in cls.PYTHON_STDLIB_MODULES):
+            return True
+
+        # 3. Check known valid mappings and recognized enterprise namespace roots
+        recognized_namespace_roots = {
+            "google", "azure", "aws", "langchain", "llama_index", "openai",
+            "pydantic", "anthropic", "stripe", "fastapi", "flask", "django", "pytest"
+        }
+        if root in recognized_namespace_roots:
+            return True
+
+        if clean in cls.KNOWN_IMPORT_TO_PACKAGE_MAP or root in cls.KNOWN_IMPORT_TO_PACKAGE_MAP:
+            return True
+
+        # 4. Check locally installed spec
+        if ecosystem == "python":
+            try:
+                import importlib.util
+                if importlib.util.find_spec(root) is not None or importlib.util.find_spec(clean) is not None:
+                    return True
+            except Exception:
+                pass
+
+        # 5. Check PyPI / npm Registry
+        cache_key = f"valid_import:{ecosystem}:{clean}"
+        if cache_key in _PACKAGE_METADATA_CACHE:
+            return bool(_PACKAGE_METADATA_CACHE[cache_key].get("exists", False))
+
+        # Check candidate package names
+        candidates = [root, clean, root.replace("_", "-"), clean.replace("_", "-")]
+        if "." in clean:
+            dotted_parts = clean.split(".")
+            candidates.append(f"{dotted_parts[0]}-{dotted_parts[1]}")
+
+        for cand in candidates:
+            if ecosystem == "python":
+                meta = cls.fetch_pypi_metadata(cand, timeout=timeout)
+                if meta and meta.get("name"):
+                    _PACKAGE_METADATA_CACHE[cache_key] = {"exists": True}
+                    return True
+            else:
+                meta = cls.fetch_npm_metadata(cand, timeout=timeout)
+                if meta and meta.get("name"):
+                    _PACKAGE_METADATA_CACHE[cache_key] = {"exists": True}
+                    return True
+
+        # If not found in standard library, mappings, or PyPI -> module does not exist
+        _PACKAGE_METADATA_CACHE[cache_key] = {"exists": False}
+        return False
+
+    @classmethod
+    def verify_module_symbol(cls, module_path: str, symbol_name: str) -> bool:
+        """
+        Dynamically verifies whether a specific symbol/attribute exists within a module namespace.
+        Prevents hallucinated cross-package attribute lookups (e.g. types.ToolContext in google.genai.types).
+        """
+        clean_mod = module_path.strip()
+        clean_sym = symbol_name.strip()
+
+        # Specific known cross-framework symbol mixups:
+        # ToolContext belongs to google.adk.tools, NOT google.genai.types
+        if clean_mod.endswith("google.genai.types") or clean_mod == "google.genai.types":
+            if clean_sym in {"ToolContext", "SessionContext", "AgentContext", "InMemorySessionService"}:
+                return False
+
+        # Try dynamic runtime inspection if installed in local env
+        try:
+            import importlib
+            mod = importlib.import_module(clean_mod)
+            return hasattr(mod, clean_sym)
+        except Exception:
+            # If not locally installed, accept standard symbols unless explicitly invalid
+            return True
+
+

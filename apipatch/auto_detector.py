@@ -165,6 +165,10 @@ def should_audit_file(
             normalized_libs.add(lib_clean)
             normalized_libs.add(lib_clean.replace('-', '_'))
             normalized_libs.add(lib_clean.replace('_', '-'))
+            if '-' in lib_clean:
+                normalized_libs.add(lib_clean.split('-')[0])
+            if '.' in lib_clean:
+                normalized_libs.add(lib_clean.split('.')[0])
             if lib_clean.startswith('@') and '/' in lib_clean:
                 scoped_name = lib_clean.split('/')[1]
                 normalized_libs.add(scoped_name)

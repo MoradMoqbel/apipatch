@@ -22,6 +22,16 @@ github_token.txt
 *.token
 .env
 .env.*
+gcc_auth.json
+gcc-auth.json
+*auth*.json
+*credentials*.json
+*.pem
+*.key
+node_modules/
+test.js
+package.json
+package-lock.json
 
 # Distribution / Packaging / Test artifacts
 dist/

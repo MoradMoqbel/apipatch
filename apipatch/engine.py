@@ -106,6 +106,35 @@ def is_meaningful_code_change(original_code: str, refactored_code: str, ext: str
     return True
 
 
+def ensure_docstring_restored(original_code: str, refactored_code: str, ext: str) -> str:
+    """
+    If the original Python file had a top-level module docstring that was omitted
+    or dropped by the LLM in refactored_code, automatically re-injects it at the top.
+    """
+    if ext not in {".py", ".pyw"} or not original_code or not refactored_code:
+        return refactored_code
+
+    try:
+        import ast
+        import re
+        orig_tree = ast.parse(original_code)
+        ref_tree = ast.parse(refactored_code)
+        orig_doc = ast.get_docstring(orig_tree)
+        ref_doc = ast.get_docstring(ref_tree)
+
+        if orig_doc and not ref_doc:
+            m = re.match(r'^\s*("""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\')\s*', original_code)
+            if m:
+                raw_docstring = m.group(1).strip()
+                return f"{raw_docstring}\n\n{refactored_code.lstrip()}"
+            else:
+                formatted = f'"""\n{orig_doc}\n"""\n\n'
+                return f"{formatted}{refactored_code.lstrip()}"
+    except Exception:
+        pass
+    return refactored_code
+
+
 class ApiPatchEngine:
     def __init__(
         self,
@@ -271,7 +300,8 @@ class ApiPatchEngine:
             llm_res = self._call_with_retry(file_name, code, libs, project_context=project_context)
 
             if llm_res.get("has_breaking_changes") and llm_res.get("refactored_code"):
-                refactored = llm_res["refactored_code"]
+                refactored = ensure_docstring_restored(code, llm_res["refactored_code"], ext)
+                llm_res["refactored_code"] = refactored
 
                 # Discard pure cosmetic / formatting / string whitespace changes
                 if not is_meaningful_code_change(code, refactored, ext):
@@ -305,7 +335,8 @@ class ApiPatchEngine:
                             project_context=project_context
                         )
                         if healed_res.get("has_breaking_changes") and healed_res.get("refactored_code"):
-                            healed_code = healed_res["refactored_code"]
+                            healed_code = ensure_docstring_restored(code, healed_res["refactored_code"], ext)
+                            healed_res["refactored_code"] = healed_code
                             if not is_meaningful_code_change(code, healed_code, ext):
                                 return empty_result
 
@@ -557,6 +588,19 @@ class ApiPatchEngine:
                 except Exception as e:
                     fpath = future_to_file[future]
                     safe_print(f"{Colors.FAIL}[!] Audit exception on {os.path.basename(fpath)}: {e}{Colors.ENDC}")
+
+        # ── Synchronize Manifest Files (requirements.txt, package.json, pyproject.toml) ──
+        if write_in_place and affected_files > 0:
+            from apipatch.manifest_bumper import ManifestBumper
+            modernized_libs: Set[str] = set()
+            for r in results:
+                for issue in r.get("issues", []):
+                    if issue.get("library"):
+                        modernized_libs.add(issue["library"])
+            if modernized_libs:
+                bumped = ManifestBumper.bump_local_manifests(target_dir, modernized_libs, write=True)
+                for b in bumped:
+                    safe_print(f"  {Colors.OKGREEN}[✓] Automatically synced dependency version in {b['manifest']}.{Colors.ENDC}")
 
         total_duration = time.time() - start_time
         safe_print(

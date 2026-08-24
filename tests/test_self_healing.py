@@ -25,7 +25,6 @@ class MockBrokenThenHealedProvider(BaseProvider):
         detected_libraries: List[str],
         project_context: Optional[str] = None
     ) -> Dict[str, Any]:
-        # Returns code with a syntax error (unclosed parenthesis)
         return {
             "has_breaking_changes": True,
             "detected_issues": [{
@@ -35,7 +34,7 @@ class MockBrokenThenHealedProvider(BaseProvider):
                 "description": "Migrate to OpenAI v1.0",
                 "line_hint": "line 2"
             }],
-            "refactored_code": "def ask():\n    return client.chat.completions.create(model='gpt-4o'\n"  # syntax error: missing closing paren
+            "refactored_code": "def ask():\n    return client.chat.completions.create(model='gpt-4o'\n"
         }
 
     def heal_code(
@@ -49,7 +48,6 @@ class MockBrokenThenHealedProvider(BaseProvider):
     ) -> Dict[str, Any]:
         self.heal_called = True
         self.received_val_error = validation_error
-        # Returns corrected syntactically valid code
         return {
             "has_breaking_changes": True,
             "detected_issues": [{
@@ -102,9 +100,43 @@ class TestSelfHealing(unittest.TestCase):
         orig_code = "def original_func():\n    pass\n"
         res = engine.audit_code("test.py", orig_code, detected_libraries=["openai"])
 
-        # When self-healing fails all attempts, it should safely return empty_result without crashing
         self.assertFalse(res["has_breaking_changes"])
         self.assertEqual(res["refactored_code"], orig_code)
+
+    def test_self_healing_recovers_from_hallucinated_import(self):
+        class MockHallucinatedThenHealedProvider(BaseProvider):
+            def __init__(self):
+                super().__init__()
+                self.heal_called = False
+                self.received_val_error = None
+
+            def audit_code(self, file_name, code, detected_libraries, project_context=None):
+                return {
+                    "has_breaking_changes": True,
+                    "detected_issues": [{"library": "google-genai", "deprecated_symbol": "genai", "replacement_symbol": "genai.Client", "description": "Migrate SDK", "line_hint": "1"}],
+                    "refactored_code": "from google_generativeai.agents import LlmAgent\n\ndef run():\n    pass\n"
+                }
+
+            def heal_code(self, file_name, original_code, broken_code, validation_error, detected_libraries=None, project_context=None):
+                self.heal_called = True
+                self.received_val_error = validation_error
+                return {
+                    "has_breaking_changes": True,
+                    "detected_issues": [{"library": "google-genai", "deprecated_symbol": "genai", "replacement_symbol": "genai.Client", "description": "Migrate SDK", "line_hint": "1"}],
+                    "refactored_code": "from google.adk.agents import LlmAgent\nfrom google import genai\n\ndef run():\n    pass\n"
+                }
+
+        engine = ApiPatchEngine()
+        mock_provider = MockHallucinatedThenHealedProvider()
+        engine.provider = mock_provider
+
+        orig_code = "from google.adk.agents import LlmAgent\nimport google.generativeai as genai\n\ndef run():\n    pass\n"
+        res = engine.audit_code("agent.py", orig_code, detected_libraries=["google-genai"])
+
+        self.assertTrue(mock_provider.heal_called)
+        self.assertIn("google_generativeai", mock_provider.received_val_error)
+        self.assertTrue(res["has_breaking_changes"])
+        self.assertIn("from google.adk.agents import LlmAgent", res["refactored_code"])
 
 
 if __name__ == "__main__":

@@ -34,15 +34,16 @@ Rules (STRICT ZERO-TOLERANCE FOR HALLUCINATIONS & OVER-REFACTORING):
   1. HIGH PRECISION & ZERO FALSE POSITIVES: If you are not 100%% certain that an API method or import has been officially deprecated or removed in a published library release, DO NOT TOUCH IT. Return has_breaking_changes=false and refactored_code="".
   2. NEVER SWAP OR DELETE AGENT RUNNERS & FRAMEWORKS: If you encounter framework components, runners, or orchestrators (e.g. `google.adk.runners.InMemoryRunner`, `agno.agent.Agent`, `crewai.Crew`, `langgraph.graph.StateGraph`), NEVER replace or delete them with raw API calls or basic loops. Treat the agent runner architecture as modern and permanent. ONLY migrate genuinely deprecated symbols within the framework if an official migration guide exists.
   3. NEVER RENAME INTERNAL VARIABLES/CONSTANTS: Never modify internal property names, configuration keys, or constants (e.g. leave GROQ_BASE_URL, ollama_base_url, model identifiers, and config attributes exactly as written).
-  4. NO COSMETIC OR STYLE CHANGES: Do NOT reformat strings, do NOT adjust whitespace/docstrings, do NOT change `dict[...]` to `dict.get(...)`, and do NOT rewrite working file loaders (like toml.load).
+  4. NO COSMETIC OR STYLE CHANGES & PRESERVE DOCSTRINGS: Do NOT delete, drop, or rewrite module docstrings, function docstrings, class docstrings, or license comments at the top of the file. Preserve all existing docstrings and comments exactly as written. Do NOT reformat strings, and do NOT change `dict[...]` to `dict.get(...)`.
   5. NEVER REFACTOR STANDARD LIBRARY: posixpath, ntpath, os.path, urllib, sys, json, re, math, and tempfile are Python standard library modules. NEVER replace them with pathlib or third-party packages.
-  6. PRESERVE 100%% OF ORIGINAL BUSINESS LOGIC: Function signatures, class structures, variable names, and string literals must remain completely intact.
+  6. PRESERVE 100%% OF ORIGINAL BUSINESS LOGIC & DOCUMENTATION: Function signatures, class structures, variable names, top-level module docstrings, and string literals must remain completely intact.
   7. NEVER DOWNGRADE MODELS OR SDK VERSIONS: If a model name (e.g. `gemini-3-flash`, `gemini-3-pro-image`, `gemini-2.5`, `gpt-4o`, `claude-3-7`) or API pattern is newer or unfamiliar, DO NOT TOUCH IT. NEVER downgrade a modern/preview model to an older legacy model (e.g. NEVER change Gemini 3.x/2.x to Gemini 1.5). Treat newer models and APIs as valid and modern.
   8. DO NOT CONFUSE PYPI PACKAGE NAMES WITH PYTHON IMPORT NAMES: Many packages on PyPI use different names than their Python import statements. For example, `python-dotenv` MUST be imported as `dotenv` (NEVER `import python_dotenv`), `pillow` is imported as `PIL`, `pyyaml` is imported as `yaml`, and `beautifulsoup4` is imported as `bs4`. Keep the valid import name.
   9. NEVER REPLACE CODE WITH COMMENTS: Never comment out working code or replace implementation with `# Example for ...` placeholder comments.
   10. PRESUMPTION OF MODERNITY: If you encounter any library, runner, or symbol that you do not recognize, ASSUME IT IS A MODERN 2025/2026 RELEASE and leave it untouched (has_breaking_changes=false).
-  11. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
-  12. Respond ONLY with a valid JSON object matching the exact schema below.
+  11. DO NOT INVENT OR MUTATE ROOT MODULE NAMES: If a file imports from a framework or SDK (e.g. `google.adk`, `google.genai`, `agno`, `crewai`), NEVER rewrite the root package or invent non-existent packages like `google_generativeai`. Only refactor specific documented deprecated symbols.
+  12. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
+  13. Respond ONLY with a valid JSON object matching the exact schema below.
       Do NOT include any preamble, explanation, markdown fences, or commentary.
 
 Response schema:
@@ -80,9 +81,9 @@ Previously attempted refactored code (contained the error above):
 ```
 {project_context_section}
 Your mission:
-  1. Analyze the exact validation/test error (e.g. SyntaxError, dropped functions/classes, unclosed braces/brackets, or broken test assertion).
+  1. Analyze the exact validation/test error (e.g. SyntaxError, dropped functions/classes, dropped module docstrings, unclosed braces/brackets, or broken test assertion).
   2. Fix the error completely while keeping the modernized third-party library calls intact.
-  3. Preserve 100%% of the original business logic, classes, and function signatures.
+  3. Preserve 100%% of the original business logic, classes, function signatures, and top-level module docstrings.
   4. Never truncate the refactored code — return the COMPLETE corrected modernized file.
   5. Respond ONLY with a valid JSON object matching the schema below.
      Do NOT include any preamble, markdown fences, or commentary.

@@ -145,7 +145,130 @@ class CodeValidator:
                 error_message=f"Refactored code dropped native agent framework runner(s): {', '.join(sorted(dropped_runners))}. Preserve the original runner architecture."
             )
 
+        # Module-level docstring preservation check
+        try:
+            tree_orig = ast.parse(original_code)
+            tree_ref = ast.parse(refactored_code)
+            orig_doc = ast.get_docstring(tree_orig)
+            ref_doc = ast.get_docstring(tree_ref)
+            if orig_doc and not ref_doc:
+                return ValidationResult(
+                    is_valid=False,
+                    error_message="Refactored code dropped module-level docstring header. Preserve the original module documentation exactly."
+                )
+        except Exception:
+            pass
+
         return ValidationResult(is_valid=True)
+
+    @staticmethod
+    def extract_imported_modules(code: str) -> Set[str]:
+        """Extracts all imported module namespaces (e.g. 'google.adk.agents', 'os', 'openai') from Python code."""
+        modules = set()
+        try:
+            tree = ast.parse(code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        modules.add(alias.name)
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        modules.add(node.module)
+        except Exception:
+            pass
+        return modules
+
+    @classmethod
+    def validate_import_soundness(cls, original_code: str, refactored_code: str, file_extension: str = ".py") -> ValidationResult:
+        """
+        Dynamically verifies that all newly introduced imports in refactored code
+        exist in the Python Standard Library, known package mappings, or on the PyPI registry.
+        Rejects non-existent or hallucinated package imports (e.g. 'google_generativeai').
+        """
+        if file_extension in {".py", ".pyw"}:
+            orig_modules = cls.extract_imported_modules(original_code)
+            ref_modules = cls.extract_imported_modules(refactored_code)
+
+            new_modules = ref_modules - orig_modules
+            if not new_modules:
+                return ValidationResult(is_valid=True)
+
+            from apipatch.doc_hunter import DocHunter
+            for mod in new_modules:
+                if mod.startswith("."):
+                    continue
+                if not DocHunter.is_valid_registry_import(mod, ecosystem="python"):
+                    return ValidationResult(
+                        is_valid=False,
+                        error_message=(
+                            f"Hallucinated or non-existent import module detected: '{mod}'. "
+                            f"This module does not exist in the Python Standard Library or PyPI registry. "
+                            f"Do NOT invent non-existent package namespaces. Preserve the original import or use the official package."
+                        )
+                    )
+        return ValidationResult(is_valid=True)
+
+    @classmethod
+    def validate_symbol_soundness(cls, original_code: str, refactored_code: str, file_extension: str = ".py") -> ValidationResult:
+        """
+        Dynamically tests whether attribute lookups on imported modules in refactored code
+        (e.g., types.ToolContext, client.some_fake_attr) actually resolve without raising AttributeError.
+        """
+        if file_extension in {".py", ".pyw"}:
+            from apipatch.test_runner import MicroSandboxEvaluator
+            from apipatch.doc_hunter import DocHunter
+
+            # 1. Ephemeral MicroSandbox evaluation
+            sandbox_res = MicroSandboxEvaluator.evaluate_code_imports(refactored_code)
+            if not sandbox_res.is_valid:
+                return ValidationResult(
+                    is_valid=False,
+                    error_message=f"Runtime symbol validation error: {sandbox_res.error_message}. Do not use non-existent attributes."
+                )
+
+            # 2. Dynamic AST attribute verification via DocHunter
+            try:
+                tree = ast.parse(refactored_code)
+                import_map = {}
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        for alias in node.names:
+                            import_map[alias.asname or alias.name] = alias.name
+                    elif isinstance(node, ast.ImportFrom) and node.module:
+                        for alias in node.names:
+                            import_map[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+                        alias = node.value.id
+                        attr = node.attr
+                        if alias in import_map:
+                            mod_path = import_map[alias]
+                            if not DocHunter.verify_module_symbol(mod_path, attr):
+                                return ValidationResult(
+                                    is_valid=False,
+                                    error_message=(
+                                        f"Invalid attribute '{alias}.{attr}': symbol '{attr}' is not part of '{mod_path}'. "
+                                        f"Preserve the original context or import from the correct package."
+                                    )
+                                )
+            except Exception:
+                pass
+
+        return ValidationResult(is_valid=True)
+
+    @staticmethod
+    def extract_js_symbols(code: str) -> Set[str]:
+        """Extracts declared function, class, and component names from JS/TS code."""
+        symbols = set()
+        cleaned = re.sub(r'//.*?$|/\*.*?\*/', '', code, flags=re.MULTILINE | re.DOTALL)
+        for m in re.finditer(r'(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s+([a-zA-Z0-9_$]+)', cleaned):
+            symbols.add(m.group(1))
+        for m in re.finditer(r'(?:export\s+)?(?:default\s+)?class\s+([a-zA-Z0-9_$]+)', cleaned):
+            symbols.add(m.group(1))
+        for m in re.finditer(r'(?:export\s+)?(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=\s*(?:async\s*)?(?:\([^)]*\)|[a-zA-Z0-9_$]+)\s*=>', cleaned):
+            symbols.add(m.group(1))
+        return symbols
 
     @staticmethod
     def validate_generic_integrity(original_code: str, refactored_code: str) -> ValidationResult:
@@ -167,6 +290,16 @@ class CodeValidator:
             return ValidationResult(
                 is_valid=False,
                 error_message="Refactored code appears abnormally truncated compared to original source."
+            )
+
+        # JS/TS component and function preservation check
+        orig_syms = CodeValidator.extract_js_symbols(original_code)
+        ref_syms = CodeValidator.extract_js_symbols(refactored_code)
+        missing_syms = orig_syms - ref_syms
+        if missing_syms and len(orig_syms) > 0:
+            return ValidationResult(
+                is_valid=False,
+                error_message=f"Refactored JS/TS code dropped required component/function: {', '.join(sorted(missing_syms))}"
             )
 
         code = refactored_code
@@ -435,6 +568,16 @@ class CodeValidator:
             if not logic_check.is_valid:
                 return logic_check
 
+            import_check = cls.validate_import_soundness(original_code, refactored_code, file_extension)
+            if not import_check.is_valid:
+                return import_check
+
+            symbol_check = cls.validate_symbol_soundness(original_code, refactored_code, file_extension)
+            if not symbol_check.is_valid:
+                return symbol_check
+
             return ValidationResult(is_valid=True)
         else:
             return cls.validate_generic_integrity(original_code, refactored_code)
+
+

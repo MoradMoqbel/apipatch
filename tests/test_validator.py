@@ -82,6 +82,30 @@ class Orchestrator:
         self.assertFalse(res.is_valid)
         self.assertIn("python_dotenv", res.error_message)
 
+    def test_docstring_preservation(self):
+        orig_with_doc = '"""Module documentation for tools."""\ndef my_tool():\n    return 1\n'
+        ref_without_doc = 'def my_tool():\n    return 1\n'
+        ref_with_doc = '"""Module documentation for tools."""\ndef my_tool():\n    return 2\n'
+
+        res_bad = CodeValidator.validate_business_logic_preservation(orig_with_doc, ref_without_doc)
+        self.assertFalse(res_bad.is_valid)
+        self.assertIn("docstring", res_bad.error_message.lower())
+
+        res_good = CodeValidator.validate_business_logic_preservation(orig_with_doc, ref_with_doc)
+        self.assertTrue(res_good.is_valid)
+
+    def test_js_symbol_preservation(self):
+        orig_js = "export function processUser(user) { return user.name; }\nexport const calculateTotal = () => 100;"
+        bad_js = "export function otherFunction() { return 123; }"
+        good_js = "export function processUser(user) { return user.name.toUpperCase(); }\nexport const calculateTotal = () => 100;"
+
+        res_bad = CodeValidator.validate_generic_integrity(orig_js, bad_js)
+        self.assertFalse(res_bad.is_valid)
+        self.assertIn("processUser", res_bad.error_message)
+
+        res_good = CodeValidator.validate_generic_integrity(orig_js, good_js)
+        self.assertTrue(res_good.is_valid)
+
     def test_generic_integrity(self):
         orig_js = "function add(a, b) { return a + b; }"
         good_js = "function add(a, b) { return Number(a) + Number(b); }"

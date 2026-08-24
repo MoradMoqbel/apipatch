@@ -15,6 +15,7 @@ class TestMigrationKnowledge(unittest.TestCase):
         self.assertIn("Google GenAI", guidance)
         self.assertIn("gemini-3.1-flash-image", guidance)
         self.assertIn("google.genai", guidance)
+        self.assertIn("client.aio.models.generate_content", guidance)
 
     def test_openai_knowledge_selected(self):
         guidance = get_relevant_knowledge(

@@ -102,3 +102,105 @@ class SandboxTestRunner:
             return False, f"Test runner executable not found: {e}"
         except Exception as e:
             return False, f"Error running tests: {str(e)}"
+
+
+class MicroSandboxResult:
+    """Result of an ephemeral runtime sandbox evaluation."""
+    def __init__(self, is_valid: bool, error_message: str = "", offending_symbol: str = ""):
+        self.is_valid = is_valid
+        self.error_message = error_message
+        self.offending_symbol = offending_symbol
+
+    def __bool__(self):
+        return self.is_valid
+
+
+class MicroSandboxEvaluator:
+    """
+    Ephemeral Micro-Sandbox Runtime Evaluator.
+    Dynamically tests whether imported modules, classes, and accessed attributes
+    actually resolve in the Python runtime without raising AttributeError or ImportError.
+    """
+
+    @classmethod
+    def evaluate_code_imports(cls, code: str, timeout: float = 1.5) -> MicroSandboxResult:
+        """
+        Extracts imported aliases and attribute lookups from code and executes an isolated
+        subprocess check `python -c "..."` to detect runtime AttributeError / ImportError.
+        """
+        import ast
+
+        try:
+            tree = ast.parse(code)
+        except Exception as e:
+            return MicroSandboxResult(is_valid=False, error_message=f"SyntaxError in code: {e}")
+
+        # Map imported local names -> full module path
+        # e.g., 'from google.genai import types' -> {'types': 'google.genai.types'}
+        import_map = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    name = alias.asname or alias.name
+                    import_map[name] = alias.name
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                for alias in node.names:
+                    name = alias.asname or alias.name
+                    import_map[name] = f"{node.module}.{alias.name}"
+
+        # Collect attribute lookups on imported aliases (e.g. types.ToolContext, pydantic.ConfigDict)
+        tested_pairs = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+                alias = node.value.id
+                attr = node.attr
+                if alias in import_map:
+                    tested_pairs.add((import_map[alias], attr))
+
+        if not tested_pairs:
+            return MicroSandboxResult(is_valid=True)
+
+        # Build dynamic Python evaluation script
+        test_script_lines = [
+            "import sys, importlib",
+            "errors = []"
+        ]
+
+        for mod_path, attr_name in tested_pairs:
+            # Escape strings safely
+            safe_mod = mod_path.replace("'", "\\'")
+            safe_attr = attr_name.replace("'", "\\'")
+            test_script_lines.append(f"""
+try:
+    mod = importlib.import_module('{safe_mod}')
+    if not hasattr(mod, '{safe_attr}'):
+        errors.append(f"AttributeError: module '{safe_mod}' has no attribute '{safe_attr}'")
+except ModuleNotFoundError:
+    pass
+except Exception as e:
+    errors.append(str(e))
+""")
+
+        test_script_lines.append("if errors:\n    print('ERR:' + '; '.join(errors))\n    sys.exit(1)")
+
+        script = "\n".join(test_script_lines)
+
+        try:
+            res = subprocess.run(
+                [sys.executable, "-c", script],
+                capture_output=True,
+                text=True,
+                timeout=timeout
+            )
+            if res.returncode != 0:
+                err_text = (res.stdout + "\n" + res.stderr).strip()
+                if "ERR:" in err_text:
+                    err_msg = err_text.split("ERR:", 1)[1].strip()
+                    return MicroSandboxResult(is_valid=False, error_message=err_msg)
+                elif "AttributeError" in err_text or "ImportError" in err_text:
+                    return MicroSandboxResult(is_valid=False, error_message=err_text)
+        except Exception:
+            pass
+
+        return MicroSandboxResult(is_valid=True)
+

@@ -18,8 +18,13 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
 • Google GenAI Migration Guidelines (Latest Official 2025/2026 SDK):
   - Package: 'google-genai' (Import: 'from google import genai', 'from google.genai import types')
   - Initialization: client = genai.Client(api_key=...)
-  - Text & Multimodal:
+  - Synchronous Calls:
       response = client.models.generate_content(
+          model="gemini-2.5-flash",
+          contents=["..."]
+      )
+  - Asynchronous Calls (inside `async def` with `await`):
+      response = await client.aio.models.generate_content(
           model="gemini-2.5-flash",
           contents=["..."]
       )
