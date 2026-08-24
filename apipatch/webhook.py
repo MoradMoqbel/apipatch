@@ -15,7 +15,7 @@ from typing import Optional, Dict, Any
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
-from apipatch import __version__
+from apipatch._version import __version__
 from apipatch.github_client import resolve_github_token, mask_token
 from apipatch.proactive_hunter import GitHubPRHunter
 from apipatch.engine import ApiPatchEngine, Colors

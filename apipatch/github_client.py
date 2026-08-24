@@ -124,7 +124,7 @@ class GitHubClient:
         data = json.dumps(payload).encode("utf-8") if payload is not None else None
         req = urllib.request.Request(url, data=data, headers=headers, method=method)
 
-        for attempt in range(1, 4):
+        for attempt in range(1, 5):
             try:
                 with urllib.request.urlopen(req, timeout=45) as response:
                     chunks = []
@@ -153,8 +153,8 @@ class GitHubClient:
                     print(f"[!] GitHub API HTTP {e.code} on {method} {url}: {err_msg}")
                 return None
             except Exception as e:
-                if attempt < 3:
-                    time.sleep(1.0 * attempt)
+                if attempt < 4:
+                    time.sleep(2.0 * attempt)
                     continue
                 print(f"[!] Network error on GitHub API request ({method} {url}): {e}")
                 return None

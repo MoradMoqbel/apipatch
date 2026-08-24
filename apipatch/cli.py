@@ -8,7 +8,7 @@ import sys
 import json
 import argparse
 from typing import Optional
-from apipatch import __version__
+from apipatch._version import __version__
 from apipatch.engine import ApiPatchEngine, Colors
 from apipatch.auto_detector import AutoDeprecationDetector
 from apipatch.proactive_hunter import GitHubPRHunter
