@@ -138,6 +138,51 @@ class TestSelfHealing(unittest.TestCase):
         self.assertTrue(res["has_breaking_changes"])
         self.assertIn("from google.adk.agents import LlmAgent", res["refactored_code"])
 
+    def test_rich_syntax_error_diagnostics_formatting(self):
+        from apipatch.validator import CodeValidator
+        broken_try_code = "def fetch_data():\n    try:\n        data = request()\n"
+        val = CodeValidator.validate_python_syntax(broken_try_code)
+        self.assertFalse(val.is_valid)
+        self.assertIn("Line", val.error_message)
+        self.assertIn("Diagnostic Hint", val.error_message)
+        self.assertIn("try:", val.error_message)
+
+    def test_self_healing_recovers_missing_except_block(self):
+        class MockTryExceptHealer(BaseProvider):
+            def __init__(self):
+                super().__init__()
+                self.heal_called = False
+                self.received_val_error = None
+
+            def audit_code(self, file_name, code, detected_libraries, project_context=None):
+                return {
+                    "has_breaking_changes": True,
+                    "detected_issues": [{"library": "openai", "deprecated_symbol": "create", "replacement_symbol": "create", "description": "fix", "line_hint": "1"}],
+                    "refactored_code": "import openai\n\ndef run():\n    try:\n        openai.ChatCompletion.create()\n"
+                }
+
+            def heal_code(self, file_name, original_code, broken_code, validation_error, detected_libraries=None, project_context=None):
+                self.heal_called = True
+                self.received_val_error = validation_error
+                return {
+                    "has_breaking_changes": True,
+                    "detected_issues": [{"library": "openai", "deprecated_symbol": "create", "replacement_symbol": "create", "description": "fix", "line_hint": "1"}],
+                    "refactored_code": "import openai\n\ndef run():\n    try:\n        client = openai.OpenAI()\n        client.chat.completions.create()\n    except Exception as e:\n        pass\n"
+                }
+
+        engine = ApiPatchEngine()
+        mock_provider = MockTryExceptHealer()
+        engine.provider = mock_provider
+
+        orig_code = "import openai\n\ndef run():\n    try:\n        openai.ChatCompletion.create()\n    except Exception as e:\n        pass\n"
+        res = engine.audit_code("tools.py", orig_code, detected_libraries=["openai"])
+
+        self.assertTrue(mock_provider.heal_called)
+        self.assertIn("Diagnostic Hint", mock_provider.received_val_error)
+        self.assertTrue(res["has_breaking_changes"])
+        self.assertIn("except Exception as e:", res["refactored_code"])
+
 
 if __name__ == "__main__":
     unittest.main()
+

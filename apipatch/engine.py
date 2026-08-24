@@ -30,7 +30,7 @@ _MAX_CODE_LINES = 2500
 _MAX_RETRIES = 3
 _RETRY_BACKOFF_BASE = 2.0  # seconds
 # Maximum self-healing attempts for syntax / structural / test errors
-_MAX_HEALING_ATTEMPTS = 2
+_MAX_HEALING_ATTEMPTS = 3
 
 # Reconfigure stdout/stderr for safe Unicode / Windows encoding
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):

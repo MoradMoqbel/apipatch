@@ -35,6 +35,51 @@ class CodeValidator:
     }
 
     @staticmethod
+    def enrich_syntax_error_context(code: str, exc: SyntaxError) -> str:
+        """
+        Builds a rich, actionable diagnostic string from a SyntaxError,
+        including exact line number, surrounding code snippet window,
+        and targeted structural hints (e.g. unclosed try/except blocks, indentation, unclosed brackets).
+        """
+        lines = code.splitlines()
+        err_line_num = exc.lineno or 1
+        err_msg = exc.msg or "invalid syntax"
+
+        # Build surrounding code snippet (up to 4 lines before and 3 lines after)
+        start_idx = max(0, err_line_num - 4)
+        end_idx = min(len(lines), err_line_num + 3)
+
+        snippet_lines = []
+        for idx in range(start_idx, end_idx):
+            line_no = idx + 1
+            line_content = lines[idx]
+            prefix = ">" if line_no == err_line_num else " "
+            snippet_lines.append(f"  {prefix} Line {line_no:3d}: {line_content}")
+
+        snippet_str = "\n".join(snippet_lines)
+
+        # Targeted structural diagnostic hint
+        hint = ""
+        msg_lower = err_msg.lower()
+        if "expected 'except' or 'finally' block" in msg_lower or "expected an except block" in msg_lower:
+            hint = (
+                "\n\nDiagnostic Hint: An incomplete 'try:' block was detected without a matching 'except:' or 'finally:' clause. "
+                "Ensure every 'try:' block is completed with its matching 'except Exception as e:' or 'finally:' block and proper indentation."
+            )
+        elif "indentation" in msg_lower or "indent" in msg_lower:
+            hint = (
+                "\n\nDiagnostic Hint: Indentation mismatch detected. Ensure 4-space indentation is consistently used "
+                "inside all function definitions, classes, and code blocks."
+            )
+        elif "was never closed" in msg_lower or "unclosed" in msg_lower:
+            hint = (
+                "\n\nDiagnostic Hint: Unclosed parenthesis, bracket, or string literal detected. "
+                "Ensure all '(', '[', '{', and quotes are properly paired and closed."
+            )
+
+        return f"SyntaxError: {err_msg} on line {err_line_num}\nCode snippet around error:\n{snippet_str}{hint}"
+
+    @staticmethod
     def validate_python_syntax(code: str) -> ValidationResult:
         """Parses code with Python AST parser to catch any SyntaxError, IndentationError, or hallucinated import names."""
         try:
@@ -59,9 +104,10 @@ class CodeValidator:
                         )
             return ValidationResult(is_valid=True)
         except SyntaxError as e:
+            detailed_err = CodeValidator.enrich_syntax_error_context(code, e)
             return ValidationResult(
                 is_valid=False,
-                error_message=f"SyntaxError: {e.msg}",
+                error_message=detailed_err,
                 error_line=e.lineno
             )
         except Exception as e:
