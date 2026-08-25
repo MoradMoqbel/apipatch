@@ -312,6 +312,18 @@ class GitHubClient:
             return data["sha"]
         return None
 
+    def get_file_last_commit_date(self, repo_full_name: str, file_path: str) -> Optional[str]:
+        """Fetches the ISO timestamp of the latest commit affecting a specific file."""
+        clean_name = self.normalize_repo_name(repo_full_name)
+        clean_path = file_path.lstrip("/")
+        encoded_path = urllib.parse.quote(clean_path)
+        data = self._request(f"/repos/{clean_name}/commits?path={encoded_path}&per_page=1")
+        if data and isinstance(data, list) and len(data) > 0:
+            commit_obj = data[0].get("commit", {})
+            committer = commit_obj.get("committer") or commit_obj.get("author") or {}
+            return committer.get("date")
+        return None
+
     # ── Commits & Multi-file Updates ────────────────────────────────────────
 
     def commit_single_file(

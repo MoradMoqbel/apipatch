@@ -161,6 +161,20 @@ class GitHubPRHunter:
                 if days_ago is None or days_ago > recent_days:
                     continue
 
+                # File-level recency check: verify the candidate file itself is maintained
+                file_path = item.get("path", "")
+                file_commit_date = self.client.get_file_last_commit_date(repo_name, file_path)
+                if file_commit_date:
+                    try:
+                        file_dt = datetime.datetime.fromisoformat(file_commit_date.replace("Z", "+00:00"))
+                        file_days_ago = (now - file_dt).days
+                        # Filter out files in legacy/unmaintained folders older than recent_days * 2
+                        if file_days_ago > max(recent_days * 2, 60):
+                            continue
+                        item["_file_days_ago"] = file_days_ago
+                    except Exception:
+                        pass
+
             seen_repos.add(repo_name)
             item["_stars"] = stars
             item["_pushed_at"] = pushed_at_str[:10] if pushed_at_str else "Unknown"
@@ -742,7 +756,8 @@ class GitHubPRHunter:
 
             meta_str = ""
             if "_stars" in item and "_days_ago" in item:
-                meta_str = f" (⭐ {item['_stars']} | 🕒 {item['_days_ago']}d ago / {item['_pushed_at']})"
+                file_age_str = f" | 📄 File updated: {item['_file_days_ago']}d ago" if "_file_days_ago" in item else ""
+                meta_str = f" (⭐ {item['_stars']} | 🕒 Repo: {item['_days_ago']}d ago{file_age_str})"
 
             print(f"\n🎯 Target: {Colors.BOLD}{repo_name}{Colors.ENDC}{meta_str} -> {Colors.OKCYAN}{file_name}{Colors.ENDC}")
             raw_code = self.fetch_raw_file_content(raw_url)
