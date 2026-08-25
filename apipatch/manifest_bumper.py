@@ -58,6 +58,35 @@ class ManifestBumper:
         return None
 
     @classmethod
+    def _parse_version_numbers(cls, ver_str: str) -> tuple:
+        """Extracts numeric version tuple from a constraint string like '==2.10.6' or '>=2.0.0'."""
+        digits = re.findall(r"\d+", ver_str)
+        return tuple(int(x) for x in digits[:3]) if digits else (0,)
+
+    @classmethod
+    def _should_update_version(cls, existing: str, target: str) -> bool:
+        """
+        Returns False (do not update) if the existing constraint is already modern.
+        Logic:
+          - If existing uses == (exact pin) and its version >= target minimum → keep it, don't loosen.
+          - If existing uses >= and is already >= target → keep it.
+          - Otherwise allow the update.
+        """
+        existing = existing.strip()
+        target = target.strip()
+        try:
+            target_min = cls._parse_version_numbers(target)
+            if existing.startswith("=="):
+                current = cls._parse_version_numbers(existing[2:])
+                return current < target_min  # Only update if pinned version is TOO OLD
+            elif existing.startswith(">="):
+                current = cls._parse_version_numbers(existing[2:])
+                return current < target_min  # Only update if floor is too low
+        except Exception:
+            pass
+        return True  # Default: allow update if we can't parse
+
+    @classmethod
     def bump_requirements_txt(cls, content: str, modernized_libraries: Set[str]) -> Tuple[str, bool]:
         """
         Updates version requirements in requirements.txt content for modernized libraries.
@@ -81,15 +110,20 @@ class ManifestBumper:
                 continue
 
             # Extract pkg name (before any version operators)
-            parts = re.split(r"([><=~;!@\[].*)", stripped, maxsplit=1)
+            parts = re.split(r"([><\=~;!@\[].*)", stripped, maxsplit=1)
             pkg_name = parts[0].strip()
             pkg_lower = pkg_name.lower()
 
             if pkg_lower in normalized_libs or pkg_lower.replace("_", "-") in normalized_libs or pkg_lower.replace("-", "_") in normalized_libs:
                 target_ver = cls.get_target_constraint(pkg_lower)
                 if target_ver:
-                    # Check existing constraint
                     existing_constraint = parts[1].strip() if len(parts) > 1 else ""
+
+                    # ── Anti-Regression Guard: never loosen a modern pinned version ──
+                    if existing_constraint and not cls._should_update_version(existing_constraint, target_ver):
+                        new_lines.append(line)
+                        continue
+
                     new_line_content = f"{pkg_name}{target_ver}"
                     ending = "\n" if line.endswith("\n") else ""
                     if existing_constraint != target_ver:

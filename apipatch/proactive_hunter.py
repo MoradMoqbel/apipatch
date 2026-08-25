@@ -482,32 +482,73 @@ class GitHubPRHunter:
                 "audit_results": []
             }
 
-        # ── Synchronize Remote Manifest Files ──
+        # ── Synchronize Remote Manifest Files (Scope-Aware: Only in modified directories) ──
         from apipatch.manifest_bumper import ManifestBumper
         modernized_libs: Set[str] = set()
+
+        # Map: directory prefix → set of libraries modified in that directory
+        dir_to_libs: Dict[str, Set[str]] = {}
         for r in audit_results:
+            file_path = r.get("file", "")
+            # Extract parent directory (and grandparent for monorepos)
+            parts = file_path.replace("\\", "/").split("/")
+            # Build all ancestor directories (up to 3 levels deep) to catch requirements.txt
+            ancestor_dirs = set()
+            for depth in range(1, min(len(parts), 4)):
+                ancestor_dirs.add("/".join(parts[:depth]))
+            ancestor_dirs.add("")  # repo root
+
+            libs_in_file: Set[str] = set()
             for issue in r.get("detected_issues", []):
                 if issue.get("library"):
-                    modernized_libs.add(issue["library"])
+                    lib = issue["library"]
+                    modernized_libs.add(lib)
+                    libs_in_file.add(lib)
+
+            for d in ancestor_dirs:
+                if d not in dir_to_libs:
+                    dir_to_libs[d] = set()
+                dir_to_libs[d].update(libs_in_file)
 
         if modernized_libs and not precomputed_results and 'tree_items' in locals():
             for item in tree_items:
                 path = item.get("path", "")
                 base = os.path.basename(path).lower()
-                if base in ("requirements.txt", "pyproject.toml", "package.json"):
-                    content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
-                    if content:
-                        if base == "requirements.txt":
-                            new_c, changed = ManifestBumper.bump_requirements_txt(content, modernized_libs)
-                        elif base == "package.json":
-                            new_c, changed = ManifestBumper.bump_package_json(content, modernized_libs)
-                        elif base == "pyproject.toml":
-                            new_c, changed = ManifestBumper.bump_pyproject_toml(content, modernized_libs)
-                        else:
-                            changed = False
-                        if changed:
-                            print(f"  {Colors.OKGREEN}[✓] Automatically synced dependency version in {path}{Colors.ENDC}")
-                            files_to_commit[path] = new_c
+                if base not in ("requirements.txt", "pyproject.toml", "package.json"):
+                    continue
+
+                # ── Scope check: only touch manifest if its directory was modified ──
+                manifest_dir = "/".join(path.replace("\\", "/").split("/")[:-1])
+                relevant_libs: Set[str] = set()
+                for d, libs in dir_to_libs.items():
+                    # Root manifest (manifest_dir=="") matches any modified file
+                    # Other manifests match if in same dir or ancestor/descendant
+                    if (manifest_dir == ""
+                            or manifest_dir == d
+                            or manifest_dir.startswith(d + "/")
+                            or d.startswith(manifest_dir + "/")):
+
+                        relevant_libs.update(libs)
+
+                if not relevant_libs:
+                    continue  # This manifest is unrelated to any modified code — skip it
+
+                content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
+                if not content:
+                    continue
+
+                if base == "requirements.txt":
+                    new_c, changed = ManifestBumper.bump_requirements_txt(content, relevant_libs)
+                elif base == "package.json":
+                    new_c, changed = ManifestBumper.bump_package_json(content, relevant_libs)
+                elif base == "pyproject.toml":
+                    new_c, changed = ManifestBumper.bump_pyproject_toml(content, relevant_libs)
+                else:
+                    changed = False
+
+                if changed:
+                    print(f"  {Colors.OKGREEN}[✓] Automatically synced dependency version in {path}{Colors.ENDC}")
+                    files_to_commit[path] = new_c
 
         print(f"\n{Colors.OKGREEN}[✓] Identified {len(audit_results)} file(s) requiring modernization ({len(files_to_commit)} total files to commit).{Colors.ENDC}")
 
