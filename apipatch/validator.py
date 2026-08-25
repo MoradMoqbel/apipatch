@@ -284,11 +284,21 @@ class CodeValidator:
                         for alias in node.names:
                             import_map[alias.asname or alias.name] = f"{node.module}.{alias.name}"
 
+                local_param_names = set()
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        for arg in node.args.args + node.args.kwonlyargs:
+                            local_param_names.add(arg.arg)
+                        if node.args.vararg:
+                            local_param_names.add(node.args.vararg.arg)
+                        if node.args.kwarg:
+                            local_param_names.add(node.args.kwarg.arg)
+
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
                         alias = node.value.id
                         attr = node.attr
-                        if alias in import_map:
+                        if alias in import_map and alias not in local_param_names:
                             mod_path = import_map[alias]
                             if not DocHunter.verify_module_symbol(mod_path, attr):
                                 return ValidationResult(

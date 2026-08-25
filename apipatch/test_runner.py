@@ -148,13 +148,25 @@ class MicroSandboxEvaluator:
                     name = alias.asname or alias.name
                     import_map[name] = f"{node.module}.{alias.name}"
 
+        # Extract local function parameter names to avoid false positive module attribute checks
+        # when a parameter name shadows a module name (e.g., def _findKey(self, json: dict): json.items())
+        local_param_names = set()
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                for arg in node.args.args + node.args.kwonlyargs:
+                    local_param_names.add(arg.arg)
+                if node.args.vararg:
+                    local_param_names.add(node.args.vararg.arg)
+                if node.args.kwarg:
+                    local_param_names.add(node.args.kwarg.arg)
+
         # Collect attribute lookups on imported aliases (e.g. types.ToolContext, pydantic.ConfigDict)
         tested_pairs = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
                 alias = node.value.id
                 attr = node.attr
-                if alias in import_map:
+                if alias in import_map and alias not in local_param_names:
                     tested_pairs.add((import_map[alias], attr))
 
         if not tested_pairs:
