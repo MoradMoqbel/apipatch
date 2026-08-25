@@ -43,8 +43,10 @@ Rules (STRICT ZERO-TOLERANCE FOR HALLUCINATIONS & OVER-REFACTORING):
   10. PRESUMPTION OF MODERNITY: If you encounter any library, runner, or symbol that you do not recognize, ASSUME IT IS A MODERN 2025/2026 RELEASE and leave it untouched (has_breaking_changes=false).
   11. DO NOT INVENT OR MUTATE ROOT MODULE NAMES: If a file imports from a framework or SDK (e.g. `google.adk`, `google.genai`, `agno`, `crewai`), NEVER rewrite the root package or invent non-existent packages like `google_generativeai`. Only refactor specific documented deprecated symbols.
   12. STRUCTURAL BLOCK INTEGRITY: When modernizing code inside or around `try:` blocks, conditionals (`if/else`), `with` statements, or functions, NEVER delete or orphan the matching `except:`/`finally:` clauses or leave incomplete syntax structures.
-  13. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
-  14. Respond ONLY with a valid JSON object matching the exact schema below.
+  13. ZERO HALLUCINATION OF METHOD NAMES (NO FAKE RUNNER CALLS): Never change standard agent methods like `agent.run()` to `.invoke()` or `.execute()` unless the file explicitly imports and uses LangChain Runnable classes. Keep framework methods intact.
+  14. PRESERVE MODERN AUDIO & SIGNAL PARAMETERS (NO LIBROSA REGRESSIONS): In modern librosa/audio libraries, `librosa.resample(y=..., orig_sr=..., target_sr=...)` uses `orig_sr`, NOT `sr`. Never revert modern keyword arguments to deprecated ones.
+  15. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
+  16. Respond ONLY with a valid JSON object matching the exact schema below.
       Do NOT include any preamble, explanation, markdown fences, or commentary.
 
 Response schema:

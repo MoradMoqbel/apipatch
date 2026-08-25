@@ -362,17 +362,19 @@ class GitHubClient:
         # 1. Create blobs for modified files
         tree_items = []
         for file_path, content in files.items():
+            if isinstance(content, str):
+                encoded_c = base64.b64encode(content.encode("utf-8", errors="replace")).decode("ascii")
+            elif isinstance(content, bytes):
+                encoded_c = base64.b64encode(content).decode("ascii")
+            else:
+                encoded_c = base64.b64encode(str(content).encode("utf-8", errors="replace")).decode("ascii")
+
             blob_payload = {
-                "content": content,
-                "encoding": "utf-8"
+                "content": encoded_c,
+                "encoding": "base64"
             }
             blob_data = self._request(f"/repos/{clean_name}/git/blobs", method="POST", payload=blob_payload)
-            if not blob_data or "sha" not in blob_data:
-                encoded_c = base64.b64encode(content.encode("utf-8")).decode("utf-8")
-                blob_payload = {"content": encoded_c, "encoding": "base64"}
-                blob_data = self._request(f"/repos/{clean_name}/git/blobs", method="POST", payload=blob_payload)
-
-            if blob_data and "sha" in blob_data:
+            if blob_data and isinstance(blob_data, dict) and "sha" in blob_data:
                 tree_items.append({
                     "path": file_path.lstrip("/"),
                     "mode": "100644",
@@ -472,7 +474,8 @@ class GitHubClient:
     def generate_pr_markdown(
         repo_name: str,
         audit_results: List[Dict[str, Any]],
-        custom_title: Optional[str] = None
+        custom_title: Optional[str] = None,
+        scope_prefix: Optional[str] = None
     ) -> Dict[str, str]:
         """
         Generates standard GitHub Pull Request title and rich Markdown body.
@@ -486,7 +489,9 @@ class GitHubClient:
         libs = sorted(list({issue.get("library", "API") for _, issue in all_issues if issue.get("library")}))
         libs_str = ", ".join(libs) if libs else "Third-Party"
 
-        title = custom_title or f"[ApiPatch] Migrate deprecated {libs_str} API calls ({total_files} file{'s' if total_files > 1 else ''})"
+        prefix = scope_prefix or ""
+        default_title = f"{prefix}[ApiPatch] Migrate deprecated {libs_str} API calls ({total_files} file{'s' if total_files > 1 else ''})"
+        title = custom_title or default_title
 
         body_lines = [
             "## ⚡ Autonomous API Migration by [ApiPatch](https://github.com/MoradMoqbel/apipatch)",

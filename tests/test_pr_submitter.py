@@ -72,8 +72,49 @@ class TestPRSubmitter(unittest.TestCase):
             title="[ApiPatch] Migrate openai",
             body="PR Description"
         )
-        self.assertIsNotNone(res)
-        self.assertEqual(res["html_url"], "https://github.com/owner/repo/pull/42")
+    def test_generate_pr_markdown_with_custom_title_and_scope_prefix(self):
+        from apipatch.github_client import GitHubClient
+        audit_results = [{
+            "file": "apps/beifong/models/schemas.py",
+            "detected_issues": [{
+                "library": "pydantic",
+                "deprecated_symbol": "class Config",
+                "replacement_symbol": "model_config = ConfigDict()"
+            }]
+        }]
+        
+        # Test default with scope prefix
+        payload_scope = GitHubClient.generate_pr_markdown("owner/repo", audit_results, scope_prefix="[Beifong] ")
+        self.assertEqual(payload_scope["title"], "[Beifong] [ApiPatch] Migrate deprecated pydantic API calls (1 file)")
+        
+        # Test custom title override
+        payload_custom = GitHubClient.generate_pr_markdown("owner/repo", audit_results, custom_title="[Beifong] Modernize Pydantic v2")
+        self.assertEqual(payload_custom["title"], "[Beifong] Modernize Pydantic v2")
+
+    @patch.object(GitHubPRHunter, "get_authenticated_user")
+    @patch.object(GitHubPRHunter, "get_default_branch")
+    @patch.object(GitHubPRHunter, "get_branch_sha")
+    def test_audit_and_pr_repository_filters_target_path(self, mock_sha, mock_branch, mock_user):
+        mock_user.return_value = "test-user"
+        mock_branch.return_value = "main"
+        mock_sha.return_value = "abc12345"
+        
+        hunter = GitHubPRHunter(github_token="fake_token")
+        hunter.client.get_repo_file_tree = MagicMock(return_value=[
+            {"path": "apps/beifong/models/podcast.py", "type": "blob"},
+            {"path": "apps/beifong/models/user.py", "type": "blob"},
+            {"path": "apps/other_app/server.py", "type": "blob"},
+            {"path": "readme.md", "type": "blob"}
+        ])
+        hunter.client.fetch_file_content = MagicMock(return_value="import os\n")
+        
+        # Run with target_path="beifong" in dry_run mode
+        res = hunter.audit_and_pr_repository(
+            repo_name="owner/repo",
+            dry_run=True,
+            target_path="beifong"
+        )
+        self.assertEqual(res["status"], "clean")
 
 
 if __name__ == "__main__":

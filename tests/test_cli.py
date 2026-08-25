@@ -107,7 +107,7 @@ class TestCLI(unittest.TestCase):
         self.assertIn("--no-fork", combined)
 
     def test_cli_pr_help(self):
-        """pr command help should list repo, --dry-run, --fork, --token."""
+        """pr command help should list repo, --dry-run, --fork, --token, --path, --title."""
         res = subprocess.run(
             [sys.executable, "-m", "apipatch.cli", "pr", "--help"],
             capture_output=True,
@@ -119,6 +119,8 @@ class TestCLI(unittest.TestCase):
         self.assertIn("--dry-run", combined)
         self.assertIn("--fork", combined)
         self.assertIn("--token", combined)
+        self.assertIn("--path", combined)
+        self.assertIn("--title", combined)
 
     def test_cli_webhook_help(self):
         """webhook command help should list --port, --host, --secret."""

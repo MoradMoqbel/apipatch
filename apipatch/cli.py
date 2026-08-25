@@ -63,6 +63,8 @@ def main():
     pr_parser.add_argument("--fork", dest="fork", action="store_true", default=None, help="Force forking the repository first")
     pr_parser.add_argument("--no-fork", dest="fork", action="store_false", help="Push directly to target repository without forking")
     pr_parser.add_argument("--dry-run", "--preview", dest="dry_run", action="store_true", help="Inspect and preview refactorings without pushing branch or PR")
+    pr_parser.add_argument("--path", "--dir", "--target-path", dest="target_path", help="Target sub-directory or file path within repository to restrict audit/PR scope (e.g., 'beifong' or 'apps/my-app')")
+    pr_parser.add_argument("--title", dest="custom_title", help="Custom title for the generated Pull Request")
     pr_parser.add_argument("--max-files", type=int, default=50, help="Max repository files to inspect (default: 50)")
     pr_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini", "bedrock"], help="AI provider for dynamic reasoning")
     pr_parser.add_argument("--api-key", help="API key for chosen provider")
@@ -173,7 +175,9 @@ def main():
             branch_name=args.new_branch,
             submit=not args.dry_run,
             dry_run=args.dry_run,
-            max_files=args.max_files
+            max_files=args.max_files,
+            target_path=getattr(args, "target_path", None),
+            custom_title=getattr(args, "custom_title", None)
         )
 
     elif args.command == "webhook":

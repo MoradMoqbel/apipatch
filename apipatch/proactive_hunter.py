@@ -382,16 +382,20 @@ class GitHubPRHunter:
         submit: bool = True,
         dry_run: bool = False,
         max_files: int = 50,
-        precomputed_results: Optional[List[Dict[str, Any]]] = None
+        precomputed_results: Optional[List[Dict[str, Any]]] = None,
+        target_path: Optional[str] = None,
+        custom_title: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Audits an entire GitHub repository, applies refactorings to all deprecated files,
+        Audits an entire GitHub repository (or specific sub-directory), applies refactorings to all deprecated files,
         creates a branch (directly or on a fork), commits all modified files, and opens
         a comprehensive live Pull Request.
         """
         repo_name = GitHubClient.normalize_repo_name(repo_name)
         print(f"\n{Colors.HEADER}{Colors.BOLD}=== ApiPatch: Autonomous GitHub PR Pipeline ==={Colors.ENDC}")
         print(f"Target Repository: {Colors.OKCYAN}{repo_name}{Colors.ENDC}")
+        if target_path:
+            print(f"Scope Filter (Target Path): {Colors.BOLD}{target_path}{Colors.ENDC}")
         print(f"Auth Token: {Colors.OKBLUE}{mask_token(self.github_token)}{Colors.ENDC}")
 
         if not self.github_token:
@@ -428,13 +432,23 @@ class GitHubPRHunter:
             print(f"[✓] Retrieved {len(tree_items)} total repository files.")
 
             supported_exts = (".py", ".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs")
-            candidate_files = [
-                item["path"] for item in tree_items
-                if item.get("path", "").endswith(supported_exts)
-                and not any(ignore in item.get("path", "") for ignore in [
+            target_norm = target_path.strip("/\\").replace("\\", "/").lower() if target_path else None
+            candidate_files = []
+            for item in tree_items:
+                p = item.get("path", "")
+                if not p.endswith(supported_exts):
+                    continue
+                if any(ignore in p for ignore in [
                     "node_modules/", ".git/", "__pycache__/", "venv/", ".env", "dist/", "build/"
-                ])
-            ][:max_files]
+                ]):
+                    continue
+                if target_norm:
+                    p_lower = p.replace("\\", "/").lower()
+                    if not (p_lower == target_norm or p_lower.startswith(target_norm + "/") or f"/{target_norm}/" in ("/" + p_lower) or target_norm in p_lower):
+                        continue
+                candidate_files.append(p)
+
+            candidate_files = candidate_files[:max_files]
 
             print(f"[*] Inspecting {len(candidate_files)} supported candidate code files in parallel...")
 
@@ -486,52 +500,39 @@ class GitHubPRHunter:
         from apipatch.manifest_bumper import ManifestBumper
         modernized_libs: Set[str] = set()
 
-        # Map: directory prefix → set of libraries modified in that directory
-        dir_to_libs: Dict[str, Set[str]] = {}
+        # Map: modified_file_dir → set of libraries modified in that directory
+        file_dirs_to_libs: Dict[str, Set[str]] = {}
         for r in audit_results:
-            file_path = r.get("file", "")
-            # Extract parent directory (and grandparent for monorepos)
-            parts = file_path.replace("\\", "/").split("/")
-            # Build all ancestor directories (up to 3 levels deep) to catch requirements.txt
-            ancestor_dirs = set()
-            for depth in range(1, min(len(parts), 4)):
-                ancestor_dirs.add("/".join(parts[:depth]))
-            ancestor_dirs.add("")  # repo root
+            file_path = r.get("file", "").replace("\\", "/")
+            mod_dir = "/".join(file_path.split("/")[:-1])
+            if mod_dir not in file_dirs_to_libs:
+                file_dirs_to_libs[mod_dir] = set()
 
-            libs_in_file: Set[str] = set()
             for issue in r.get("detected_issues", []):
                 if issue.get("library"):
                     lib = issue["library"]
                     modernized_libs.add(lib)
-                    libs_in_file.add(lib)
-
-            for d in ancestor_dirs:
-                if d not in dir_to_libs:
-                    dir_to_libs[d] = set()
-                dir_to_libs[d].update(libs_in_file)
+                    file_dirs_to_libs[mod_dir].add(lib)
 
         if modernized_libs and not precomputed_results and 'tree_items' in locals():
             for item in tree_items:
-                path = item.get("path", "")
+                path = item.get("path", "").replace("\\", "/")
                 base = os.path.basename(path).lower()
                 if base not in ("requirements.txt", "pyproject.toml", "package.json"):
                     continue
 
-                # ── Scope check: only touch manifest if its directory was modified ──
-                manifest_dir = "/".join(path.replace("\\", "/").split("/")[:-1])
+                # ── Scope check: only touch manifest if it encloses the modified file ──
+                manifest_dir = "/".join(path.split("/")[:-1])
                 relevant_libs: Set[str] = set()
-                for d, libs in dir_to_libs.items():
-                    # Root manifest (manifest_dir=="") matches any modified file
-                    # Other manifests match if in same dir or ancestor/descendant
-                    if (manifest_dir == ""
-                            or manifest_dir == d
-                            or manifest_dir.startswith(d + "/")
-                            or d.startswith(manifest_dir + "/")):
-
+                for mod_dir, libs in file_dirs_to_libs.items():
+                    # 1. Root manifest (manifest_dir == "") matches any modified file
+                    # 2. Same directory manifest (manifest_dir == mod_dir)
+                    # 3. Ancestor manifest (mod_dir.startswith(manifest_dir + "/"))
+                    if manifest_dir == "" or manifest_dir == mod_dir or mod_dir.startswith(manifest_dir + "/"):
                         relevant_libs.update(libs)
 
                 if not relevant_libs:
-                    continue  # This manifest is unrelated to any modified code — skip it
+                    continue  # This manifest is in an unrelated subproject — skip it!
 
                 content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
                 if not content:
@@ -553,7 +554,18 @@ class GitHubPRHunter:
         print(f"\n{Colors.OKGREEN}[✓] Identified {len(audit_results)} file(s) requiring modernization ({len(files_to_commit)} total files to commit).{Colors.ENDC}")
 
         # 2. Generate PR Markdown Payload
-        pr_payload = self.client.generate_pr_markdown(repo_name, audit_results)
+        scope_prefix = None
+        if target_path:
+            scope_leaf = os.path.basename(target_path.rstrip("/\\"))
+            if scope_leaf:
+                scope_prefix = f"[{scope_leaf.capitalize()}] "
+
+        pr_payload = self.client.generate_pr_markdown(
+            repo_name,
+            audit_results,
+            custom_title=custom_title,
+            scope_prefix=scope_prefix
+        )
         print(f"\n{Colors.HEADER}Proposed PR Title:{Colors.ENDC} {pr_payload['title']}")
 
         if dry_run or not submit:

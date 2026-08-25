@@ -1,4 +1,4 @@
-﻿"""
+"""
 Unit tests for the three dynamic fixes:
 1. Scope-Aware Manifest Bumper  
 2. Anti-Regression Version Guard
@@ -55,14 +55,11 @@ class TestBumpRequirementsTxt:
         assert changed is False
 
 
-def _scope_match(manifest_dir, dir_to_libs):
+def _scope_match(manifest_dir, file_dirs_to_libs):
     """Mirror of the scope matching logic in proactive_hunter.py"""
     relevant = set()
-    for d, libs in dir_to_libs.items():
-        if (manifest_dir == ""
-                or manifest_dir == d
-                or manifest_dir.startswith(d + "/")
-                or d.startswith(manifest_dir + "/")):
+    for mod_dir, libs in file_dirs_to_libs.items():
+        if manifest_dir == "" or manifest_dir == mod_dir or mod_dir.startswith(manifest_dir + "/"):
             relevant.update(libs)
     return relevant
 
@@ -84,6 +81,14 @@ class TestScopeAwareDirectoryLogic:
     def test_nested_subdirectory_matches_parent_manifest(self):
         libs = _scope_match("beifong", {"beifong/models": {"pydantic"}})
         assert "pydantic" in libs
+
+    def test_monorepo_sibling_under_shared_parent_does_not_match(self):
+        """Manifest in sibling app under shared folder must NOT be touched"""
+        libs = _scope_match(
+            "advanced_ai_agents/multi_agent_apps/agent_teams/ai_travel_planner_agent_team",
+            {"advanced_ai_agents/multi_agent_apps/ai_news_and_podcast_agents/beifong/models": {"pydantic"}}
+        )
+        assert len(libs) == 0
 
     def test_completely_unrelated_paths_do_not_match(self):
         libs = _scope_match("coding_assistant", {"ai_finance_agent": {"openai"}})
