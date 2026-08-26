@@ -14,6 +14,7 @@ from apipatch.auto_detector import AutoDeprecationDetector
 from apipatch.proactive_hunter import GitHubPRHunter
 from apipatch.github_client import resolve_github_token, mask_token
 from apipatch.webhook import run_webhook_server
+from apipatch.telemetry import track_cli_event
 
 # Ensure UTF-8 console output on Windows
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -30,6 +31,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("-v", "--version", action="version", version=f"apipatch {__version__}")
+    parser.add_argument("--no-telemetry", action="store_true", help="Disable anonymous usage telemetry")
 
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
@@ -116,6 +118,12 @@ def main():
     if not args.command:
         parser.print_help()
         sys.exit(0)
+
+    if getattr(args, "no_telemetry", False):
+        import os
+        os.environ["APIPATCH_NO_TELEMETRY"] = "1"
+
+    track_cli_event(args.command, {"has_provider": bool(getattr(args, "provider", None))})
 
     if args.command == "scan":
         engine = ApiPatchEngine(
