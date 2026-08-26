@@ -180,6 +180,37 @@ class CodeValidator:
                 error_message=f"Refactored code dropped required class(es): {', '.join(sorted(missing_classes))}"
             )
 
+        # Check for dropped imported names that are still referenced in refactored code (NameError guard)
+        try:
+            orig_imported_names = set()
+            orig_tree = ast.parse(original_code)
+            for node in ast.walk(orig_tree):
+                if isinstance(node, (ast.Import, ast.ImportFrom)):
+                    for alias in node.names:
+                        orig_imported_names.add(alias.asname or alias.name)
+
+            ref_imported_names = set()
+            ref_defined_names = set()
+            ref_referenced_names = set()
+            ref_tree = ast.parse(refactored_code)
+            for node in ast.walk(ref_tree):
+                if isinstance(node, (ast.Import, ast.ImportFrom)):
+                    for alias in node.names:
+                        ref_imported_names.add(alias.asname or alias.name)
+                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    ref_defined_names.add(node.name)
+                elif isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):
+                    ref_referenced_names.add(node.id)
+
+            dropped_used_imports = (orig_imported_names & ref_referenced_names) - (ref_imported_names | ref_defined_names)
+            if dropped_used_imports:
+                return ValidationResult(
+                    is_valid=False,
+                    error_message=f"Refactored code dropped import(s) for symbol(s) still referenced in the code: {', '.join(sorted(dropped_used_imports))}. Preserve all required imports."
+                )
+        except Exception:
+            pass
+
         # Framework runner and agent preservation check
         orig_imports = CodeValidator.extract_imported_symbols(original_code)
         new_imports = CodeValidator.extract_imported_symbols(refactored_code)
