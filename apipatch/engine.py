@@ -345,6 +345,15 @@ class ApiPatchEngine:
                                 safe_print(
                                     f"  {Colors.OKGREEN}[✓] {file_name} successfully self-healed on attempt {heal_attempt}!{Colors.ENDC}"
                                 )
+                                if llm_res and llm_res.get("detected_issues"):
+                                    orig_issues = llm_res.get("detected_issues", [])
+                                    healed_issues = healed_res.get("detected_issues", [])
+                                    combined = list(orig_issues)
+                                    for hi in healed_issues:
+                                        if hi not in combined:
+                                            combined.append(hi)
+                                    healed_res["detected_issues"] = combined
+
                                 return healed_res
                             else:
                                 current_broken_code = healed_code
