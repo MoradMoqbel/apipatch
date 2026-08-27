@@ -1,0 +1,28 @@
+name: 'ApiPatch Codebase Maintenance'
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  apipatch-audit:
+    name: 'Audit & Migrate Deprecated APIs'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Run ApiPatch
+        uses: MoradMoqbel/apipatch@main
+        with:
+          mode: 'fix'
+          provider: 'gemini'
+          api_key: ${{ secrets.GEMINI_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          auto_pr: 'true'

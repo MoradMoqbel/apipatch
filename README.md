@@ -154,13 +154,44 @@ apipatch fix /path/to/project --write
 
 ---
 
+## 🤖 GitHub Actions CI/CD Integration
+
+Automate codebase maintenance by running ApiPatch on a schedule or on every push. Add `.github/workflows/apipatch.yml` to your repository:
+
+```yaml
+name: 'ApiPatch Codebase Maintenance'
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Runs every Monday at midnight
+  workflow_dispatch:
+
+jobs:
+  apipatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run ApiPatch & Create PR
+        uses: MoradMoqbel/apipatch@main
+        with:
+          mode: 'fix'
+          provider: 'gemini'
+          api_key: ${{ secrets.GEMINI_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          auto_pr: 'true'
+```
+
+---
+
 ## 🧪 Testing
 
 ```bash
 pytest
 ```
 
-All 76 tests are offline-safe and mocked (no external network or live LLM required for the test suite).
+All tests are offline-safe and mocked (no external network or live LLM required for the test suite).
 
 ---
 
@@ -171,12 +202,13 @@ All 76 tests are offline-safe and mocked (no external network or live LLM requir
 - [x] AST Syntax & Safety Validator
 - [x] Multi-LLM Provider (Gemini 2.5 Flash Lite, OpenAI, Claude) with auto-discovery
 - [x] In-place refactoring with automatic backup (`--write`)
-- [x] Automated test suite (76/76 tests passing)
 - [x] **v0.5.0: Autonomous GitHub PR Engine (`apipatch pr`)**
 - [x] **v0.5.0: GitHub App Webhook Daemon (`apipatch webhook`)**
 - [x] **v0.6.0: Smart 2026 Repository Discovery Engine (`apipatch discover`)**
 - [x] **v0.6.0: Multi-threaded parallel file auditing (10x performance boost)**
 - [x] **v0.6.0: AST Self-Healing feedback loop**
+- [x] **v0.8.0: Anonymous Privacy-Preserving CLI Telemetry (PostHog)**
+- [x] **v0.8.1: Official GitHub Actions CI/CD Integration (`action.yml`)**
 - [x] PyPI Release (`pip install apipatch`)
 
 ---
