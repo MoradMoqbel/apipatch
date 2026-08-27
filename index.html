@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApiPatch — Autonomous AI Agent for API Breaking Changes</title>
+  <meta name="description" content="Autonomous agent that detects API breaking changes, grounds fixes in official docs via DocHunter™, validates AST safety, and submits production-ready GitHub PRs." />
+  
+  <!-- Browser Favicon & Touch Icon -->
+  <link rel="icon" type="image/jpeg" href="logo.jpg" />
+  <link rel="shortcut icon" type="image/jpeg" href="logo.jpg" />
+  <link rel="apple-touch-icon" href="logo.jpg" />
+
+  <!-- OpenGraph Meta -->
+  <meta property="og:title" content="ApiPatch — Self-Maintaining Codebases" />
+  <meta property="og:description" content="From deprecated API call to merged fix — automatically. Now live on PyPI v0.8.1 & GitHub Actions." />
+  <meta property="og:image" content="logo.jpg" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="top-banner">
+    <div class="top-banner-inner">
+      <span class="badge-new">NEW v0.8.1</span>
+      <span>Live on PyPI &amp; GitHub Actions with Automated CI/CD Codebase Maintenance</span>
+      <a href="https://pypi.org/project/apipatch/" target="_blank" class="banner-link">View Release ↗</a>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="logo-wrap">
+        <img src="logo.jpg" alt="ApiPatch Logo" class="nav-logo-img" />
+        <span class="logo">ApiPatch</span>
+      </a>
+      <div class="nav-links">
+        <a href="#how">How It Works</a>
+        <a href="#playground">Playground</a>
+        <a href="#features">Features</a>
+        <a href="#cli">CLI &amp; App</a>
+        <a href="#demo">Live Demo</a>
+        <a href="https://github.com/MoradMoqbel/apipatch" target="_blank">GitHub ↗</a>
+      </div>
+      <div class="status-pill">
+        <span class="dot"></span> 
+        <span class="status-text">v0.8.0 · 111 Tests Passing</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">Developer Infrastructure · Autonomous AI Agent</p>
+      <h1>Stop chasing<br /><em>broken APIs.</em></h1>
+      <p class="hero-sub">
+        ApiPatch detects third-party breaking changes, fetches live changelogs via <strong>DocHunter™</strong>, rewrites deprecated code with AST safety validation, and opens ready-to-merge GitHub Pull Requests.
+      </p>
+      
+      <!-- Hero Terminal Install Box -->
+      <div class="hero-install">
+        <div class="terminal-widget mini">
+          <div class="term-titlebar mini">
+            <div class="term-dots">
+              <span class="tdot red"></span>
+              <span class="tdot yellow"></span>
+              <span class="tdot green"></span>
+            </div>
+            <span class="term-mini-title">terminal — pip install</span>
+          </div>
+          <div class="term-widget-body">
+            <span class="prompt-sym">$</span>
+            <code id="install-cmd">pip install apipatch</code>
+            <button class="copy-btn" id="copy-install-btn" title="Copy command">
+              <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span class="copy-text">Copy</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="https://github.com/MoradMoqbel/apipatch" target="_blank" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Get Started on GitHub
+        </a>
+        <a href="#how" class="btn-ghost">Explore Live PRs →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Stats Strip -->
+  <div class="grid-strip">
+    <div class="metric">
+      <span>111/111</span>
+      <p>Passing unit tests with AST validation &amp; zero regressions</p>
+    </div>
+    <div class="metric">
+      <span>&lt;0.1s</span>
+      <p>DocHunter™ live grounding against official package changelogs</p>
+    </div>
+    <div class="metric">
+      <span>100%</span>
+      <p>Autonomous workflow: scan, fork, branch, AST validate &amp; PR</p>
+    </div>
+    <div class="metric">
+      <span>5+</span>
+      <p>Languages &amp; formats: Python, JS, TS, JSX, TSX, JSON</p>
+    </div>
+  </div>
+
+  <!-- How Section / Interactive Diff Showcase (Terminal IDE Style) -->
+  <section class="how" id="how">
+    <div class="how-inner">
+      <div class="how-text">
+        <p class="label">Autonomous Refactoring</p>
+        <h2>From breaking changes<br />to merged PRs —<br />zero hallucinations.</h2>
+        <p class="body-text">
+          Tools like Dependabot only bump version numbers in configuration files. ApiPatch understands actual code semantics, validates changes through AST syntax trees, and submits ready-to-merge Pull Requests.
+        </p>
+        
+        <ul class="check-list">
+          <li><strong>DocHunter™ Grounding:</strong> Resolves live PyPI/npm documentation and changelogs before writing code.</li>
+          <li><strong>AST Self-Healing:</strong> Detects and repairs LLM syntax or structural errors automatically.</li>
+          <li><strong>Atomic GitHub Commits:</strong> Opens live PRs directly on target repositories via Git Database REST API.</li>
+        </ul>
+
+        <div class="live-pr-badge">
+          <span class="live-dot"></span>
+          <span>Verified Live PR: <a href="https://github.com/jedarden/duck-e/pull/1" target="_blank">jedarden/duck-e #1 ↗</a></span>
+        </div>
+      </div>
+
+      <!-- Terminal Diff Container -->
+      <div class="diff-container">
+        <!-- Terminal Diff Tabs -->
+        <div class="diff-tabs">
+          <button class="diff-tab active" data-target="pydantic-diff">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Pydantic v1 ➔ v2 (Live PR #1)
+          </button>
+          <button class="diff-tab" data-target="openai-diff">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            OpenAI v0.x ➔ v1.0 SDK
+          </button>
+          <button class="diff-tab" data-target="stripe-diff">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Stripe Charge ➔ PaymentIntent
+          </button>
+        </div>
+
+        <!-- Terminal Diff Window: Pydantic -->
+        <div class="terminal-editor diff-panel active" id="pydantic-diff">
+          <div class="term-titlebar">
+            <div class="term-dots">
+              <span class="tdot red"></span>
+              <span class="tdot yellow"></span>
+              <span class="tdot green"></span>
+            </div>
+            <div class="term-tab-active">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+              <span>app/models/user.py</span>
+            </div>
+            <div class="term-status-badge">
+              <span class="badge-dot"></span> Live PR #1 Generated
+            </div>
+          </div>
+          
+          <div class="term-code-view">
+            <div class="code-line context">
+              <span class="ln">1</span><span class="sign"> </span><span class="code"><span class="kwd">from</span> enum <span class="kwd">import</span> Enum</span>
+            </div>
+            <div class="code-line context">
+              <span class="ln">2</span><span class="sign"> </span><span class="code"><span class="kwd">from</span> pydantic <span class="kwd">import</span> BaseModel, Field</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">3</span><span class="sign">+</span><span class="code"><span class="kwd">from</span> pydantic.config <span class="kwd">import</span> <span class="typ">ConfigDict</span></span>
+            </div>
+            <div class="code-line context">
+              <span class="ln">4</span><span class="sign"> </span><span class="code"></span>
+            </div>
+            <div class="code-line context">
+              <span class="ln">5</span><span class="sign"> </span><span class="code"><span class="kwd">class</span> <span class="typ">UserTierConfig</span>(BaseModel):</span>
+            </div>
+            <div class="code-line context">
+              <span class="ln">6</span><span class="sign"> </span><span class="code">    session_timeout: <span class="typ">int</span> = Field(description=<span class="str">"Timeout in seconds"</span>)</span>
+            </div>
+            <div class="code-line context">
+              <span class="ln">7</span><span class="sign"> </span><span class="code"></span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">8</span><span class="sign">-</span><span class="code">    <span class="kwd">class</span> <span class="typ">Config</span>:</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">9</span><span class="sign">-</span><span class="code">        frozen = <span class="typ">True</span>  <span class="cmt"># Deprecated Pydantic v1 syntax</span></span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">10</span><span class="sign">+</span><span class="code">    model_config = <span class="typ">ConfigDict</span>(frozen=<span class="typ">True</span>)</span>
+            </div>
+          </div>
+
+          <div class="term-status-footer">
+            <div class="term-footer-left">
+              <span class="term-git-branch"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg> apipatch/migrate-pydantic-v2</span>
+              <span class="term-sep">|</span>
+              <span class="term-msg">↳ Pull Request: <a href="https://github.com/jedarden/duck-e/pull/1" target="_blank">[ApiPatch] Migrate deprecated pydantic API calls (2 files) ↗</a></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminal Diff Window: OpenAI -->
+        <div class="terminal-editor diff-panel" id="openai-diff">
+          <div class="term-titlebar">
+            <div class="term-dots">
+              <span class="tdot red"></span>
+              <span class="tdot yellow"></span>
+              <span class="tdot green"></span>
+            </div>
+            <div class="term-tab-active">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+              <span>services/ai_service.py</span>
+            </div>
+            <div class="term-status-badge">
+              <span class="badge-dot"></span> OpenAI v1.0 SDK Refactored
+            </div>
+          </div>
+          
+          <div class="term-code-view">
+            <div class="code-line context">
+              <span class="ln">1</span><span class="sign"> </span><span class="code"><span class="cmt"># OpenAI SDK v0.x Legacy Migration</span></span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">2</span><span class="sign">-</span><span class="code"><span class="kwd">import</span> openai</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">3</span><span class="sign">-</span><span class="code">response = openai.ChatCompletion.create(</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">4</span><span class="sign">-</span><span class="code">    model=<span class="str">"gpt-4o"</span>,</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">5</span><span class="sign">-</span><span class="code">    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: prompt}],</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">6</span><span class="sign">-</span><span class="code">)</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">7</span><span class="sign">-</span><span class="code"><span class="kwd">return</span> response[<span class="str">"choices"</span>][0][<span class="str">"message"</span>][<span class="str">"content"</span>]</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">8</span><span class="sign">+</span><span class="code"><span class="kwd">from</span> openai <span class="kwd">import</span> <span class="typ">OpenAI</span></span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">9</span><span class="sign">+</span><span class="code">client = <span class="typ">OpenAI</span>()</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">10</span><span class="sign">+</span><span class="code">response = client.chat.completions.create(</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">11</span><span class="sign">+</span><span class="code">    model=<span class="str">"gpt-4o"</span>,</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">12</span><span class="sign">+</span><span class="code">    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: prompt}],</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">13</span><span class="sign">+</span><span class="code">)</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">14</span><span class="sign">+</span><span class="code"><span class="kwd">return</span> response.choices[0].message.content</span>
+            </div>
+          </div>
+
+          <div class="term-status-footer">
+            <div class="term-footer-left">
+              <span class="term-git-branch"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg> apipatch/openai-v1-migration</span>
+              <span class="term-sep">|</span>
+              <span class="term-msg">↳ Pull Request: <em>[ApiPatch] Migrate OpenAI legacy ChatCompletion to v1.0 SDK</em></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminal Diff Window: Stripe -->
+        <div class="terminal-editor diff-panel" id="stripe-diff">
+          <div class="term-titlebar">
+            <div class="term-dots">
+              <span class="tdot red"></span>
+              <span class="tdot yellow"></span>
+              <span class="tdot green"></span>
+            </div>
+            <div class="term-tab-active">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+              <span>payments/billing.py</span>
+            </div>
+            <div class="term-status-badge">
+              <span class="badge-dot"></span> SCA &amp; 3DS Safe
+            </div>
+          </div>
+          
+          <div class="term-code-view">
+            <div class="code-line context">
+              <span class="ln">1</span><span class="sign"> </span><span class="code"><span class="cmt"># Stripe Charges ➔ PaymentIntent Migration</span></span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">2</span><span class="sign">-</span><span class="code">charge = stripe.Charge.create(</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">3</span><span class="sign">-</span><span class="code">    amount=2900,</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">4</span><span class="sign">-</span><span class="code">    currency=<span class="str">"usd"</span>,</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">5</span><span class="sign">-</span><span class="code">    source=card_token,</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">6</span><span class="sign">-</span><span class="code">)</span>
+            </div>
+            <div class="code-line rem">
+              <span class="ln">7</span><span class="sign">-</span><span class="code"><span class="kwd">return</span> charge.id</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">8</span><span class="sign">+</span><span class="code">intent = stripe.PaymentIntent.create(</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">9</span><span class="sign">+</span><span class="code">    amount=2900,</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">10</span><span class="sign">+</span><span class="code">    currency=<span class="str">"usd"</span>,</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">11</span><span class="sign">+</span><span class="code">    payment_method_types=[<span class="str">'card'</span>],</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">12</span><span class="sign">+</span><span class="code">)</span>
+            </div>
+            <div class="code-line add">
+              <span class="ln">13</span><span class="sign">+</span><span class="code"><span class="kwd">return</span> intent.id</span>
+            </div>
+          </div>
+
+          <div class="term-status-footer">
+            <div class="term-footer-left">
+              <span class="term-git-branch"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg> apipatch/stripe-payment-intents</span>
+              <span class="term-sep">|</span>
+              <span class="term-msg">↳ Pull Request: <em>[ApiPatch] Upgrade legacy Stripe Charges to PaymentIntent API</em></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Live Playground Section -->
+  <section class="playground-section" id="playground">
+    <div class="playground-inner">
+      <div class="section-head">
+        <p class="label">Live Simulator</p>
+        <h2>Test ApiPatch on Real Code</h2>
+        <p class="section-sub">Pick a legacy SDK pattern or paste your own code. Watch DocHunter™ ground the official changelogs, run AST validation, and modernize the code in real time.</p>
+      </div>
+
+      <!-- Playground Preset Buttons -->
+      <div class="playground-presets">
+        <button class="preset-btn active" data-preset="pydantic">Pydantic v1 ConfigDict</button>
+        <button class="preset-btn" data-preset="openai">OpenAI v0.x ➔ v1.0</button>
+        <button class="preset-btn" data-preset="google">Google GenAI Client</button>
+        <button class="preset-btn" data-preset="stripe">Stripe PaymentIntent</button>
+        <button class="preset-btn" data-preset="fastapi">FastAPI Lifespan</button>
+      </div>
+
+      <!-- Playground Editor Container -->
+      <div class="playground-grid">
+        <!-- Left Pane: Input Code -->
+        <div class="pg-pane pg-input-pane">
+          <div class="pg-titlebar">
+            <div class="pg-dots">
+              <span class="pdot red"></span>
+              <span class="pdot yellow"></span>
+              <span class="pdot green"></span>
+            </div>
+            <span class="pg-file-title" id="pg-input-filename">models.py (Legacy Source)</span>
+            <span class="pg-tag-legacy">Deprecated API</span>
+          </div>
+          <div class="pg-editor-wrap">
+            <textarea id="pg-source-input" spellcheck="false" placeholder="Paste your legacy Python or JS/TS code here..."></textarea>
+          </div>
+          <div class="pg-action-bar">
+            <span class="pg-detected-lib" id="pg-detected-badge">Detected: <strong>pydantic (v1.10)</strong></span>
+            <button class="btn-run-agent" id="btn-run-agent">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>Run ApiPatch Agent ⚡</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Pane: Modernized Output & Pipeline Trace -->
+        <div class="pg-pane pg-output-pane">
+          <div class="pg-titlebar">
+            <div class="pg-dots">
+              <span class="pdot red"></span>
+              <span class="pdot yellow"></span>
+              <span class="pdot green"></span>
+            </div>
+            <span class="pg-file-title" id="pg-output-filename">models.py (Modernized)</span>
+            <span class="pg-tag-modern" id="pg-status-badge">PR Ready ✅</span>
+          </div>
+
+          <!-- Live Agent Pipeline Stages -->
+          <div class="pg-pipeline-stages" id="pg-pipeline">
+            <div class="stage-item done" id="stage-hunter">
+              <span class="stage-icon">🌐</span>
+              <div class="stage-info">
+                <strong>DocHunter™ Grounding:</strong>
+                <span class="stage-desc" id="stage-hunter-text">Verified against official PyPI &amp; GitHub changelogs (0.08s)</span>
+              </div>
+            </div>
+            <div class="stage-item done" id="stage-ast">
+              <span class="stage-icon">🛡️</span>
+              <div class="stage-info">
+                <strong>AST Safety Guard:</strong>
+                <span class="stage-desc" id="stage-ast-text">Parsed AST syntax tree, 100% logic and docstrings intact</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pg-output-view">
+            <pre><code id="pg-refactored-output"></code></pre>
+          </div>
+
+          <div class="pg-footer">
+            <div class="pg-pr-summary" id="pg-pr-summary">
+              <span>PR: <strong>[ApiPatch] Migrate deprecated Pydantic v1 Config to v2 ConfigDict</strong></span>
+            </div>
+            <button class="copy-btn mini" id="pg-copy-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy Code</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Architecture / Features Grid with Sleek Modern SVG Icons -->
+  <section class="features" id="features">
+    <div class="features-inner">
+      <div class="section-head">
+        <p class="label">Under The Hood</p>
+        <h2>Engineered for real-world production codebases.</h2>
+        <p class="section-sub">Zero guesswork. Grounded in live documentation, secured by AST compilers, and delivered via atomic Git commits.</p>
+      </div>
+
+      <div class="feature-grid">
+        <!-- Feature 1: DocHunter -->
+        <div class="feature-card">
+          <div class="card-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+          </div>
+          <h3>DocHunter™ Live Grounding</h3>
+          <p>Instantly pulls live official documentation, changelogs, and migration guides from PyPI, npm, and GitHub APIs in under 100ms to eliminate hallucinations.</p>
+        </div>
+
+        <!-- Feature 2: AST Self-Healing -->
+        <div class="feature-card">
+          <div class="card-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+          </div>
+          <h3>AST Self-Healing Loop</h3>
+          <p>Parses refactored Python and JavaScript/TypeScript through AST linters. If syntax or structural errors occur, ApiPatch automatically prompts the AI to self-heal.</p>
+        </div>
+
+        <!-- Feature 3: Autonomous GitHub PR Pipeline -->
+        <div class="feature-card">
+          <div class="card-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="18" r="3"></circle>
+              <circle cx="6" cy="6" r="3"></circle>
+              <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
+              <line x1="6" y1="9" x2="6" y2="21"></line>
+            </svg>
+          </div>
+          <h3>Autonomous GitHub PR Pipeline</h3>
+          <p>Run <code>apipatch pr owner/repo</code> to audit remote repositories, fork, create isolated branches, commit refactorings, and open live PRs automatically.</p>
+        </div>
+
+        <!-- Feature 4: Parallel Async Auditing -->
+        <div class="feature-card">
+          <div class="card-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <h3>10x Parallel Async Auditing</h3>
+          <p>Multi-threaded candidate file pre-filtering scans thousands of files concurrently using lightweight fast AST regex parsers before invoking the LLM.</p>
+        </div>
+
+        <!-- Feature 5: Multi-LLM Engine -->
+        <div class="feature-card">
+          <div class="card-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5v1.5a2 2 0 0 1-2 2h0a2 2 0 0 1-2-2V9.5C8.8 8.8 8 7.5 8 6a4 4 0 0 1 4-4z"></path>
+              <path d="M9 18h6"></path>
+              <path d="M10 22h4"></path>
+            </svg>
+          </div>
+          <h3>Multi-LLM Engine</h3>
+          <p>Optimized for Google Gemini 2.5 Flash Lite, Anthropic Claude 3.7 Sonnet, and OpenAI GPT-4o with automatic fallback and key discovery.</p>
+        </div>
+
+        <!-- Feature 6: GitHub App Webhook -->
+        <div class="feature-card">
+          <div class="card-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
+          <h3>GitHub App &amp; Webhook Daemon</h3>
+          <p>Run <code>apipatch webhook</code> on your CI/CD server or cloud container to receive push webhooks and maintain 100% up-to-date dependencies 24/7.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLI & Terminal Showcase (Unified Terminal Design) -->
+  <section class="cli-section" id="cli">
+    <div class="cli-inner">
+      <div class="cli-text">
+        <p class="label">Command Line Interface</p>
+        <h2>One command to audit.<br />One command to patch.</h2>
+        <p class="body-text">
+          ApiPatch provides intuitive CLI commands for local audits, proactive repository discovery, and autonomous pull requests.
+        </p>
+
+        <!-- Command Cards Styled as Mini Terminal Prompts -->
+        <div class="cli-commands-list">
+          <div class="terminal-cmd-card">
+            <div class="cmd-topbar">
+              <span class="cmd-prompt-sym">$</span>
+              <code>apipatch scan ./src</code>
+            </div>
+            <span class="cmd-desc">Local recursive scan with colorized diffs</span>
+          </div>
+
+          <div class="terminal-cmd-card">
+            <div class="cmd-topbar">
+              <span class="cmd-prompt-sym">$</span>
+              <code>apipatch fix ./src --write</code>
+            </div>
+            <span class="cmd-desc">Apply fixes in-place with automatic <code>.bak</code> backups</span>
+          </div>
+
+          <div class="terminal-cmd-card active-card">
+            <div class="cmd-topbar">
+              <span class="cmd-prompt-sym">$</span>
+              <code>apipatch pr owner/repo</code>
+            </div>
+            <span class="cmd-desc">Autonomous end-to-end GitHub Pull Request</span>
+          </div>
+
+          <div class="terminal-cmd-card">
+            <div class="cmd-topbar">
+              <span class="cmd-prompt-sym">$</span>
+              <code>apipatch discover "topic:ai"</code>
+            </div>
+            <span class="cmd-desc">Proactively find &amp; audit trending active repos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Terminal Window -->
+      <div class="terminal-editor">
+        <div class="term-titlebar">
+          <div class="term-dots">
+            <span class="tdot red"></span>
+            <span class="tdot yellow"></span>
+            <span class="tdot green"></span>
+          </div>
+          <div class="term-tab-active">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            <span>bash — apipatch pr jedarden/duck-e</span>
+          </div>
+          <div class="term-status-badge">
+            <span class="badge-dot"></span> Pipeline Completed
+          </div>
+        </div>
+
+        <pre class="terminal-body"><code><span class="t-prompt">$</span> <span class="t-cmd">apipatch pr jedarden/duck-e --max-files 20</span>
+<span class="t-cyan">=== ApiPatch: Autonomous GitHub PR Pipeline ===</span>
+Target Repository: jedarden/duck-e
+Authenticated As: @MoradMoqbel
+Base Branch: main (6ff958ac)
+
+<span class="t-blue">[*]</span> Fetching file tree for jedarden/duck-e...
+<span class="t-green">[✓]</span> Retrieved 304 total repository files.
+<span class="t-blue">[*]</span> Inspecting candidate code files in parallel...
+
+  <span class="t-yellow">⚡ Breaking changes detected in app/models/user.py</span>
+  <span class="t-dim">Pydantic v1 `class Config` ➔ Pydantic v2 `model_config = ConfigDict`</span>
+
+<span class="t-green">[✓]</span> AST syntax &amp; structure validation passed (0 errors).
+<span class="t-blue">[*]</span> Forking repository to @MoradMoqbel...
+<span class="t-blue">[*]</span> Creating branch 'apipatch/migrate-1787384283'...
+<span class="t-blue">[*]</span> Committing 2 modernized file(s)...
+<span class="t-blue">[*]</span> Submitting live Pull Request...
+
+<span class="t-lime">🎉 SUCCESS! Pull Request Opened:</span>
+<span class="t-link">https://github.com/jedarden/duck-e/pull/1</span></code></pre>
+
+        <div class="term-status-footer">
+          <div class="term-footer-left">
+            <span class="term-git-branch"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg> Total Time: 4.8s</span>
+            <span class="term-sep">|</span>
+            <span class="term-msg">Live Pull Request: <a href="https://github.com/jedarden/duck-e/pull/1" target="_blank">jedarden/duck-e #1 ↗</a></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Video Section -->
+  <section class="demo" id="demo">
+    <div class="demo-inner">
+      <div class="section-head">
+        <p class="label">See It in Action</p>
+        <h2>Live execution in 60 seconds.</h2>
+        <p class="section-sub">Watch ApiPatch discover deprecated syntax, validate logic via AST, and open live GitHub Pull Requests.</p>
+      </div>
+
+      <div class="video-wrap">
+        <video id="main-video" muted autoplay loop playsinline class="demo-video">
+          <source src="demo.mp4" type="video/mp4" />
+        </video>
+        <div class="video-overlay" id="video-overlay">
+          <button class="play-btn" id="play-btn" aria-label="Play video">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / Waitlist Section (With Terminal Widget) -->
+  <section class="cta">
+    <div class="cta-inner">
+      <p class="label">Get Started Today</p>
+      <h2>Keep your codebase<br />modern forever.</h2>
+      <p>Install the CLI immediately via PyPI, or join our early access list for the hosted GitHub App (automatic 1-click CI/CD installs).</p>
+      
+      <div class="cta-actions">
+        <div class="terminal-widget mini">
+          <div class="term-titlebar mini">
+            <div class="term-dots">
+              <span class="tdot red"></span>
+              <span class="tdot yellow"></span>
+              <span class="tdot green"></span>
+            </div>
+            <span class="term-mini-title">terminal — install</span>
+          </div>
+          <div class="term-widget-body">
+            <span class="prompt-sym">$</span>
+            <code>pip install apipatch</code>
+          </div>
+        </div>
+      </div>
+
+      <form class="waitlist" id="waitlist-form">
+        <input type="email" id="email-input" placeholder="Enter your work email" required />
+        <button type="submit">Join GitHub App Beta</button>
+      </form>
+      <p class="form-note" id="form-feedback"></p>
+      <p class="proto-note">Open Source · MIT License · Free for public repositories.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <div class="footer-brand">
+          <img src="logo.jpg" alt="ApiPatch Logo" class="footer-logo-img" />
+          <span class="logo">ApiPatch</span>
+        </div>
+        <p>Built by <a href="https://linkedin.com/in/moradmoqbel" target="_blank">Morad Moqbel</a> · Open Source 2026</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://pypi.org/project/apipatch/" target="_blank">PyPI</a>
+        <a href="https://github.com/MoradMoqbel/apipatch" target="_blank">GitHub</a>
+        <a href="https://github.com/jedarden/duck-e/pull/1" target="_blank">Live PR Proof</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
