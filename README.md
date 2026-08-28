@@ -154,6 +154,57 @@ apipatch fix /path/to/project --write
 
 ---
 
+## 🐳 Docker Deployment (Webhook Server)
+
+The fastest way to run the **ApiPatch Webhook Daemon** in production — no Python installation needed.
+
+### 1. Quick Start
+
+```bash
+# Clone the repo
+git clone https://github.com/MoradMoqbel/apipatch.git
+cd apipatch
+
+# Create your .env file
+cp .env.example .env   # then edit with your keys
+
+# Build & start
+docker compose up -d
+```
+
+### 2. Environment Variables (`.env`)
+
+```bash
+# AI Provider — choose one
+GEMINI_API_KEY=AIzaSy...
+# OPENAI_API_KEY=sk-...
+# ANTHROPIC_API_KEY=sk-ant-...
+
+# GitHub
+GITHUB_TOKEN=ghp_...
+GITHUB_WEBHOOK_SECRET=your_webhook_secret   # set this in your GitHub App settings
+```
+
+### 3. Connect Your GitHub Repository
+
+1. Go to your GitHub repository → **Settings → Webhooks → Add webhook**
+2. Set **Payload URL** to: `http://YOUR_SERVER_IP:8080/webhook`
+3. Set **Content type** to `application/json`
+4. Set **Secret** to match your `GITHUB_WEBHOOK_SECRET`
+5. Select **push** events → **Save**
+
+ApiPatch will now automatically audit every `push` and open a modernization PR.
+
+### 4. Health Check
+
+```bash
+curl http://localhost:8080/health
+# → {"status": "healthy", "version": "0.8.1", ...}
+```
+
+---
+
+
 ## 🤖 GitHub Actions CI/CD Integration
 
 Automate codebase maintenance by running ApiPatch on a schedule or on every push. Add `.github/workflows/apipatch.yml` to your repository:

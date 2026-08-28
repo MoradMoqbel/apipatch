@@ -16,6 +16,55 @@ from apipatch.github_client import resolve_github_token, mask_token
 from apipatch.webhook import run_webhook_server
 from apipatch.telemetry import track_cli_event
 
+
+ONBOARDING_GUIDE = f"""
+{Colors.HEADER}{Colors.BOLD}⚡ ApiPatch — Quick Setup Guide{Colors.ENDC}
+
+{Colors.BOLD}Step 1: Get a free AI API key (choose one){Colors.ENDC}
+  • Google Gemini (recommended, free tier):  https://aistudio.google.com/apikey
+  • OpenAI:                                   https://platform.openai.com/api-keys
+  • Anthropic Claude:                         https://console.anthropic.com/
+
+{Colors.BOLD}Step 2: Set your key (choose one method){Colors.ENDC}
+
+  {Colors.OKCYAN}Option A — .env file (recommended):{Colors.ENDC}
+    Create a file named {Colors.BOLD}.env{Colors.ENDC} in your project directory:
+
+      GEMINI_API_KEY=AIzaSy...
+      # or
+      OPENAI_API_KEY=sk-...
+      # or
+      ANTHROPIC_API_KEY=sk-ant-...
+
+  {Colors.OKCYAN}Option B — Environment variable:{Colors.ENDC}
+    export GEMINI_API_KEY="AIzaSy..."      # Linux/macOS
+    set GEMINI_API_KEY=AIzaSy...           # Windows CMD
+    $env:GEMINI_API_KEY="AIzaSy..."        # Windows PowerShell
+
+  {Colors.OKCYAN}Option C — CLI flag:{Colors.ENDC}
+    apipatch scan . --provider gemini --api-key AIzaSy...
+
+{Colors.BOLD}Step 3: Run ApiPatch{Colors.ENDC}
+  apipatch scan .                   # scan current directory
+  apipatch fix . --write            # scan + apply fixes
+  apipatch pr owner/repo --dry-run  # preview PR on any GitHub repo
+
+{Colors.OKGREEN}Tip:{Colors.ENDC} Use {Colors.BOLD}--no-telemetry{Colors.ENDC} to disable anonymous usage reporting.
+{Colors.OKGREEN}Docs:{Colors.ENDC} https://github.com/MoradMoqbel/apipatch
+"""
+
+
+def _check_provider_or_guide(engine: ApiPatchEngine, command: str) -> bool:
+    """
+    Checks if engine has an active AI provider.
+    If not, prints the onboarding guide and returns False.
+    """
+    if engine.provider is not None:
+        return True
+    print(f"\n{Colors.FAIL}[!] No AI provider configured for '{command}' command.{Colors.ENDC}")
+    print(ONBOARDING_GUIDE)
+    return False
+
 # Ensure UTF-8 console output on Windows
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     try:
@@ -133,6 +182,8 @@ def main():
             create_backup=False,
             concurrency=getattr(args, "concurrency", 6)
         )
+        if not _check_provider_or_guide(engine, "scan"):
+            sys.exit(1)
         if os_is_file(args.path):
             result = engine.process_file(args.path, write_in_place=False)
             if getattr(args, "output", None):
@@ -151,6 +202,8 @@ def main():
             concurrency=getattr(args, "concurrency", 6),
             verify_tests=getattr(args, "verify_tests", False)
         )
+        if not _check_provider_or_guide(engine, "fix"):
+            sys.exit(1)
         if os_is_file(args.path):
             result = engine.process_file(
                 args.path,
@@ -175,6 +228,8 @@ def main():
             model=args.model,
             create_backup=False
         )
+        if not _check_provider_or_guide(engine, "pr"):
+            sys.exit(1)
         hunter = GitHubPRHunter(github_token=args.token, engine=engine)
         hunter.audit_and_pr_repository(
             repo_name=args.repo,
@@ -214,6 +269,8 @@ def main():
             model=args.model,
             create_backup=False
         )
+        if not _check_provider_or_guide(engine, "hunt"):
+            sys.exit(1)
         hunter = GitHubPRHunter(github_token=args.token, engine=engine)
         hunter.hunt_and_preview(
             query=args.query,
@@ -231,6 +288,8 @@ def main():
             model=args.model,
             create_backup=False
         )
+        if not _check_provider_or_guide(engine, "discover"):
+            sys.exit(1)
         hunter = GitHubPRHunter(github_token=args.token, engine=engine)
         dry_run = not getattr(args, "submit", False)
         hunter.discover_and_audit(

@@ -9,9 +9,6 @@ audit_*.md
 audit_*.txt
 *.log
 
-# Frontend Assets (Hosted Separately)
-front/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -26,6 +23,7 @@ github_token.txt
 *.token
 .env
 .env.*
+!.env.example
 gcc_auth.json
 gcc-auth.json
 *auth*.json

@@ -263,11 +263,21 @@ class ApiPatchEngine:
         # Truncate very large files to avoid token-limit failures
         code_lines = code.splitlines()
         if len(code_lines) > _MAX_CODE_LINES:
+            # Smart boundary truncation: cut at the last top-level def/class within limit
+            cut_line = _MAX_CODE_LINES
+            if ext in {".py", ".pyw"}:
+                # Walk backwards from limit to find last clean top-level boundary
+                for i in range(_MAX_CODE_LINES - 1, max(0, _MAX_CODE_LINES - 200), -1):
+                    stripped = code_lines[i].lstrip()
+                    if stripped.startswith(("def ", "async def ", "class ", "# ")) and not code_lines[i][0].isspace():
+                        cut_line = i
+                        break
+            dropped = len(code_lines) - cut_line
             safe_print(
-                f"  {Colors.WARNING}[~] {file_name} is large ({len(code_lines)} lines), "
-                f"truncating to {_MAX_CODE_LINES} lines for LLM analysis.{Colors.ENDC}"
+                f"  {Colors.WARNING}[~] {file_name} is large ({len(code_lines)} lines). "
+                f"Analyzing first {cut_line} lines ({dropped} lines skipped — add smaller modules for full coverage).{Colors.ENDC}"
             )
-            code = "\n".join(code_lines[:_MAX_CODE_LINES])
+            code = "\n".join(code_lines[:cut_line])
 
         try:
             # Extract file-specific imports

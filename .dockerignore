@@ -1,0 +1,48 @@
+﻿# ApiPatch — .dockerignore
+# Prevents secrets and dev artifacts from entering the Docker build context
+
+# Secrets & credentials
+.env
+*.env
+github_token.txt
+gcc_auth.json
+gcc-auth.json
+*.key
+*.pem
+*.p12
+
+# Development
+.git/
+.github/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Dist artifacts
+apipatch-*/
+node_modules/
+package-lock.json
+*.js
+
+# Test files
+tests/
+front/
+scratch_*/
+
+# Docs and misc
+*.md
+*.pdf
+*.html
+*.txt
+Apply to*/
+yc_answers*
+implementation_plan*
+DEVELOPMENT_PLAN*
+GITHUB_PROFILE*
