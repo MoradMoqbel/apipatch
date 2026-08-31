@@ -1,0 +1,228 @@
+{
+  "generated_at": "2026-08-31T03:55:43.998567Z",
+  "apipatch_version": "0.8.1",
+  "total_scanned": 44,
+  "affected_files": 0,
+  "results": [
+    {
+      "file": "/home/runner/work/apipatch/apipatch/front/app.js",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_gemini_vertex.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_doc_hunter.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_pr_submitter.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_prefilter.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_cli.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_self_healing.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_manifest_scoping.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_import_verifier.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_micro_sandbox.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_detector.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_telemetry.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_bedrock_provider.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_project_context.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/sample_deprecated_app.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_knowledge.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_engine.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_js_validator.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_manifest_bumper.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_sandbox_runner.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_validator.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_github_client.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/tests/test_webhook.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/__init__.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/webhook.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/doc_hunter.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/knowledge.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/validator.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/manifest_bumper.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/github_client.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/proactive_hunter.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/_version.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/engine.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/cli.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/test_runner.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/telemetry.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/auto_detector.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/providers/__init__.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/providers/gemini_provider.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/providers/bedrock_provider.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/providers/openai_provider.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/providers/factory.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/providers/anthropic_provider.py",
+      "status": "clean",
+      "issues": []
+    },
+    {
+      "file": "/home/runner/work/apipatch/apipatch/apipatch/providers/base.py",
+      "status": "clean",
+      "issues": []
+    }
+  ]
+}
