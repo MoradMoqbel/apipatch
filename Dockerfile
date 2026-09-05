@@ -1,4 +1,4 @@
-﻿# ── ApiPatch Webhook Server — Dockerfile ──────────────────────────────────────
+# ── ApiPatch Webhook Server — Dockerfile ──────────────────────────────────────
 # Build:  docker build -t apipatch .
 # Run:    docker run --env-file .env -p 8080:8080 apipatch
 # ──────────────────────────────────────────────────────────────────────────────
@@ -8,7 +8,7 @@ FROM python:3.11-slim
 # Metadata
 LABEL maintainer="Morad Moqbel <moradyunes2@gmail.com>"
 LABEL description="ApiPatch — Autonomous AI Agent Webhook Server"
-LABEL version="0.8.1"
+LABEL version="0.8.2"
 
 # Security: run as non-root user
 RUN groupadd -r apipatch && useradd -r -g apipatch apipatch

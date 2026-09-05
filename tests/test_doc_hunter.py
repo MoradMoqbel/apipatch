@@ -72,13 +72,27 @@ class TestDocHunter(unittest.TestCase):
         self.assertIn("Package 'agno' (Latest Official Release: v2.9.0)", context)
         self.assertIn("https://docs.agno.com", context)
 
-    @patch.object(DocHunter, "build_grounded_context")
-    def test_get_relevant_knowledge_incorporates_grounding(self, mock_grounding):
-        mock_grounding.return_value = "\n[Authoritative Live Package Grounding]\n• Package 'agno' v2.9.0\n"
-        
-        guidance = get_relevant_knowledge(detected_libraries=["agno"])
-        self.assertIn("Authoritative Live Package Grounding", guidance)
-        self.assertIn("agno", guidance)
+    @patch("urllib.request.urlopen")
+    def test_fetch_llms_txt_success(self, mock_urlopen):
+        mock_resp = MagicMock()
+        mock_resp.headers = {"Content-Type": "text/markdown"}
+        mock_resp.read.return_value = b"# Cohere API Documentation\nOverview of Embed v4 and Chat v2 APIs"
+        mock_resp.__enter__.return_value = mock_resp
+        mock_urlopen.return_value = mock_resp
+
+        res = DocHunter.fetch_llms_txt("https://docs.cohere.com/reference")
+        self.assertIn("Cohere API Documentation", res)
+
+    @patch("urllib.request.urlopen")
+    def test_fetch_github_changelog_success(self, mock_urlopen):
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = b"# Changelog\n\n## v5.0.0 (2025-01-01)\n- Breaking: Introduce ClientV2 for modern chat/embed"
+        mock_resp.__enter__.return_value = mock_resp
+        mock_urlopen.return_value = mock_resp
+
+        res = DocHunter.fetch_github_changelog("https://github.com/cohere-ai/cohere-python")
+        self.assertIn("v5.0.0", res)
+        self.assertIn("ClientV2", res)
 
 
 if __name__ == "__main__":

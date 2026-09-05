@@ -114,6 +114,30 @@ class Orchestrator:
         self.assertTrue(CodeValidator.validate_generic_integrity(orig_js, good_js).is_valid)
         self.assertFalse(CodeValidator.validate_generic_integrity(orig_js, empty_js).is_valid)
 
+    def test_model_name_downgrade_rejected(self):
+        orig = 'client.messages.create(model="claude-sonnet-4-5", max_tokens=1024)'
+        bad_refactored = 'client.messages.create(model="claude-3-5-sonnet-20241022", max_tokens=1024)'
+        good_refactored = 'client.messages.create(model="claude-sonnet-4-5", max_tokens=2048)'
+
+        res_bad = CodeValidator.validate_model_name_integrity(orig, bad_refactored)
+        self.assertFalse(res_bad.is_valid)
+        self.assertIn("downgrade", res_bad.error_message.lower())
+
+        res_good = CodeValidator.validate_model_name_integrity(orig, good_refactored)
+        self.assertTrue(res_good.is_valid)
+
+    def test_client_v2_downgrade_rejected(self):
+        orig = 'co = cohere.ClientV2(api_key=key)'
+        bad_refactored = 'co = cohere.Client(api_key=key)'
+        good_refactored = 'co = cohere.ClientV2(api_key=key, timeout=30)'
+
+        res_bad = CodeValidator.validate_model_name_integrity(orig, bad_refactored)
+        self.assertFalse(res_bad.is_valid)
+        self.assertIn("ClientV2", res_bad.error_message)
+
+        res_good = CodeValidator.validate_model_name_integrity(orig, good_refactored)
+        self.assertTrue(res_good.is_valid)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -82,8 +82,11 @@ class CodeValidator:
     @staticmethod
     def validate_python_syntax(code: str) -> ValidationResult:
         """Parses code with Python AST parser to catch any SyntaxError, IndentationError, or hallucinated import names."""
+        import warnings
         try:
-            tree = ast.parse(code)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", SyntaxWarning)
+                tree = ast.parse(code)
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
@@ -644,6 +647,167 @@ class CodeValidator:
         return ValidationResult(is_valid=True)
 
     @classmethod
+    def validate_model_name_integrity(cls, original_code: str, refactored_code: str) -> ValidationResult:
+        """
+        Guards against model identifier downgrades (e.g. Claude 4.5/3.7 -> 3.5, Gemini 3/2.5 -> 1.5)
+        and client version downgrades (e.g. ClientV2 -> Client).
+        """
+        # 1. Guard against ClientV2 downgrade
+        if ("ClientV2" in original_code) and ("ClientV2" not in refactored_code) and ("Client(" in refactored_code or ".Client(" in refactored_code):
+            return ValidationResult(
+                is_valid=False,
+                error_message="Refactored code downgraded modern 'ClientV2' to legacy 'Client'. Preserve modern 'ClientV2'."
+            )
+
+        # 2. Guard against modern model string downgrades (e.g. claude-sonnet-4-5, claude-4.5-sonnet, claude-3-7)
+        modern_model_patterns = [
+            r"claude-(?:sonnet-)?4[.-]5(?:-sonnet)?",
+            r"claude-3[.-]7(?:-sonnet)?",
+            r"gemini-3(?:[.-]\d+)?(?:-flash|-pro)?(?:-image)?",
+            r"gemini-2\.5(?:-flash|-pro)?",
+            r"gpt-5",
+            r"qwen-3",
+        ]
+
+        for pat in modern_model_patterns:
+            orig_matches = set(re.findall(pat, original_code, re.IGNORECASE))
+            if orig_matches:
+                ref_matches = set(re.findall(pat, refactored_code, re.IGNORECASE))
+                if not ref_matches:
+                    # Check if it was replaced with an older version
+                    if any(legacy in refactored_code.lower() for legacy in ["claude-3-5", "claude-3.5", "gemini-1.5", "gpt-4"]):
+                        return ValidationResult(
+                            is_valid=False,
+                            error_message=(
+                                f"Model downgrade detected: original code specified a modern model matching '{list(orig_matches)[0]}', "
+                                f"which was erroneously downgraded in refactored code. "
+                                f"Preserve the exact modern model identifier specified in the original code."
+                            )
+                        )
+
+        return ValidationResult(is_valid=True)
+
+    FORMAT_SPEC_RE = re.compile(r"%(?:\((?P<key>[^)]+)\))?[#0\- +]*\d*(?:\.\d+)?[hlL]?[diouxXeEfFgGcrsap%]")
+
+    @classmethod
+    def validate_string_formatting_integrity(cls, refactored_code: str) -> ValidationResult:
+        """
+        Validates printf-style formatting in logging calls (logger.info, error, etc.)
+        and modulo operator string format expressions to prevent runtime TypeError.
+        """
+        try:
+            tree = ast.parse(refactored_code)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Call):
+                    func = node.func
+                    method = None
+                    arg_idx = 0
+                    if isinstance(func, ast.Attribute) and func.attr in {
+                        "debug", "info", "warning", "warn", "error", "critical", "exception"
+                    }:
+                        method = func.attr
+                        arg_idx = 0
+                    elif isinstance(func, ast.Attribute) and func.attr == "log" and len(node.args) >= 2:
+                        method = "log"
+                        arg_idx = 1
+
+                    if method and len(node.args) > arg_idx:
+                        first_arg = node.args[arg_idx]
+                        if isinstance(first_arg, ast.Constant) and isinstance(first_arg.value, str):
+                            fmt = first_arg.value
+                            specs = [
+                                m.group(0)
+                                for m in cls.FORMAT_SPEC_RE.finditer(fmt)
+                                if m.group(0) != "%%" and not m.group("key")
+                            ]
+                            has_starred = any(isinstance(a, ast.Starred) for a in node.args[arg_idx + 1:])
+                            if specs and not has_starred:
+                                provided = len(node.args) - (arg_idx + 1)
+                                if provided < len(specs):
+                                    return ValidationResult(
+                                        is_valid=False,
+                                        error_message=(
+                                            f"String formatting error in '{method}' call at line {node.lineno}: "
+                                            f"format string expects {len(specs)} argument(s) ({', '.join(specs)}) "
+                                            f"but only {provided} were provided. Preserve all original arguments."
+                                        ),
+                                        error_line=node.lineno,
+                                    )
+                elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod):
+                    if isinstance(node.left, ast.Constant) and isinstance(node.left.value, str):
+                        fmt = node.left.value
+                        specs = [
+                            m.group(0)
+                            for m in cls.FORMAT_SPEC_RE.finditer(fmt)
+                            if m.group(0) != "%%" and not m.group("key")
+                        ]
+                        if specs:
+                            if isinstance(node.right, ast.Tuple):
+                                has_starred = any(isinstance(elt, ast.Starred) for elt in node.right.elts)
+                                if not has_starred and len(node.right.elts) < len(specs):
+                                    return ValidationResult(
+                                        is_valid=False,
+                                        error_message=(
+                                            f"String formatting error at line {node.lineno}: "
+                                            f"format string expects {len(specs)} argument(s) ({', '.join(specs)}) "
+                                            f"but tuple provides {len(node.right.elts)}. Preserve original arguments."
+                                        ),
+                                        error_line=node.lineno,
+                                    )
+                            elif len(specs) > 1 and not isinstance(node.right, (ast.Call, ast.Subscript, ast.Attribute, ast.Name)):
+                                return ValidationResult(
+                                    is_valid=False,
+                                    error_message=(
+                                        f"String formatting error at line {node.lineno}: "
+                                        f"format string expects {len(specs)} argument(s) ({', '.join(specs)}) "
+                                        f"but non-tuple single value provided."
+                                    ),
+                                    error_line=node.lineno,
+                                )
+        except Exception:
+            pass
+        return ValidationResult(is_valid=True)
+
+    @staticmethod
+    def validate_syntax_warnings(original_code: str, refactored_code: str) -> ValidationResult:
+        """
+        Checks for new SyntaxWarnings introduced by the LLM (e.g. invalid escape sequences '\\.').
+        Flags them so the LLM uses raw string literals (r'...') before outputting code.
+        """
+        import warnings
+        orig_warnings = set()
+        try:
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always", SyntaxWarning)
+                compile(original_code, "<string>", "exec")
+                for w in caught:
+                    if issubclass(w.category, SyntaxWarning):
+                        orig_warnings.add(str(w.message))
+        except Exception:
+            pass
+
+        try:
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always", SyntaxWarning)
+                compile(refactored_code, "<string>", "exec")
+                for w in caught:
+                    if issubclass(w.category, SyntaxWarning):
+                        msg = str(w.message)
+                        if msg not in orig_warnings:
+                            return ValidationResult(
+                                is_valid=False,
+                                error_message=(
+                                    f"SyntaxWarning introduced on line {w.lineno}: {msg}. "
+                                    f"Use raw string literals (e.g. r'...' or r\"...\") for regular expressions and escape sequences."
+                                ),
+                                error_line=w.lineno,
+                            )
+        except Exception:
+            pass
+
+        return ValidationResult(is_valid=True)
+
+    @classmethod
     def validate(cls, original_code: str, refactored_code: str, file_extension: str = ".py") -> ValidationResult:
         """Runs comprehensive multi-layer validation on refactored code."""
         if file_extension in {".py", ".pyw"}:
@@ -651,9 +815,25 @@ class CodeValidator:
             if not syntax_check.is_valid:
                 return syntax_check
 
+            warning_check = cls.validate_syntax_warnings(original_code, refactored_code)
+            if not warning_check.is_valid:
+                return warning_check
+
             logic_check = cls.validate_business_logic_preservation(original_code, refactored_code)
             if not logic_check.is_valid:
                 return logic_check
+
+            format_check = cls.validate_string_formatting_integrity(refactored_code)
+            if not format_check.is_valid:
+                return format_check
+
+            model_check = cls.validate_model_name_integrity(original_code, refactored_code)
+            if not model_check.is_valid:
+                return model_check
+
+            modernity_check = cls.validate_api_modernity_integrity(original_code, refactored_code)
+            if not modernity_check.is_valid:
+                return modernity_check
 
             import_check = cls.validate_import_soundness(original_code, refactored_code, file_extension)
             if not import_check.is_valid:
@@ -666,5 +846,46 @@ class CodeValidator:
             return ValidationResult(is_valid=True)
         else:
             return cls.validate_generic_integrity(original_code, refactored_code)
+
+    @classmethod
+    def validate_api_modernity_integrity(cls, original_code: str, refactored_code: str) -> ValidationResult:
+        """
+        Guards against reverse migrations or downgrades of modern 2025/2026 SDK calls
+        (e.g., Responses API -> Chat Completions, developer role -> system role, modern tokens).
+        """
+        # 1. Guard against OpenAI Responses API downgrade to Chat Completions
+        if "responses.create" in original_code and "chat.completions.create" in refactored_code and "responses.create" not in refactored_code:
+            return ValidationResult(
+                is_valid=False,
+                error_message=(
+                    "API Downgrade detected: original code uses modern OpenAI Responses API ('responses.create'), "
+                    "which was erroneously downgraded to 'chat.completions.create'. "
+                    "Preserve modern Responses API calls."
+                )
+            )
+
+        # 2. Guard against 'developer' role regression to 'system'
+        if ('"role": "developer"' in original_code or "'role': 'developer'" in original_code) and \
+           ('"role": "developer"' not in refactored_code and "'role': 'developer'" not in refactored_code):
+            return ValidationResult(
+                is_valid=False,
+                error_message=(
+                    "Parameter downgrade detected: 'developer' role is an intentional modern parameter. "
+                    "Do not revert 'developer' to 'system'."
+                )
+            )
+
+        # 3. Guard against max_output_tokens / max_completion_tokens downgrade to max_tokens
+        for modern_tok in ["max_output_tokens", "max_completion_tokens"]:
+            if modern_tok in original_code and modern_tok not in refactored_code and "max_tokens" in refactored_code:
+                return ValidationResult(
+                    is_valid=False,
+                    error_message=(
+                        f"Token parameter downgrade detected: '{modern_tok}' is an intentional modern parameter. "
+                        f"Preserve '{modern_tok}' instead of reverting to legacy 'max_tokens'."
+                    )
+                )
+
+        return ValidationResult(is_valid=True)
 
 

@@ -49,14 +49,17 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
 
     "openai": {
         "aliases": ["openai"],
-        "description": "OpenAI Python & TypeScript v1.0+ SDK",
+        "description": "OpenAI Python & TypeScript Modern SDKs",
         "guidance": """\
-• OpenAI v1.0+ Migration Guidelines:
+• OpenAI v1.0+ Modern SDK Guidelines (and 2025/2026 Responses API):
   - Python Initialization: from openai import OpenAI; client = OpenAI(api_key=...)
-  - Chat: client.chat.completions.create(model="gpt-4o", messages=[...])
+  - Chat Completions: client.chat.completions.create(model="gpt-4o", messages=[...])
+  - Responses API: client.responses.create(model="...", input=[...], max_output_tokens=...) with response.output_text is the official modern Responses API. NEVER convert Responses API to Chat Completions!
+  - Modern Parameters: role: "developer" and max_completion_tokens / max_output_tokens are standard modern parameters. Do NOT revert them to "system" or max_tokens.
   - Embeddings: client.embeddings.create(model="text-embedding-3-small", input=...)
-  - Response parsing: Access via attributes (e.g. response.choices[0].message.content) instead of dict subscripting (response['choices']).
+  - Response parsing: Access via attributes (e.g. response.choices[0].message.content, response.output_text).
   - TS/JS Initialization: import OpenAI from 'openai'; const client = new OpenAI({ apiKey: ... });
+  - ONLY migrate genuinely legacy v0.x calls (e.g. openai.ChatCompletion.create, openai.Completion.create, openai.api_key = ...).
 """
     },
 

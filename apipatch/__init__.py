@@ -4,6 +4,9 @@ Detects and fixes deprecated third-party API calls in Python, JavaScript, TypeSc
 JSX, TSX, and any other language — powered by LLM reasoning.
 """
 
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
 from apipatch._version import __version__, __author__, __license__
 
 from apipatch.engine import ApiPatchEngine

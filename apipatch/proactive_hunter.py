@@ -398,7 +398,8 @@ class GitHubPRHunter:
         max_files: int = 50,
         precomputed_results: Optional[List[Dict[str, Any]]] = None,
         target_path: Optional[str] = None,
-        custom_title: Optional[str] = None
+        custom_title: Optional[str] = None,
+        verify_tests: bool = False
     ) -> Dict[str, Any]:
         """
         Audits an entire GitHub repository (or specific sub-directory), applies refactorings to all deprecated files,
@@ -410,6 +411,8 @@ class GitHubPRHunter:
         print(f"Target Repository: {Colors.OKCYAN}{repo_name}{Colors.ENDC}")
         if target_path:
             print(f"Scope Filter (Target Path): {Colors.BOLD}{target_path}{Colors.ENDC}")
+        if verify_tests:
+            print(f"Verification Engine: {Colors.OKGREEN}Active (AST & Sandbox Test Validation){Colors.ENDC}")
         print(f"Auth Token: {Colors.OKBLUE}{mask_token(self.github_token)}{Colors.ENDC}")
 
         if not self.github_token:

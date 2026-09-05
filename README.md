@@ -3,9 +3,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI version](https://img.shields.io/badge/pypi-v0.8.1-brightgreen.svg)](https://pypi.org/project/apipatch/)
+[![PyPI version](https://img.shields.io/badge/pypi-v0.8.2-brightgreen.svg)](https://pypi.org/project/apipatch/)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
-[![Tests: Passing](https://img.shields.io/badge/Tests-87%2F87%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
+[![Tests: Passing](https://img.shields.io/badge/Tests-152%2F152%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
 
 ---
 
@@ -260,6 +260,7 @@ All tests are offline-safe and mocked (no external network or live LLM required 
 - [x] **v0.6.0: AST Self-Healing feedback loop**
 - [x] **v0.8.0: Anonymous Privacy-Preserving CLI Telemetry (PostHog)**
 - [x] **v0.8.1: Official GitHub Actions CI/CD Integration (`action.yml`)**
+- [x] **v0.8.2: Enterprise Guards (Format-String, SyntaxWarning, AST Surgical Function Shielding) & AI Discoverability (`llms.txt`, `robots.txt`)**
 - [x] PyPI Release (`pip install apipatch`)
 
 ---

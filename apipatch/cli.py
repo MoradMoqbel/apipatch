@@ -117,6 +117,7 @@ def main():
     pr_parser.add_argument("--path", "--dir", "--target-path", dest="target_path", help="Target sub-directory or file path within repository to restrict audit/PR scope (e.g., 'beifong' or 'apps/my-app')")
     pr_parser.add_argument("--title", dest="custom_title", help="Custom title for the generated Pull Request")
     pr_parser.add_argument("--max-files", type=int, default=50, help="Max repository files to inspect (default: 50)")
+    pr_parser.add_argument("--verify-tests", "--run-tests", dest="verify_tests", action="store_true", help="Run AST and sandbox test verification before opening PR")
     pr_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini", "bedrock"], help="AI provider for dynamic reasoning")
     pr_parser.add_argument("--api-key", help="API key for chosen provider")
     pr_parser.add_argument("--model", help="Specific model name")
@@ -226,7 +227,8 @@ def main():
             provider_name=args.provider,
             api_key=args.api_key,
             model=args.model,
-            create_backup=False
+            create_backup=False,
+            verify_tests=getattr(args, "verify_tests", False)
         )
         if not _check_provider_or_guide(engine, "pr"):
             sys.exit(1)
@@ -240,7 +242,8 @@ def main():
             dry_run=args.dry_run,
             max_files=args.max_files,
             target_path=getattr(args, "target_path", None),
-            custom_title=getattr(args, "custom_title", None)
+            custom_title=getattr(args, "custom_title", None),
+            verify_tests=getattr(args, "verify_tests", False)
         )
 
     elif args.command == "webhook":
