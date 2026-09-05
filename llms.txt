@@ -1,0 +1,109 @@
+# ApiPatch
+
+> Autonomous developer agent that detects API breaking changes, deprecations, and library migrations, and automatically opens production-ready, AST-shielded GitHub Pull Requests to fix the code.
+
+ApiPatch solves the fundamental failure of existing dependency management tools (such as Dependabot and Renovate), which only bump version numbers in package manifests (e.g. `openai==0.28` to `openai==1.50`), immediately breaking production code at runtime. ApiPatch inspects repositories, detects broken and deprecated API signatures, grounds refactoring in live package documentation via DocHunter™, validates syntax through deterministic AST safety guards, and delivers complete, ready-to-merge Pull Requests.
+
+- Website: https://moradmoqbel.github.io/apipatch/
+- GitHub Repository: https://github.com/MoradMoqbel/apipatch
+- PyPI Package: https://pypi.org/project/apipatch/
+- GitHub Action: https://github.com/marketplace/actions/apipatch-autonomous-api-migration-agent
+
+## Key Capabilities
+
+- **Autonomous Remote GitHub PR Submission (`apipatch pr owner/repo`)**: Audits remote repositories via the GitHub REST API and Git Database API, forks when needed, commits modernized code, and opens a structured Pull Request.
+- **AST Surgical Shielding (`shield_unaffected_functions`)**: Isolates unaffected functions and classes and re-injects them verbatim from the original AST, preventing Large Language Model (LLM) drift or accidental modifications of unrelated code.
+- **String Formatting & Logging Safety Guard**: Verifies that all printf-style formatting arguments (`%s`, `%d`) and logging parameters are preserved with zero argument dropping.
+- **API Modernity Integrity Guard**: Prevents hallucinated downgrades of modern 2025/2026 APIs (e.g. OpenAI Responses API) to deprecated legacy endpoints.
+- **DocHunter™ Live Retrieval**: Fetches official documentation, PyPI/npm releases, and GitHub changelogs in <0.1s to ground migrations and eliminate LLM hallucinations.
+- **Sandbox Test Verification (`--verify-tests`)**: Runs project test suites (e.g. `pytest`, `npm test`) in an isolated sandbox before opening a Pull Request.
+
+## Quickstart & Installation
+
+Install via PyPI:
+```bash
+pip install apipatch
+```
+
+Set your AI provider API key (Gemini, OpenAI, Anthropic, or AWS Bedrock):
+```bash
+export GEMINI_API_KEY="AIzaSy..."
+# or
+export OPENAI_API_KEY="sk-..."
+# or
+export ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+Optionally set your GitHub Token for remote PR workflows:
+```bash
+export GITHUB_TOKEN="ghp_..."
+```
+
+## CLI Reference
+
+### 1. Scan a Codebase
+Audit a file or directory for deprecated API calls without modifying files:
+```bash
+apipatch scan .
+apipatch scan src/api.py --output scan_report.json
+```
+
+### 2. Autonomous In-Place Refactoring
+Audit, refactor, and self-heal deprecated code in-place:
+```bash
+apipatch fix . --write
+apipatch fix . --write --verify-tests
+```
+
+### 3. Remote GitHub Repository PR
+Inspect any public or private GitHub repository and open a Pull Request:
+```bash
+# Preview changes locally without pushing (dry-run):
+apipatch pr owner/repo --dry-run
+
+# Target a specific directory or file:
+apipatch pr owner/repo --target-path src/api/chat.py --dry-run
+
+# Submit live Pull Request:
+apipatch pr owner/repo --title "refactor(openai): migrate legacy ChatCompletion to v1.x client"
+```
+
+### 4. Proactive Codebase Hunter
+Search GitHub for repositories suffering from breaking changes and submit fixes:
+```bash
+apipatch hunt "openai.ChatCompletion.create language:python" --max 3 --submit
+```
+
+### 5. Dependency & Architecture Auto-Discovery
+Discover project dependencies, package manifests, and architecture context:
+```bash
+apipatch detect .
+```
+
+## Supported Libraries & Migration Profiles
+
+- **OpenAI Python SDK**: v0.28 → v1.x (e.g. `openai.ChatCompletion.create` → `client.chat.completions.create`, `openai.api_key` → `OpenAI(api_key=...)`, `functions` → `tools`, `function_call` → `tool_choice`, Pydantic response attribute access).
+- **LangChain**: v0.0.x → v0.1/v0.2/v0.3 (`langchain.chat_models` → `langchain_community` / `langchain_openai`, LCEL syntax, `invoke()` migration).
+- **Pydantic**: v1 → v2 (`@validator` → `@field_validator`, `.dict()` → `.model_dump()`, `.parse_obj()` → `.model_validate()`, Config class → `model_config = ConfigDict()`).
+- **Elasticsearch**: v7 → v8 (`Elasticsearch(["http://..."])` → `Elasticsearch(hosts=["http://..."])`).
+- **Stripe**: `stripe.Charge.create` → `stripe.PaymentIntent.create`.
+- **Python Modernity**: Syntax warning fixes, invalid escape sequences (`\.`, `\?` → raw strings), modern typing imports.
+
+## Architecture
+
+1. **Static Analysis & Heuristic Pre-Filtering**: Rapidly identifies affected files referencing target libraries using Python AST and regex scanners.
+2. **Context Assembly & Documentation Grounding**: Pulls relevant migration documentation via DocHunter™.
+3. **AST Shielding**: Analyzes the AST tree to separate modified functions from unaffected functions.
+4. **Targeted Refactoring**: Employs LLM reasoning (Gemini Flash, Claude Sonnet, or GPT-4o) with surgical prompts.
+5. **Multi-Stage Validation Pipeline**:
+   - Python AST Syntax & Indentation Validation.
+   - String Formatting & Logger Argument Guard.
+   - API Modernity & Anti-Downgrade Guard.
+   - Self-Healing Feedback Loop (up to 3 iterations upon syntax failure).
+6. **Git Database Engine**: Creates atomic commits via GitHub REST and Git Database API without cloning multi-gigabyte repositories.
+
+## Contact & Team
+
+- Founder: Morad Moqbel
+- Contact: morad@apipatch.dev / moradmoqbel@gmail.com
+- Y Combinator Application: Winter 2027
