@@ -219,48 +219,34 @@ class ManifestBumper:
         target_dir = os.path.abspath(target_dir)
         records = []
 
-        # 1. requirements.txt
-        req_path = os.path.join(target_dir, "requirements.txt")
-        if os.path.isfile(req_path):
-            try:
-                with open(req_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                new_c, changed = cls.bump_requirements_txt(content, modernized_libraries)
-                if changed:
-                    if write:
-                        with open(req_path, "w", encoding="utf-8") as f:
-                            f.write(new_c)
-                    records.append({"file": req_path, "manifest": "requirements.txt", "content": new_c})
-            except Exception:
-                pass
+        # Find all manifests in target_dir (supporting root and nested monorepo subprojects)
+        candidate_manifests = []
+        for root, dirs, files in os.walk(target_dir):
+            dirs[:] = [d for d in dirs if d not in (".git", "node_modules", "venv", ".venv", "__pycache__", "dist", "build")]
+            for f in files:
+                if f.lower() in ("requirements.txt", "pyproject.toml", "package.json"):
+                    candidate_manifests.append(os.path.join(root, f))
 
-        # 2. pyproject.toml
-        pyproj_path = os.path.join(target_dir, "pyproject.toml")
-        if os.path.isfile(pyproj_path):
+        for manifest_path in candidate_manifests:
+            base = os.path.basename(manifest_path).lower()
             try:
-                with open(pyproj_path, "r", encoding="utf-8") as f:
+                with open(manifest_path, "r", encoding="utf-8") as f:
                     content = f.read()
-                new_c, changed = cls.bump_pyproject_toml(content, modernized_libraries)
-                if changed:
-                    if write:
-                        with open(pyproj_path, "w", encoding="utf-8") as f:
-                            f.write(new_c)
-                    records.append({"file": pyproj_path, "manifest": "pyproject.toml", "content": new_c})
-            except Exception:
-                pass
 
-        # 3. package.json
-        pkg_path = os.path.join(target_dir, "package.json")
-        if os.path.isfile(pkg_path):
-            try:
-                with open(pkg_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                new_c, changed = cls.bump_package_json(content, modernized_libraries)
+                if base == "requirements.txt":
+                    new_c, changed = cls.bump_requirements_txt(content, modernized_libraries)
+                elif base == "pyproject.toml":
+                    new_c, changed = cls.bump_pyproject_toml(content, modernized_libraries)
+                elif base == "package.json":
+                    new_c, changed = cls.bump_package_json(content, modernized_libraries)
+                else:
+                    changed = False
+
                 if changed:
                     if write:
-                        with open(pkg_path, "w", encoding="utf-8") as f:
+                        with open(manifest_path, "w", encoding="utf-8") as f:
                             f.write(new_c)
-                    records.append({"file": pkg_path, "manifest": "package.json", "content": new_c})
+                    records.append({"file": manifest_path, "manifest": base, "content": new_c})
             except Exception:
                 pass
 

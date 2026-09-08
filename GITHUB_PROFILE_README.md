@@ -18,10 +18,10 @@
 ## ⚡ Featured Project: [ApiPatch](https://github.com/MoradMoqbel/apipatch)
 > **Autonomous AI Agent for API Breaking Changes & Self-Maintaining Codebases**
 
-[![PyPI version](https://img.shields.io/badge/pypi-v0.8.2-brightgreen.svg)](https://pypi.org/project/apipatch/)
+[![PyPI version](https://img.shields.io/badge/pypi-v0.9.0-brightgreen.svg)](https://pypi.org/project/apipatch/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-v0.8.2-blue.svg)](https://github.com/MoradMoqbel/apipatch)
-[![Tests Passing](https://img.shields.io/badge/Tests-152%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
+[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-v0.9.0-blue.svg)](https://github.com/MoradMoqbel/apipatch)
+[![Tests Passing](https://img.shields.io/badge/Tests-162%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
 
 Over **30% of cloud outages and broken builds** happen because third-party APIs update and silently break code. Tools like **Dependabot** only bump version numbers in config files—they **do not fix actual code logic**.
 
@@ -35,7 +35,7 @@ apipatch scan .
 
 ### 🤖 CI/CD Integration with 1-Click GitHub Action
 ```yaml
-- uses: MoradMoqbel/apipatch@v0.8.2
+- uses: MoradMoqbel/apipatch@v0.9.0
   with:
     mode: 'fix'
     api_key: ${{ secrets.GEMINI_API_KEY }}
@@ -50,7 +50,7 @@ apipatch scan .
 ## 🛠️ Tech Stack & Expertise
 
 * **Languages:** Python (AST, Metaprogramming, AsyncIO), TypeScript, JavaScript, SQL
-* **AI & Agentic Systems:** LLM Orchestration, DocHunter Grounding, Ephemeral Sandboxing, AST Self-Healing Loops
+* **AI & Agentic Systems:** LLM Orchestration, DocHunter Grounding, Ephemeral Sandboxing, AST Self-Healing Loops, Monorepo Subproject Discovery
 * **AI Providers:** Gemini 2.5 Flash, Claude 3.7 / 3.5 Sonnet, GPT-4o, AWS Bedrock
 * **DevOps & Infrastructure:** GitHub Actions, CI/CD Workflows, Docker, PyPI Distribution, PostHog Analytics
 
@@ -58,7 +58,7 @@ apipatch scan .
 
 ## 📈 Real-Time Impact & Milestones
 
-- ⚡ **ApiPatch v0.8.2** shipped on PyPI & GitHub Actions.
+- ⚡ **ApiPatch v0.9.0** shipped on PyPI & GitHub Actions (Monorepo Subproject Discovery & Enterprise Guards).
 - 🌍 **330+ installs** across US, Singapore, Japan, UK, and Europe.
 - 🩺 Submitted autonomous refactoring Pull Requests to top-tier repositories (including Microsoft MarkItDown & Anthropic Skills).
 - 🏆 Applied to **Y Combinator** to scale autonomous software maintenance infrastructure.

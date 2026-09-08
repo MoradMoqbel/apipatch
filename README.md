@@ -3,9 +3,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![PyPI version](https://img.shields.io/badge/pypi-v0.8.2-brightgreen.svg)](https://pypi.org/project/apipatch/)
+[![PyPI version](https://img.shields.io/badge/pypi-v0.9.0-brightgreen.svg)](https://pypi.org/project/apipatch/)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
-[![Tests: Passing](https://img.shields.io/badge/Tests-152%2F152%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
+[![Tests: Passing](https://img.shields.io/badge/Tests-162%2F162%20Passing-brightgreen.svg)](https://github.com/MoradMoqbel/apipatch)
 
 ---
 
@@ -31,6 +31,11 @@ Tools like **Dependabot** and **Renovate** only bump version numbers in `require
 
 ## 🚀 Key Features
 
+* 🏗️ **Monorepo Subproject Discovery & Partitioning (New in v0.9.0):** Automatically detects multi-workspace monorepos (e.g. 150+ subprojects), resolves nearest ancestor manifests (`requirements.txt`, `pyproject.toml`, `package.json`), and partitions changes into isolated, scoped Pull Requests (`[<Subproject>] [ApiPatch] ...`).
+* 🛡️ **Anti-Spam & GitHub Rate-Limit Protection:** Enforces configurable `--max-prs` and intelligent 3-second pacing between PRs to protect accounts from bot flags and API rate exhaustion.
+* ⚡ **Entrypoint Sampling (`--files-per-subproject`):** Prioritizes core entrypoints (`app.py`, `main.py`, `agent.py`) so multi-project repositories can be audited in minutes without downloading redundant secondary files.
+* 🔒 **Deterministic AST Modernity Integrity:** Rejects hallucinated downgrades on modern reasoning model attributes (e.g., DeepSeek-R1 `.reasoning_content` / `.reasoning`) and modern `ClientV2` instances.
+* ⏱️ **Socket Hang Immunity & Real-Time Progress:** Enforces global network timeouts (`socket.setdefaulttimeout(35)`) and a live thread-safe progress counter (`[X/N] Auditing: file...`).
 * 🌐 **DocHunter™ Live Official Documentation Grounding:** Automatically resolves live PyPI/npm package metadata, official documentation URLs, and GitHub changelogs in <0.1s to eliminate hallucinations.
 * 🌟 **Smart 2026 Repository Discovery (`apipatch discover`):** Automatically finds trending, active, non-archived repositories updated in the last 30 days and audits them for breaking changes.
 * 🤖 **Autonomous GitHub PR Pipeline (`apipatch pr`):** Scans an entire remote repository, auto-forks/branches, commits refactorings via atomic Git Database API, and opens live Pull Requests.
@@ -114,13 +119,19 @@ apipatch discover "topic:llm language:python" --days 30 --submit
 ```
 
 ### 2. 🚀 Autonomous Live GitHub Pull Request
-Audits an entire GitHub repository, forks if needed, commits modernized files, and opens a real live PR:
+Audits an entire GitHub repository, forks if needed, commits modernized files, and opens real live PRs:
 ```bash
 # Dry run / preview changes without opening PR
 apipatch pr owner/repo --dry-run
 
-# Open live PR on repository
+# Open live PR on single-project repository
 apipatch pr owner/repo
+
+# Monorepo: Auto-partition into scoped PRs (e.g. up to 5 PRs, 1 entrypoint file per subproject)
+apipatch pr Shubhamsaboo/awesome-llm-apps --files-per-subproject 1 --max-prs 5
+
+# Target a specific subproject directory within a repository
+apipatch pr owner/repo --target-path subproject_directory --max-prs 1
 ```
 
 ### 3. 🎯 Proactive GitHub Code Hunter
@@ -261,6 +272,7 @@ All tests are offline-safe and mocked (no external network or live LLM required 
 - [x] **v0.8.0: Anonymous Privacy-Preserving CLI Telemetry (PostHog)**
 - [x] **v0.8.1: Official GitHub Actions CI/CD Integration (`action.yml`)**
 - [x] **v0.8.2: Enterprise Guards (Format-String, SyntaxWarning, AST Surgical Function Shielding) & AI Discoverability (`llms.txt`, `robots.txt`)**
+- [x] **v0.9.0: Monorepo Subproject Partitioning, Anti-Spam Guard (`--max-prs`), AST Reasoning Integrity & Socket Hang Immunity**
 - [x] PyPI Release (`pip install apipatch`)
 
 ---

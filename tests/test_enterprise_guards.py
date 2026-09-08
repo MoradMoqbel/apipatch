@@ -199,3 +199,19 @@ def call():
 '''
         res = CodeValidator.validate(original, modernized)
         assert res.is_valid is True
+
+    def test_reasoning_content_downgrade_rejected(self):
+        # Reproduces the DeepSeek-R1 reasoning_content -> content issue
+        original = '''
+reasoning_content = deepseek_response.choices[0].message.reasoning_content
+st.write(reasoning_content)
+'''
+        downgraded = '''
+reasoning_content = deepseek_response.choices[0].message.content
+st.write(reasoning_content)
+'''
+        res = CodeValidator.validate(original, downgraded)
+        assert res.is_valid is False
+        assert "Reasoning field regression detected" in res.error_message
+        assert "reasoning_content" in res.error_message
+

@@ -54,3 +54,22 @@ dependencies = [
     assert '"pydantic>=2.0.0"' in new_content
     assert '"openai>=1.0.0"' in new_content
     assert '"requests>=2.25.0"' in new_content
+
+
+def test_sync_local_manifests_monorepo_nested(tmp_path):
+    subproject_a = tmp_path / "apps" / "service_a"
+    subproject_a.mkdir(parents=True)
+    req_a = subproject_a / "requirements.txt"
+    req_a.write_text("openai==0.28.0\n", encoding="utf-8")
+
+    subproject_b = tmp_path / "apps" / "service_b"
+    subproject_b.mkdir(parents=True)
+    pkg_b = subproject_b / "package.json"
+    pkg_b.write_text('{"dependencies": {"@supabase/supabase-js": "^1.35.0"}}', encoding="utf-8")
+
+    records = ManifestBumper.bump_local_manifests(str(tmp_path), {"openai", "@supabase/supabase-js"}, write=True)
+
+    assert len(records) == 2
+    assert "openai>=1.0.0" in req_a.read_text(encoding="utf-8")
+    assert "^2.0.0" in pkg_b.read_text(encoding="utf-8")
+

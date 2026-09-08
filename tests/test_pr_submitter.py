@@ -116,6 +116,149 @@ class TestPRSubmitter(unittest.TestCase):
         )
         self.assertEqual(res["status"], "clean")
 
+    @patch.object(GitHubPRHunter, "get_authenticated_user")
+    @patch.object(GitHubPRHunter, "get_default_branch")
+    @patch.object(GitHubPRHunter, "get_branch_sha")
+    def test_audit_and_pr_monorepo_auto_discovery(self, mock_sha, mock_branch, mock_user):
+        mock_user.return_value = "test-user"
+        mock_branch.return_value = "main"
+        mock_sha.return_value = "abc12345"
+
+        hunter = GitHubPRHunter(github_token="fake_token")
+        hunter.client.get_repo_file_tree = MagicMock(return_value=[
+            {"path": "rag_tutorials/requirements.txt", "type": "blob"},
+            {"path": "rag_tutorials/advanced_rag.py", "type": "blob"},
+            {"path": "agent_teams/requirements.txt", "type": "blob"},
+            {"path": "agent_teams/agent.py", "type": "blob"},
+        ])
+
+        def fake_fetch(repo, path, ref="main"):
+            if path == "rag_tutorials/advanced_rag.py":
+                return "import openai\nopenai.ChatCompletion.create()\n"
+            elif path == "rag_tutorials/requirements.txt":
+                return "openai==0.28.0\n"
+            return "import os\n"
+
+        hunter.client.fetch_file_content = MagicMock(side_effect=fake_fetch)
+        hunter.engine.audit_code = MagicMock(return_value={
+            "has_breaking_changes": True,
+            "refactored_code": "from openai import OpenAI\nclient = OpenAI()\nclient.chat.completions.create()\n",
+            "detected_issues": [{"library": "openai", "deprecated_symbol": "ChatCompletion"}]
+        })
+        hunter.engine.generate_diff = MagicMock(return_value="--- a\n+++ b\n")
+
+        # Run WITHOUT target_path in dry_run mode
+        res = hunter.audit_and_pr_repository(
+            repo_name="Shubhamsaboo/awesome-llm-apps",
+            dry_run=True,
+            target_path=None
+        )
+
+        self.assertEqual(res["status"], "preview")
+        self.assertIn("[Rag_tutorials]", res["title"])
+
+    @patch.object(GitHubPRHunter, "get_authenticated_user")
+    @patch.object(GitHubPRHunter, "get_default_branch")
+    @patch.object(GitHubPRHunter, "get_branch_sha")
+    def test_audit_and_pr_monorepo_multi_subproject_partitioning(self, mock_sha, mock_branch, mock_user):
+        mock_user.return_value = "test-user"
+        mock_branch.return_value = "main"
+        mock_sha.return_value = "abc12345"
+
+        hunter = GitHubPRHunter(github_token="fake_token")
+        hunter.client.get_repo_file_tree = MagicMock(return_value=[
+            {"path": "rag_tutorials/requirements.txt", "type": "blob"},
+            {"path": "rag_tutorials/advanced_rag.py", "type": "blob"},
+            {"path": "agent_teams/requirements.txt", "type": "blob"},
+            {"path": "agent_teams/agent.py", "type": "blob"},
+        ])
+
+        def fake_fetch(repo, path, ref="main"):
+            if path in ("rag_tutorials/advanced_rag.py", "agent_teams/agent.py"):
+                return "import openai\nopenai.ChatCompletion.create()\n"
+            elif path in ("rag_tutorials/requirements.txt", "agent_teams/requirements.txt"):
+                return "openai==0.28.0\n"
+            return "import os\n"
+
+        hunter.client.fetch_file_content = MagicMock(side_effect=fake_fetch)
+        hunter.engine.audit_code = MagicMock(return_value={
+            "has_breaking_changes": True,
+            "refactored_code": "from openai import OpenAI\nclient = OpenAI()\nclient.chat.completions.create()\n",
+            "detected_issues": [{"library": "openai", "deprecated_symbol": "ChatCompletion"}]
+        })
+        hunter.engine.generate_diff = MagicMock(return_value="--- a\n+++ b\n")
+
+        # Test with max_prs=2
+        res2 = hunter.audit_and_pr_repository(
+            repo_name="Shubhamsaboo/awesome-llm-apps",
+            dry_run=True,
+            per_subproject=True,
+            max_prs=2
+        )
+        self.assertEqual(res2["status"], "preview")
+        self.assertEqual(res2["total_subprojects_affected"], 2)
+        self.assertEqual(len(res2["prs"]), 2)
+        subprojects_in_prs = {pr["subproject"] for pr in res2["prs"]}
+        self.assertIn("rag_tutorials", subprojects_in_prs)
+        self.assertIn("agent_teams", subprojects_in_prs)
+
+        # Test with max_prs=1 (Anti-Spam Guard enforces 1 PR preview/creation)
+        res1 = hunter.audit_and_pr_repository(
+            repo_name="Shubhamsaboo/awesome-llm-apps",
+            dry_run=True,
+            per_subproject=True,
+            max_prs=1
+        )
+        self.assertEqual(res1["status"], "preview")
+        self.assertEqual(res1["total_subprojects_affected"], 2)
+        self.assertEqual(len(res1["prs"]), 1)
+
+    @patch.object(GitHubPRHunter, "get_authenticated_user")
+    @patch.object(GitHubPRHunter, "get_default_branch")
+    @patch.object(GitHubPRHunter, "get_branch_sha")
+    def test_audit_and_pr_monorepo_files_per_subproject_sampling(self, mock_sha, mock_branch, mock_user):
+        mock_user.return_value = "test-user"
+        mock_branch.return_value = "main"
+        mock_sha.return_value = "abc12345"
+
+        hunter = GitHubPRHunter(github_token="fake_token")
+        # 3 subprojects, each having entrypoint app.py and helper.py
+        hunter.client.get_repo_file_tree = MagicMock(return_value=[
+            {"path": "sub1/requirements.txt", "type": "blob"},
+            {"path": "sub1/helper.py", "type": "blob"},
+            {"path": "sub1/app.py", "type": "blob"},
+            {"path": "sub2/requirements.txt", "type": "blob"},
+            {"path": "sub2/helper.py", "type": "blob"},
+            {"path": "sub2/main.py", "type": "blob"},
+            {"path": "sub3/requirements.txt", "type": "blob"},
+            {"path": "sub3/helper.py", "type": "blob"},
+            {"path": "sub3/agent.py", "type": "blob"},
+        ])
+
+        inspected_files = []
+        def fake_fetch(repo, path, ref="main"):
+            inspected_files.append(path)
+            return "import os\n"
+
+        hunter.client.fetch_file_content = MagicMock(side_effect=fake_fetch)
+        hunter.engine.audit_code = MagicMock(return_value={"has_breaking_changes": False})
+
+        hunter.audit_and_pr_repository(
+            repo_name="Shubhamsaboo/awesome-llm-apps",
+            dry_run=True,
+            files_per_subproject=1
+        )
+
+        # Should prioritize entrypoints and pick exactly 1 file per subproject
+        self.assertIn("sub1/app.py", inspected_files)
+        self.assertIn("sub2/main.py", inspected_files)
+        self.assertIn("sub3/agent.py", inspected_files)
+        # Helpers should NOT be inspected when files_per_subproject=1
+        self.assertNotIn("sub1/helper.py", inspected_files)
+        self.assertNotIn("sub2/helper.py", inspected_files)
+
 
 if __name__ == "__main__":
     unittest.main()
+
+

@@ -16,8 +16,21 @@ from typing import List, Dict, Any, Optional
 from apipatch.engine import ApiPatchEngine, Colors
 from apipatch.github_client import GitHubClient, resolve_github_token, mask_token
 from apipatch.auto_detector import should_audit_file
+from apipatch.monorepo import MonorepoManager
 
 GITHUB_API_BASE = "https://api.github.com"
+
+ENTRYPOINT_FILENAMES = (
+    "app.py", "main.py", "server.py", "agent.py", "agents.py", "cli.py",
+    "index.py", "index.ts", "index.js", "router.py", "tools.py"
+)
+
+
+def _sort_subproject_files(files: List[str]) -> List[str]:
+    def _rank(p: str) -> int:
+        base = os.path.basename(p).lower()
+        return 0 if base in ENTRYPOINT_FILENAMES else 1
+    return sorted(files, key=_rank)
 
 
 def _build_raw_url(item: dict) -> str:
@@ -399,7 +412,10 @@ class GitHubPRHunter:
         precomputed_results: Optional[List[Dict[str, Any]]] = None,
         target_path: Optional[str] = None,
         custom_title: Optional[str] = None,
-        verify_tests: bool = False
+        verify_tests: bool = False,
+        per_subproject: bool = True,
+        max_prs: int = 1,
+        files_per_subproject: Optional[int] = None
     ) -> Dict[str, Any]:
         """
         Audits an entire GitHub repository (or specific sub-directory), applies refactorings to all deprecated files,
@@ -439,14 +455,25 @@ class GitHubPRHunter:
         audit_results: List[Dict[str, Any]] = []
         files_to_commit: Dict[str, str] = {}
 
+        print(f"\n{Colors.OKCYAN}[*] Fetching file tree for {repo_name}...{Colors.ENDC}")
+        try:
+            tree_items = self.client.get_repo_file_tree(repo_name, base_branch)
+        except Exception:
+            tree_items = []
+        print(f"[✓] Retrieved {len(tree_items)} total repository files.")
+
+        all_tree_paths = [it.get("path", "") for it in tree_items]
+        subprojects = MonorepoManager.discover_subprojects_from_paths(all_tree_paths)
+        is_mono = MonorepoManager.is_monorepo(subprojects)
+        if is_mono and not target_path:
+            non_root = [d for d in subprojects.keys() if d]
+            print(f"  {Colors.OKBLUE}[*] Monorepo architecture detected: Found {len(non_root)} distinct subproject workspace(s).{Colors.ENDC}")
+
         if precomputed_results:
             audit_results = precomputed_results
             for r in audit_results:
                 files_to_commit[r["file"]] = r["refactored_code"]
         else:
-            print(f"\n{Colors.OKCYAN}[*] Fetching file tree for {repo_name}...{Colors.ENDC}")
-            tree_items = self.client.get_repo_file_tree(repo_name, base_branch)
-            print(f"[✓] Retrieved {len(tree_items)} total repository files.")
 
             supported_exts = (".py", ".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs")
             target_norm = target_path.strip("/\\").replace("\\", "/").lower() if target_path else None
@@ -465,17 +492,57 @@ class GitHubPRHunter:
                         continue
                 candidate_files.append(p)
 
-            candidate_files = candidate_files[:max_files]
+            if is_mono and not target_norm and candidate_files:
+                sampled_candidates = []
+                if files_per_subproject is not None:
+                    per_sub_limit = max(1, files_per_subproject)
+                    for s_dir, s_data in subprojects.items():
+                        sub_files = [f for f in s_data.get("files", []) if f in candidate_files]
+                        ordered = _sort_subproject_files(sub_files)
+                        sampled_candidates.extend(ordered[:per_sub_limit])
+                    candidate_files = sampled_candidates
+                    print(f"  {Colors.OKBLUE}[*] Monorepo Full Coverage: Sampled {per_sub_limit} entrypoint file(s) per subproject across {len(subprojects)} workspaces ({len(candidate_files)} total files).{Colors.ENDC}")
+                else:
+                    per_sub_limit = max(1, max_files // (len(subprojects) or 1)) if len(subprojects) > max_files else max(3, max_files // (len(subprojects) or 1))
+                    for s_dir, s_data in subprojects.items():
+                        sub_files = [f for f in s_data.get("files", []) if f in candidate_files]
+                        ordered = _sort_subproject_files(sub_files)
+                        sampled_candidates.extend(ordered[:per_sub_limit])
+                    limit = max_files if (max_files and max_files > 0) else None
+                    if sampled_candidates:
+                        candidate_files = sampled_candidates[:limit] if limit else sampled_candidates
+                    else:
+                        candidate_files = candidate_files[:limit] if limit else candidate_files
+            else:
+                limit = max_files if (max_files and max_files > 0) else None
+                candidate_files = candidate_files[:limit] if limit else candidate_files
+
+            import socket
+            import threading
+            socket.setdefaulttimeout(35)
 
             print(f"[*] Inspecting {len(candidate_files)} supported candidate code files in parallel...")
 
+            completed_count = 0
+            count_lock = threading.Lock()
+            total_candidates = len(candidate_files)
+
             def _inspect_single_file(path: str):
+                nonlocal completed_count
                 try:
                     content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
                     if not content:
+                        with count_lock:
+                            completed_count += 1
                         return None
                     if not should_audit_file(content, path):
+                        with count_lock:
+                            completed_count += 1
                         return None
+                    with count_lock:
+                        completed_count += 1
+                        current_num = completed_count
+                    print(f"  {Colors.OKBLUE}[{current_num}/{total_candidates}] Auditing: {path}...{Colors.ENDC}", flush=True)
                     audit = self.engine.audit_code(path, content)
                     if audit.get("has_breaking_changes") and audit.get("refactored_code"):
                         diff = self.engine.generate_diff(content, audit["refactored_code"], path)
@@ -531,30 +598,35 @@ class GitHubPRHunter:
                     modernized_libs.add(lib)
                     file_dirs_to_libs[mod_dir].add(lib)
 
-        if modernized_libs and not precomputed_results and 'tree_items' in locals():
-            for item in tree_items:
-                path = item.get("path", "").replace("\\", "/")
-                base = os.path.basename(path).lower()
-                if base not in ("requirements.txt", "pyproject.toml", "package.json"):
+        # ── Synchronize Remote Manifest Files (Scope-Aware: Only nearest ancestor manifest) ──
+        from apipatch.manifest_bumper import ManifestBumper
+        manifest_updates: Dict[str, str] = {}
+        all_manifest_paths = [
+            item.get("path", "").replace("\\", "/")
+            for item in tree_items
+            if os.path.basename(item.get("path", "")).lower() in ("requirements.txt", "pyproject.toml", "package.json")
+        ] if ('tree_items' in locals() and not precomputed_results) else []
+
+        if all_manifest_paths and not precomputed_results:
+            manifest_to_libs: Dict[str, Set[str]] = {}
+            for r in audit_results:
+                file_path = r.get("file", "").replace("\\", "/")
+                file_libs = {iss["library"] for iss in r.get("detected_issues", []) if iss.get("library")}
+                if not file_libs:
                     continue
 
-                # ── Scope check: only touch manifest if it encloses the modified file ──
-                manifest_dir = "/".join(path.split("/")[:-1])
-                relevant_libs: Set[str] = set()
-                for mod_dir, libs in file_dirs_to_libs.items():
-                    # 1. Root manifest (manifest_dir == "") matches any modified file
-                    # 2. Same directory manifest (manifest_dir == mod_dir)
-                    # 3. Ancestor manifest (mod_dir.startswith(manifest_dir + "/"))
-                    if manifest_dir == "" or manifest_dir == mod_dir or mod_dir.startswith(manifest_dir + "/"):
-                        relevant_libs.update(libs)
+                nearest = MonorepoManager.find_nearest_manifest(file_path, all_manifest_paths)
+                if nearest:
+                    if nearest not in manifest_to_libs:
+                        manifest_to_libs[nearest] = set()
+                    manifest_to_libs[nearest].update(file_libs)
 
-                if not relevant_libs:
-                    continue  # This manifest is in an unrelated subproject — skip it!
-
+            for path, relevant_libs in manifest_to_libs.items():
                 content = self.client.fetch_file_content(repo_name, path, ref=base_branch)
                 if not content:
                     continue
 
+                base = os.path.basename(path).lower()
                 if base == "requirements.txt":
                     new_c, changed = ManifestBumper.bump_requirements_txt(content, relevant_libs)
                 elif base == "package.json":
@@ -566,123 +638,201 @@ class GitHubPRHunter:
 
                 if changed:
                     print(f"  {Colors.OKGREEN}[✓] Automatically synced dependency version in {path}{Colors.ENDC}")
-                    files_to_commit[path] = new_c
+                    manifest_updates[path] = new_c
 
-        print(f"\n{Colors.OKGREEN}[✓] Identified {len(audit_results)} file(s) requiring modernization ({len(files_to_commit)} total files to commit).{Colors.ENDC}")
+        # ── Determine PR Partitions (Subproject Partitioning vs Single PR) ──
+        subprojects_dict = subprojects if 'subprojects' in locals() else {}
+        is_monorepo = bool(locals().get('is_mono'))
 
-        # 2. Generate PR Markdown Payload
-        scope_prefix = None
-        if target_path:
-            scope_leaf = os.path.basename(target_path.rstrip("/\\"))
-            if scope_leaf:
-                scope_prefix = f"[{scope_leaf.capitalize()}] "
+        if is_monorepo and per_subproject and not target_path and subprojects_dict:
+            partitions = MonorepoManager.partition_audit_by_subproject(
+                audit_results, subprojects_dict, all_manifest_paths
+            )
+        else:
+            partitions = {"": audit_results}
 
-        pr_payload = self.client.generate_pr_markdown(
-            repo_name,
-            audit_results,
-            custom_title=custom_title,
-            scope_prefix=scope_prefix
-        )
-        print(f"\n{Colors.HEADER}Proposed PR Title:{Colors.ENDC} {pr_payload['title']}")
+        if len(partitions) > 1:
+            print(f"\n{Colors.OKCYAN}[*] Monorepo Subproject Partitioning: {len(partitions)} distinct subprojects affected.{Colors.ENDC}")
+            print(f"    Will process up to {max_prs} separate PR(s) (Anti-Spam Guard; adjust via --max-prs).\n")
+
+        sorted_partitions = sorted(partitions.items(), key=lambda item: len(item[1]), reverse=True)
+        selected_partitions = sorted_partitions[:max(1, max_prs)]
+
+        has_write = self.client.has_write_permission(repo_name)
+        should_fork = fork if fork is not None else (not has_write)
+        working_repo = repo_name
+        fork_initialized = False
+        pr_results: List[Dict[str, Any]] = []
+
+        for p_idx, (s_dir, sub_audit_results) in enumerate(selected_partitions, 1):
+            sub_files_to_commit: Dict[str, str] = {}
+            for r in sub_audit_results:
+                sub_files_to_commit[r["file"]] = r["refactored_code"]
+                nearest = MonorepoManager.find_nearest_manifest(r["file"], all_manifest_paths)
+                if nearest and nearest in manifest_updates:
+                    sub_files_to_commit[nearest] = manifest_updates[nearest]
+
+            # Resolve title & scope prefix
+            scope_prefix = None
+            if target_path:
+                scope_leaf = os.path.basename(target_path.rstrip("/\\"))
+                if scope_leaf:
+                    scope_prefix = f"[{scope_leaf.capitalize()}] "
+            elif s_dir:
+                s_name = subprojects_dict.get(s_dir, {}).get("name") or os.path.basename(s_dir) or s_dir
+                scope_prefix = f"[{s_name.capitalize()}] "
+            elif is_monorepo:
+                modified_paths = [r["file"] for r in sub_audit_results]
+                _, auto_subproject = MonorepoManager.resolve_scoped_title(modified_paths)
+                if auto_subproject:
+                    scope_prefix = f"[{auto_subproject.capitalize()}] "
+
+            pr_payload = self.client.generate_pr_markdown(
+                repo_name,
+                sub_audit_results,
+                custom_title=custom_title,
+                scope_prefix=scope_prefix
+            )
+
+            if len(partitions) > 1:
+                print(f"{Colors.HEADER}Subproject [{p_idx}/{len(selected_partitions)}]:{Colors.ENDC} {pr_payload['title']}")
+            else:
+                print(f"\n{Colors.HEADER}Proposed PR Title:{Colors.ENDC} {pr_payload['title']}")
+
+            s_slug = ((subprojects_dict.get(s_dir, {}).get("name") or os.path.basename(s_dir)) if s_dir else "root").lower().replace("/", "-").replace("_", "-").strip("-")
+            timestamp = int(time.time()) + p_idx
+            cur_branch = branch_name or f"apipatch/migrate-{s_slug}-{timestamp}"
+
+            if dry_run or not submit:
+                pr_results.append({
+                    "status": "preview",
+                    "repo": repo_name,
+                    "subproject": s_dir or "root",
+                    "branch": cur_branch,
+                    "modified_files": len(sub_files_to_commit),
+                    "title": pr_payload["title"],
+                    "body": pr_payload["body"],
+                    "audit_results": sub_audit_results,
+                    "files_to_commit": list(sub_files_to_commit.keys())
+                })
+                continue
+
+            # Submit live PR
+            if should_fork and not fork_initialized:
+                print(f"\n[*] Forking repository to @{auth_user}...")
+                fork_repo = self.client.fork_repository(repo_name)
+                if not fork_repo:
+                    fork_repo = f"{auth_user}/{repo_name.split('/')[-1]}"
+                working_repo = fork_repo
+                fork_initialized = True
+                print(f"[✓] Using fork: {working_repo}")
+
+            head_ref = f"{auth_user}:{cur_branch}" if should_fork else cur_branch
+
+            # Create working branch
+            print(f"[*] Creating branch '{cur_branch}' on {working_repo}...")
+            branch_created = self.create_branch(working_repo, cur_branch, base_sha)
+            if not branch_created:
+                print(f"{Colors.FAIL}[!] Failed to create branch '{cur_branch}' on {working_repo}.{Colors.ENDC}")
+                pr_results.append({"status": "error", "error": f"Failed to create branch {cur_branch}", "subproject": s_dir})
+                continue
+
+            # Commit modified files
+            commit_msg = pr_payload["title"]
+            print(f"[*] Committing {len(sub_files_to_commit)} modernized file(s)...")
+            commit_sha = None
+            if len(sub_files_to_commit) == 1:
+                f_path, f_content = list(sub_files_to_commit.items())[0]
+                ok = self.commit_file_change(working_repo, cur_branch, f_path, f_content, commit_msg)
+                if ok:
+                    commit_sha = "single_commit_ok"
+            else:
+                commit_sha = self.client.commit_multiple_files(
+                    repo_full_name=working_repo,
+                    branch=cur_branch,
+                    files=sub_files_to_commit,
+                    commit_message=commit_msg,
+                    base_sha=base_sha
+                )
+                if not commit_sha:
+                    for f_path, f_content in sub_files_to_commit.items():
+                        self.commit_file_change(working_repo, cur_branch, f_path, f_content, commit_msg)
+                    commit_sha = "fallback_multi_ok"
+
+            if not commit_sha:
+                print(f"{Colors.FAIL}[!] Failed to commit modernized files for {s_dir}.{Colors.ENDC}")
+                pr_results.append({"status": "error", "error": "Commit failed", "subproject": s_dir})
+                continue
+
+            print(f"{Colors.OKGREEN}[✓] Successfully committed all refactored code for {s_dir or 'root'}.{Colors.ENDC}")
+
+            # Submit PR
+            print(f"[*] Submitting live Pull Request to {repo_name}...")
+            pr_response = self.submit_pull_request(
+                base_repo=repo_name,
+                head_branch=head_ref,
+                base_branch=base_branch,
+                title=pr_payload["title"],
+                body=pr_payload["body"]
+            )
+
+            if pr_response and isinstance(pr_response, dict) and "html_url" in pr_response:
+                pr_url = pr_response["html_url"]
+                print(f"\n{Colors.OKGREEN}{Colors.BOLD}🎉 SUCCESS! Pull Request Opened:{Colors.ENDC} {Colors.OKCYAN}{pr_url}{Colors.ENDC}\n")
+                pr_results.append({
+                    "status": "success",
+                    "pr_url": pr_url,
+                    "pr_number": pr_response.get("number"),
+                    "repo": repo_name,
+                    "subproject": s_dir or "root",
+                    "branch": cur_branch,
+                    "modified_files": len(sub_files_to_commit),
+                    "audit_results": sub_audit_results,
+                    "title": pr_payload["title"]
+                })
+            else:
+                print(f"{Colors.FAIL}[!] Failed to open Pull Request for {s_dir}.{Colors.ENDC}")
+                pr_results.append({
+                    "status": "error",
+                    "error": "Failed to submit Pull Request",
+                    "branch": cur_branch,
+                    "subproject": s_dir
+                })
+
+            if p_idx < len(selected_partitions):
+                print(f"  {Colors.OKBLUE}[*] Respecting GitHub API pacing: waiting 3s before processing next PR...{Colors.ENDC}")
+                time.sleep(3)
 
         if dry_run or not submit:
-            print(f"\n{Colors.WARNING}[DRY-RUN / PREVIEW] PR creation skipped.{Colors.ENDC}")
+            print(f"\n{Colors.WARNING}[DRY-RUN / PREVIEW] PR creation skipped ({len(pr_results)} PR(s) previewed).{Colors.ENDC}")
+            primary = pr_results[0] if pr_results else {}
             return {
                 "status": "preview",
                 "repo": repo_name,
-                "modified_files": len(files_to_commit),
-                "title": pr_payload["title"],
-                "body": pr_payload["body"],
-                "audit_results": audit_results
+                "modified_files": sum(p.get("modified_files", 0) for p in pr_results),
+                "title": primary.get("title", ""),
+                "body": primary.get("body", ""),
+                "audit_results": audit_results,
+                "prs": pr_results,
+                "total_subprojects_affected": len(partitions),
+                "prs_previewed": len(pr_results)
             }
 
-        # 3. Determine Forking & Branching Strategy
-        has_write = self.client.has_write_permission(repo_name)
-        should_fork = fork if fork is not None else (not has_write)
-
-        working_repo = repo_name
-        head_ref = ""
-        timestamp = int(time.time())
-        branch_to_create = branch_name or f"apipatch/migrate-{timestamp}"
-
-        if should_fork:
-            print(f"\n[*] Forking repository to @{auth_user}...")
-            fork_repo = self.client.fork_repository(repo_name)
-            if not fork_repo:
-                fork_repo = f"{auth_user}/{repo_name.split('/')[-1]}"
-            working_repo = fork_repo
-            head_ref = f"{auth_user}:{branch_to_create}"
-            print(f"[✓] Using fork: {working_repo}")
-        else:
-            working_repo = repo_name
-            head_ref = branch_to_create
-            print(f"[✓] Direct push permissions available on {working_repo}")
-
-        # 4. Create Working Branch
-        print(f"[*] Creating branch '{branch_to_create}' on {working_repo}...")
-        branch_created = self.create_branch(working_repo, branch_to_create, base_sha)
-        if not branch_created:
-            print(f"{Colors.FAIL}[!] Failed to create branch '{branch_to_create}' on {working_repo}.{Colors.ENDC}")
-            return {"status": "error", "error": f"Failed to create branch on {working_repo}"}
-
-        # 5. Commit Modified Files
-        commit_msg = pr_payload["title"]
-        print(f"[*] Committing {len(files_to_commit)} modernized file(s)...")
-
-        commit_sha = None
-        if len(files_to_commit) == 1:
-            f_path, f_content = list(files_to_commit.items())[0]
-            ok = self.commit_file_change(working_repo, branch_to_create, f_path, f_content, commit_msg)
-            if ok:
-                commit_sha = "single_commit_ok"
-        else:
-            commit_sha = self.client.commit_multiple_files(
-                repo_full_name=working_repo,
-                branch=branch_to_create,
-                files=files_to_commit,
-                commit_message=commit_msg,
-                base_sha=base_sha
-            )
-            if not commit_sha:
-                for f_path, f_content in files_to_commit.items():
-                    self.commit_file_change(working_repo, branch_to_create, f_path, f_content, commit_msg)
-                commit_sha = "fallback_multi_ok"
-
-        if not commit_sha:
-            print(f"{Colors.FAIL}[!] Failed to commit modernized files.{Colors.ENDC}")
-            return {"status": "error", "error": "Commit failed"}
-
-        print(f"{Colors.OKGREEN}[✓] Successfully committed all refactored code.{Colors.ENDC}")
-
-        # 6. Submit Pull Request
-        print(f"[*] Submitting live Pull Request to {repo_name}...")
-        pr_response = self.submit_pull_request(
-            base_repo=repo_name,
-            head_branch=head_ref,
-            base_branch=base_branch,
-            title=pr_payload["title"],
-            body=pr_payload["body"]
-        )
-
-        if pr_response and isinstance(pr_response, dict) and "html_url" in pr_response:
-            pr_url = pr_response["html_url"]
-            print(f"\n{Colors.OKGREEN}{Colors.BOLD}🎉 SUCCESS! Pull Request Opened:{Colors.ENDC} {Colors.OKCYAN}{pr_url}{Colors.ENDC}\n")
-            return {
-                "status": "success",
-                "pr_url": pr_url,
-                "pr_number": pr_response.get("number"),
-                "repo": repo_name,
-                "branch": branch_to_create,
-                "modified_files": len(files_to_commit),
-                "audit_results": audit_results
-            }
-        else:
-            print(f"{Colors.FAIL}[!] Failed to open Pull Request via GitHub REST API.{Colors.ENDC}")
-            return {
-                "status": "error",
-                "error": "Failed to submit Pull Request",
-                "branch": branch_to_create
-            }
+        successful_prs = [p for p in pr_results if p.get("status") == "success"]
+        primary = successful_prs[0] if successful_prs else (pr_results[0] if pr_results else {})
+        return {
+            "status": "success" if successful_prs else "error",
+            "pr_url": primary.get("pr_url"),
+            "pr_number": primary.get("pr_number"),
+            "repo": repo_name,
+            "branch": primary.get("branch"),
+            "title": primary.get("title"),
+            "modified_files": sum(p.get("modified_files", 0) for p in pr_results),
+            "audit_results": audit_results,
+            "prs": pr_results,
+            "prs_created": len(successful_prs),
+            "total_subprojects_affected": len(partitions)
+        }
 
     # ── PR Payload Generation ────────────────────────────────────────────────
 

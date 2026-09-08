@@ -9,6 +9,7 @@ Apply to Y Combinator*
 audit_*.md
 audit_*.txt
 *.log
+HOW_TO_USE_AR.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

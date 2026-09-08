@@ -6,8 +6,12 @@ sandbox test verification, live GitHub PR submission, and GitHub App Webhook dae
 
 import sys
 import json
+import socket
 import argparse
 from typing import Optional
+
+# Enforce strict socket timeouts across all HTTP/TLS connections to prevent indefinite hangs
+socket.setdefaulttimeout(35)
 from apipatch._version import __version__
 from apipatch.engine import ApiPatchEngine, Colors
 from apipatch.auto_detector import AutoDeprecationDetector
@@ -117,6 +121,10 @@ def main():
     pr_parser.add_argument("--path", "--dir", "--target-path", dest="target_path", help="Target sub-directory or file path within repository to restrict audit/PR scope (e.g., 'beifong' or 'apps/my-app')")
     pr_parser.add_argument("--title", dest="custom_title", help="Custom title for the generated Pull Request")
     pr_parser.add_argument("--max-files", type=int, default=50, help="Max repository files to inspect (default: 50)")
+    pr_parser.add_argument("--all", "--all-files", dest="all_files", action="store_true", help="Inspect all candidate files across the entire repository or target path without limit")
+    pr_parser.add_argument("--files-per-subproject", type=int, default=None, help="In a Monorepo, inspect up to N entrypoint files per subproject across all workspaces")
+    pr_parser.add_argument("--max-prs", type=int, default=1, help="Max separate PRs to open in a Monorepo across distinct subprojects (default: 1, prevents rate-limits and spam)")
+    pr_parser.add_argument("--single-pr", dest="per_subproject", action="store_false", default=True, help="Combine all monorepo changes into a single PR instead of 1 PR per subproject")
     pr_parser.add_argument("--verify-tests", "--run-tests", dest="verify_tests", action="store_true", help="Run AST and sandbox test verification before opening PR")
     pr_parser.add_argument("--provider", choices=["openai", "anthropic", "gemini", "bedrock"], help="AI provider for dynamic reasoning")
     pr_parser.add_argument("--api-key", help="API key for chosen provider")
@@ -240,10 +248,13 @@ def main():
             branch_name=args.new_branch,
             submit=not args.dry_run,
             dry_run=args.dry_run,
-            max_files=args.max_files,
+            max_files=0 if getattr(args, "all_files", False) else args.max_files,
             target_path=getattr(args, "target_path", None),
             custom_title=getattr(args, "custom_title", None),
-            verify_tests=getattr(args, "verify_tests", False)
+            verify_tests=getattr(args, "verify_tests", False),
+            per_subproject=getattr(args, "per_subproject", True),
+            max_prs=getattr(args, "max_prs", 1),
+            files_per_subproject=getattr(args, "files_per_subproject", None)
         )
 
     elif args.command == "webhook":

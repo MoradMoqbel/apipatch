@@ -47,8 +47,9 @@ Rules (STRICT ZERO-TOLERANCE FOR HALLUCINATIONS & OVER-REFACTORING):
   14. PRESERVE MODERN AUDIO & SIGNAL PARAMETERS (NO LIBROSA REGRESSIONS): In modern librosa/audio libraries, `librosa.resample(y=..., orig_sr=..., target_sr=...)` uses `orig_sr`, NOT `sr`. Never revert modern keyword arguments to deprecated ones.
   15. PRESERVE MODERN CLIENTS & MULTI-API ENDPOINTS (ZERO REVERSE MIGRATION / NO DOWNGRADES): Modern SDKs frequently provide multiple parallel, specialized, or ultra-modern endpoints on client instances (e.g. `client.chat.completions.create` AND `client.responses.create`, `client.beta.*`, `client.realtime.*`, role: "developer", max_output_tokens, max_completion_tokens, response.output_text). You are an auditor for DEPRECATED and REMOVED APIs only. You are NOT a code normalizer or canonicalizer. NEVER rewrite one valid modern method or endpoint to another method simply because it is more familiar to you. If code already instantiates a modern SDK client (e.g. `client = openai.OpenAI()`, `client = genai.Client()`, `client = anthropic.Anthropic()`), do NOT mutate its method calls unless the specific method is officially removed or deprecated. Treat `responses.create`, `role: 'developer'`, and `max_output_tokens` as modern permanent 2025/2026 features. Return has_breaking_changes=false.
   16. CLEAN SYNTAX (NO TRAILING SEMICOLONS): In Python files, do NOT append trailing semicolons (;) at the end of statements.
-  17. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
-  18. Respond ONLY with a valid JSON object matching the exact schema below.
+  17. PRESERVE REASONING & CHAIN-OF-THOUGHT FIELDS: Modern reasoning models (e.g. DeepSeek-R1, OpenAI o1/o3, Qwen-Thinking) explicitly return reasoning tokens in dedicated attributes (e.g. message.reasoning_content, message.reasoning, or thinking). NEVER mutate or replace .reasoning_content with .content.
+  18. If NO genuine third-party breaking changes exist, ALWAYS return has_breaking_changes=false and refactored_code="".
+  19. Respond ONLY with a valid JSON object matching the exact schema below.
       Do NOT include any preamble, explanation, markdown fences, or commentary.
 
 Response schema:

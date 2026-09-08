@@ -652,12 +652,29 @@ class CodeValidator:
         Guards against model identifier downgrades (e.g. Claude 4.5/3.7 -> 3.5, Gemini 3/2.5 -> 1.5)
         and client version downgrades (e.g. ClientV2 -> Client).
         """
-        # 1. Guard against ClientV2 downgrade
-        if ("ClientV2" in original_code) and ("ClientV2" not in refactored_code) and ("Client(" in refactored_code or ".Client(" in refactored_code):
-            return ValidationResult(
-                is_valid=False,
-                error_message="Refactored code downgraded modern 'ClientV2' to legacy 'Client'. Preserve modern 'ClientV2'."
+        # 1. Guard against ClientV2 downgrade (AST-based so comments cannot bypass it)
+        try:
+            tree_orig = ast.parse(original_code)
+            tree_ref = ast.parse(refactored_code)
+            orig_has_v2 = any(
+                (isinstance(n, ast.Attribute) and n.attr == "ClientV2") or (isinstance(n, ast.Name) and n.id == "ClientV2")
+                for n in ast.walk(tree_orig)
             )
+            ref_has_v2 = any(
+                (isinstance(n, ast.Attribute) and n.attr == "ClientV2") or (isinstance(n, ast.Name) and n.id == "ClientV2")
+                for n in ast.walk(tree_ref)
+            )
+            if orig_has_v2 and not ref_has_v2 and ("Client(" in refactored_code or ".Client(" in refactored_code):
+                return ValidationResult(
+                    is_valid=False,
+                    error_message="Refactored code downgraded modern 'ClientV2' to legacy 'Client'. Preserve modern 'ClientV2'."
+                )
+        except Exception:
+            if ("ClientV2" in original_code) and ("ClientV2" not in refactored_code) and ("Client(" in refactored_code or ".Client(" in refactored_code):
+                return ValidationResult(
+                    is_valid=False,
+                    error_message="Refactored code downgraded modern 'ClientV2' to legacy 'Client'. Preserve modern 'ClientV2'."
+                )
 
         # 2. Guard against modern model string downgrades (e.g. claude-sonnet-4-5, claude-4.5-sonnet, claude-3-7)
         modern_model_patterns = [
@@ -883,6 +900,18 @@ class CodeValidator:
                     error_message=(
                         f"Token parameter downgrade detected: '{modern_tok}' is an intentional modern parameter. "
                         f"Preserve '{modern_tok}' instead of reverting to legacy 'max_tokens'."
+                    )
+                )
+
+        # 4. Guard against reasoning model attribute downgrades (.reasoning_content / .reasoning -> .content)
+        for r_attr in ["reasoning_content", "reasoning"]:
+            if (f".{r_attr}" in original_code or f"['{r_attr}']" in original_code or f'["{r_attr}"]' in original_code) and \
+               (f".{r_attr}" not in refactored_code and f"['{r_attr}']" not in refactored_code and f'["{r_attr}"]' not in refactored_code):
+                return ValidationResult(
+                    is_valid=False,
+                    error_message=(
+                        f"Reasoning field regression detected: '{r_attr}' is an intentional modern attribute in reasoning models (e.g. DeepSeek-R1, OpenAI o1/o3). "
+                        f"Do NOT replace or downgrade '{r_attr}' with generic 'content'."
                     )
                 )
 

@@ -8,7 +8,7 @@ FROM python:3.11-slim
 # Metadata
 LABEL maintainer="Morad Moqbel <moradyunes2@gmail.com>"
 LABEL description="ApiPatch — Autonomous AI Agent Webhook Server"
-LABEL version="0.8.2"
+LABEL version="0.9.0"
 
 # Security: run as non-root user
 RUN groupadd -r apipatch && useradd -r -g apipatch apipatch
