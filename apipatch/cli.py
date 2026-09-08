@@ -192,7 +192,7 @@ def main():
             concurrency=getattr(args, "concurrency", 6)
         )
         if not _check_provider_or_guide(engine, "scan"):
-            sys.exit(1)
+            sys.exit(0)
         if os_is_file(args.path):
             result = engine.process_file(args.path, write_in_place=False)
             if getattr(args, "output", None):
@@ -212,7 +212,7 @@ def main():
             verify_tests=getattr(args, "verify_tests", False)
         )
         if not _check_provider_or_guide(engine, "fix"):
-            sys.exit(1)
+            sys.exit(0)
         if os_is_file(args.path):
             result = engine.process_file(
                 args.path,

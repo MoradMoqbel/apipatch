@@ -789,27 +789,31 @@ class CodeValidator:
     def validate_syntax_warnings(original_code: str, refactored_code: str) -> ValidationResult:
         """
         Checks for new SyntaxWarnings introduced by the LLM (e.g. invalid escape sequences '\\.').
-        Flags them so the LLM uses raw string literals (r'...') before outputting code.
+        Supports Python 3.10/3.11 (where invalid escape sequence was DeprecationWarning)
+        and Python 3.12+ (where it became SyntaxWarning).
         """
         import warnings
         orig_warnings = set()
         try:
             with warnings.catch_warnings(record=True) as caught:
                 warnings.simplefilter("always", SyntaxWarning)
+                warnings.simplefilter("always", DeprecationWarning)
                 compile(original_code, "<string>", "exec")
                 for w in caught:
-                    if issubclass(w.category, SyntaxWarning):
-                        orig_warnings.add(str(w.message))
+                    msg = str(w.message)
+                    if issubclass(w.category, SyntaxWarning) or "invalid escape sequence" in msg.lower():
+                        orig_warnings.add(msg)
         except Exception:
             pass
 
         try:
             with warnings.catch_warnings(record=True) as caught:
                 warnings.simplefilter("always", SyntaxWarning)
+                warnings.simplefilter("always", DeprecationWarning)
                 compile(refactored_code, "<string>", "exec")
                 for w in caught:
-                    if issubclass(w.category, SyntaxWarning):
-                        msg = str(w.message)
+                    msg = str(w.message)
+                    if issubclass(w.category, SyntaxWarning) or "invalid escape sequence" in msg.lower():
                         if msg not in orig_warnings:
                             return ValidationResult(
                                 is_valid=False,
