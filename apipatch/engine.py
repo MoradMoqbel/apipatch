@@ -724,6 +724,19 @@ class ApiPatchEngine:
                 for issue in r.get("issues", []):
                     if issue.get("library"):
                         modernized_libs.add(issue["library"])
+                patch_code = r.get("patch") or r.get("refactored_code")
+                if patch_code:
+                    from apipatch.validator import CodeValidator
+                    ref_mods = CodeValidator.extract_imported_modules(patch_code)
+                    for mod in ref_mods:
+                        if "google" in mod and "genai" in mod:
+                            modernized_libs.add("google-genai")
+                        elif mod.startswith("langchain_anthropic"):
+                            modernized_libs.add("langchain-anthropic")
+                        elif mod.startswith("langchain_openai"):
+                            modernized_libs.add("langchain-openai")
+                        elif mod.startswith("langchain_google_genai"):
+                            modernized_libs.add("langchain-google-genai")
             if modernized_libs:
                 bumped = ManifestBumper.bump_local_manifests(target_dir, modernized_libs, write=True)
                 for b in bumped:

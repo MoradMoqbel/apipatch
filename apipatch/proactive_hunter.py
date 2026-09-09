@@ -612,6 +612,18 @@ class GitHubPRHunter:
             for r in audit_results:
                 file_path = r.get("file", "").replace("\\", "/")
                 file_libs = {iss["library"] for iss in r.get("detected_issues", []) if iss.get("library")}
+                if r.get("refactored_code"):
+                    from apipatch.validator import CodeValidator
+                    ref_mods = CodeValidator.extract_imported_modules(r["refactored_code"])
+                    for mod in ref_mods:
+                        if "google" in mod and "genai" in mod:
+                            file_libs.add("google-genai")
+                        elif mod.startswith("langchain_anthropic"):
+                            file_libs.add("langchain-anthropic")
+                        elif mod.startswith("langchain_openai"):
+                            file_libs.add("langchain-openai")
+                        elif mod.startswith("langchain_google_genai"):
+                            file_libs.add("langchain-google-genai")
                 if not file_libs:
                     continue
 

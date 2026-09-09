@@ -138,6 +138,30 @@ class Orchestrator:
         res_good = CodeValidator.validate_model_name_integrity(orig, good_refactored)
         self.assertTrue(res_good.is_valid)
 
+    def test_decorator_definition_order_rejected(self):
+        bad_code = """
+@app.post("/items")
+def create_item():
+    return {"status": "ok"}
+
+app = FastAPI(lifespan=lifespan)
+"""
+        res = CodeValidator.validate_decorator_definition_order(bad_code)
+        self.assertFalse(res.is_valid)
+        self.assertIn("app", res.error_message)
+        self.assertIn("before it is defined", res.error_message)
+
+    def test_decorator_definition_order_valid(self):
+        good_code = """
+app = FastAPI(lifespan=lifespan)
+
+@app.post("/items")
+def create_item():
+    return {"status": "ok"}
+"""
+        res = CodeValidator.validate_decorator_definition_order(good_code)
+        self.assertTrue(res.is_valid)
+
 
 if __name__ == "__main__":
     unittest.main()
