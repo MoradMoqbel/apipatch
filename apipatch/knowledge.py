@@ -15,19 +15,37 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
         "aliases": ["google", "google-genai", "google.genai", "google-generativeai", "gemini", "generativelanguage"],
         "description": "Google GenAI SDK (google.genai) and Gemini 3 / Nano Banana Image Generation",
         "guidance": """\
-• Google GenAI Migration Guidelines (Latest Official 2025/2026 SDK):
-  - Package: 'google-genai' (Import: 'from google import genai', 'from google.genai import types')
-  - Initialization: client = genai.Client(api_key=...)
-  - Synchronous Calls:
-      response = client.models.generate_content(
-          model="gemini-2.5-flash",
-          contents=["..."]
-      )
-  - Asynchronous Calls (inside `async def` with `await`):
-      response = await client.aio.models.generate_content(
-          model="gemini-2.5-flash",
-          contents=["..."]
-      )
+• Google GenAI Migration Guidelines (Legacy google-generativeai → Modern google-genai):
+  - Deprecated SDK: 'google-generativeai' is deprecated. Migrate to official 'google-genai' SDK.
+  - Import Migration:
+      OLD: import google.generativeai as genai
+      NEW: from google import genai
+           from google.genai import types
+  - Initialization Migration:
+      OLD: genai.configure(api_key=...)
+      NEW: client = genai.Client(api_key=...)
+  - Generation Migration:
+      OLD: model = genai.GenerativeModel('gemini-1.5-pro')
+           response = model.generate_content(prompt_or_contents)
+      NEW: response = client.models.generate_content(
+               model='gemini-1.5-pro',
+               contents=prompt_or_contents
+           )
+  - Asynchronous Generation:
+      NEW: response = await client.aio.models.generate_content(model='...', contents=...)
+  - File API Migration:
+      OLD: video_file = genai.upload_file(path=video_path, display_name=...)
+           video_file = genai.get_file(video_file.name)
+           genai.delete_file(video_file.name)
+      NEW: video_file = client.files.upload(file=video_path, config=dict(display_name=...))
+           video_file = client.files.get(name=video_file.name)
+           client.files.delete(name=video_file.name)
+  - Model Listing:
+      OLD: genai.list_models()
+      NEW: client.models.list()
+  - Embeddings:
+      OLD: genai.embed_content(model=..., content=...)
+      NEW: client.models.embed_content(model=..., contents=...)
   - Image Generation & Editing (Nano Banana / Gemini 3 Image):
       Official Models: 'gemini-3.1-flash-image', 'gemini-3-pro-image', 'gemini-3.1-flash-lite-image', 'gemini-2.5-flash-image'
       Usage:

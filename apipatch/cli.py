@@ -10,8 +10,14 @@ import socket
 import argparse
 from typing import Optional
 
-# Enforce strict socket timeouts across all HTTP/TLS connections to prevent indefinite hangs
-socket.setdefaulttimeout(35)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+# Enforce reasonable socket timeouts across all HTTP/TLS connections (120s for LLM generation)
+socket.setdefaulttimeout(120)
 from apipatch._version import __version__
 from apipatch.engine import ApiPatchEngine, Colors
 from apipatch.auto_detector import AutoDeprecationDetector
