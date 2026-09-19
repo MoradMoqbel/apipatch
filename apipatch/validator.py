@@ -886,9 +886,20 @@ class CodeValidator:
 
         return ValidationResult(is_valid=True)
 
+    @staticmethod
+    def strip_code_fences(code: str) -> str:
+        """Strips accidental markdown code fences (```python ... ``` or ``` ...) from source code."""
+        if not code or not isinstance(code, str):
+            return code
+        cleaned = code.strip()
+        cleaned = re.sub(r"^```[a-zA-Z0-9_+-]*\s*\r?\n?", "", cleaned)
+        cleaned = re.sub(r"\r?\n?```\s*$", "", cleaned)
+        return cleaned.strip()
+
     @classmethod
     def validate(cls, original_code: str, refactored_code: str, file_extension: str = ".py") -> ValidationResult:
         """Runs comprehensive multi-layer validation on refactored code."""
+        refactored_code = cls.strip_code_fences(refactored_code)
         if file_extension in {".py", ".pyw"}:
             syntax_check = cls.validate_python_syntax(refactored_code)
             if not syntax_check.is_valid:

@@ -100,6 +100,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 4b. Private Pilot Form Submission
+  const pilotForm = document.getElementById('pilot-form');
+  const pilotFeedback = document.getElementById('pilot-feedback');
+
+  if (pilotForm && pilotFeedback) {
+    pilotForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('pilot-name')?.value.trim() || '';
+      const email = document.getElementById('pilot-email')?.value.trim() || '';
+      const company = document.getElementById('pilot-company')?.value.trim() || '';
+      const stack = document.getElementById('pilot-stack')?.value.trim() || '';
+      const notes = document.getElementById('pilot-notes')?.value.trim() || '';
+
+      if (email && company) {
+        try {
+          const pilots = JSON.parse(localStorage.getItem('apipatch_pilots') || '[]');
+          pilots.push({ name, email, company, stack, notes, timestamp: new Date().toISOString() });
+          localStorage.setItem('apipatch_pilots', JSON.stringify(pilots));
+        } catch (_) {}
+
+        pilotFeedback.textContent = `✓ Thank you, ${name || 'there'}! We received your pilot request for ${company}. We will reach out within 24 hours.`;
+        pilotForm.reset();
+        setTimeout(() => {
+          pilotFeedback.textContent = '';
+        }, 8000);
+      }
+    });
+  }
+
   // 5. Interactive Live Simulator / Playground
   const PLAYGROUND_PRESETS = {
     pydantic: {

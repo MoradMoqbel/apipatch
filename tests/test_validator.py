@@ -162,6 +162,22 @@ def create_item():
         res = CodeValidator.validate_decorator_definition_order(good_code)
         self.assertTrue(res.is_valid)
 
+    def test_strip_code_fences_during_validation(self):
+        fenced_code = """```python
+import os
+
+def hello():
+    return "world"
+```"""
+        orig_code = """import os
+
+def hello():
+    return "world"
+"""
+        res = CodeValidator.validate(orig_code, fenced_code, file_extension=".py")
+        self.assertTrue(res.is_valid, f"Expected valid result, got: {res.error_message}")
+
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -177,6 +177,11 @@ def main():
     discover_parser.add_argument("--submit", "--open-pr", dest="submit", action="store_true", help="Submit live Pull Requests directly")
     discover_parser.add_argument("--dry-run", dest="dry_run", action="store_true", default=True, help="Preview PRs without opening (default: True)")
 
+    # Command: radar
+    radar_parser = subparsers.add_parser("radar", help="Launch the local interactive ApiPatch Radar Web Dashboard")
+    radar_parser.add_argument("--port", type=int, default=8765, help="Port to bind dashboard server (default: 8765)")
+    radar_parser.add_argument("--no-browser", action="store_true", help="Do not open browser automatically")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -319,6 +324,11 @@ def main():
             max_repos=args.max_repos,
             dry_run=dry_run
         )
+
+    elif args.command == "radar":
+        from radar_server import run_server
+        run_server(port=args.port, auto_open=not args.no_browser)
+
 
 
 def os_is_file(path: str) -> bool:
