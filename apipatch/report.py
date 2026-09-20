@@ -18,6 +18,7 @@ DEPRECATION_RULES = [
     {
         "id": "LC-001",
         "framework": "LangChain",
+        "languages": [".py", ".pyw"],
         "severity": "CRITICAL",
         "name": "Deprecated LLMChain & legacy chain invocation",
         "pattern": r"from\s+langchain\.chains\s+import\s+.*LLMChain",
@@ -29,6 +30,7 @@ DEPRECATION_RULES = [
     {
         "id": "LC-002",
         "framework": "LangChain",
+        "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "Legacy monolithic chat_models import",
         "pattern": r"from\s+langchain\.chat_models\s+import\s+(ChatOpenAI|ChatAnthropic)",
@@ -40,6 +42,7 @@ DEPRECATION_RULES = [
     {
         "id": "LC-003",
         "framework": "LangChain",
+        "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "Legacy monolithic embeddings import",
         "pattern": r"from\s+langchain\.embeddings\s+import\s+(OpenAIEmbeddings|HuggingFaceEmbeddings)",
@@ -51,6 +54,7 @@ DEPRECATION_RULES = [
     {
         "id": "LC-004",
         "framework": "LangChain",
+        "languages": [".py", ".pyw"],
         "severity": "CRITICAL",
         "name": "Deprecated RetrievalQA chain",
         "pattern": r"from\s+langchain\.chains\s+import\s+.*RetrievalQA|RetrievalQA\.from_chain_type",
@@ -62,6 +66,7 @@ DEPRECATION_RULES = [
     {
         "id": "LC-005",
         "framework": "LangChain",
+        "languages": [".py", ".pyw"],
         "severity": "MEDIUM",
         "name": "Deprecated chain.run() invocation",
         "pattern": r"\b(chain|agent_executor|qa)\.run\(",
@@ -75,9 +80,10 @@ DEPRECATION_RULES = [
     {
         "id": "ANT-001",
         "framework": "Anthropic",
+        "languages": [".py", ".pyw", ".js", ".ts"],
         "severity": "CRITICAL",
         "name": "Deprecated client.completion() API",
-        "pattern": r"client\.completion\(|\.completions\.create\(|HUMAN_PROMPT|AI_PROMPT",
+        "pattern": r"\bclient\.completion\(|\banthropic\.completion\(|HUMAN_PROMPT|AI_PROMPT",
         "description": "Anthropic Text Completions API is deprecated. Migrate to Claude Messages API.",
         "before": "res = client.completion(prompt=f'{HUMAN_PROMPT} Hello{AI_PROMPT}', model='claude-2')",
         "after": "res = client.messages.create(model='claude-3-5-sonnet-20241022', max_tokens=1024, messages=[{'role': 'user', 'content': 'Hello'}])",
@@ -88,6 +94,7 @@ DEPRECATION_RULES = [
     {
         "id": "OAI-001",
         "framework": "OpenAI",
+        "languages": [".py", ".pyw"],
         "severity": "CRITICAL",
         "name": "Legacy static openai.ChatCompletion.create()",
         "pattern": r"openai\.ChatCompletion\.create\(",
@@ -99,6 +106,7 @@ DEPRECATION_RULES = [
     {
         "id": "OAI-002",
         "framework": "OpenAI",
+        "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "Global openai.api_key assignment",
         "pattern": r"openai\.api_key\s*=",
@@ -110,6 +118,7 @@ DEPRECATION_RULES = [
     {
         "id": "OAI-003",
         "framework": "OpenAI",
+        "languages": [".py", ".pyw"],
         "severity": "CRITICAL",
         "name": "Legacy static openai.Completion.create()",
         "pattern": r"openai\.Completion\.create\(",
@@ -123,6 +132,7 @@ DEPRECATION_RULES = [
     {
         "id": "PYD-001",
         "framework": "Pydantic",
+        "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "Deprecated class Config in BaseModel",
         "pattern": r"class\s+Config\s*:",
@@ -134,6 +144,7 @@ DEPRECATION_RULES = [
     {
         "id": "PYD-002",
         "framework": "Pydantic",
+        "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "Deprecated @validator decorator",
         "pattern": r"@validator\(|from\s+pydantic\s+import\s+.*validator\b",
@@ -145,17 +156,19 @@ DEPRECATION_RULES = [
     {
         "id": "PYD-003",
         "framework": "Pydantic",
+        "languages": [".py", ".pyw"],
         "severity": "MEDIUM",
-        "name": "Deprecated .dict() and .json() serialization",
-        "pattern": r"\.(dict|json)\(\)",
-        "description": ".dict() and .json() methods are deprecated in Pydantic v2. Use .model_dump() and .model_dump_json().",
-        "before": "data = user.dict()\nraw_json = user.json()",
-        "after": "data = user.model_dump()\nraw_json = user.model_dump_json()",
+        "name": "Deprecated .dict() serialization",
+        "pattern": r"\.dict\(\)",
+        "description": ".dict() method is deprecated in Pydantic v2. Use .model_dump().",
+        "before": "data = user.dict()",
+        "after": "data = user.model_dump()",
         "dev_hours": 2.0
     },
     {
         "id": "PYD-004",
         "framework": "Pydantic",
+        "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "BaseSettings imported from pydantic root",
         "pattern": r"from\s+pydantic\s+import\s+.*BaseSettings",
@@ -169,6 +182,7 @@ DEPRECATION_RULES = [
     {
         "id": "STR-001",
         "framework": "Stripe",
+        "languages": [".py", ".pyw", ".js", ".ts"],
         "severity": "CRITICAL",
         "name": "Legacy stripe.Charge.create()",
         "pattern": r"stripe\.Charge\.create\(",
@@ -182,6 +196,7 @@ DEPRECATION_RULES = [
     {
         "id": "FAS-001",
         "framework": "FastAPI",
+        "languages": [".py", ".pyw"],
         "severity": "MEDIUM",
         "name": "Deprecated @app.on_event lifecycle handler",
         "pattern": r"@(?:app|router)\.on_event\(['\"](startup|shutdown)['\"]\)",
@@ -238,7 +253,8 @@ class CodebaseAuditor:
     IGNORE_DIRS = {
         ".git", ".hg", ".svn", "node_modules", "venv", ".venv", "env",
         "__pycache__", ".pytest_cache", ".mypy_cache", "dist", "build",
-        ".egg-info", ".next", ".nuxt", "target", "coverage", ".agents"
+        ".egg-info", ".next", ".nuxt", "target", "coverage", ".agents",
+        "tests", "test", "testing", "clint_finder", "radar_web", "update_files"
     }
 
     SUPPORTED_EXTS = {".py", ".pyw", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}
@@ -283,11 +299,59 @@ class CodebaseAuditor:
                 except Exception:
                     continue
 
+                # For Python files, extract line numbers of docstrings, multiline strings, and print/logger statements
+                non_code_lines = set()
+                if ext in {".py", ".pyw"}:
+                    try:
+                        tree = ast.parse("".join(lines))
+                        for node in ast.walk(tree):
+                            # Multiline strings spanning multiple lines
+                            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                                if hasattr(node, "lineno") and hasattr(node, "end_lineno") and node.end_lineno > node.lineno:
+                                    for l in range(node.lineno, node.end_lineno + 1):
+                                        non_code_lines.add(l)
+                            # Docstring expressions (module, class, function docstrings)
+                            elif isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                                if hasattr(node, "lineno") and hasattr(node, "end_lineno"):
+                                    for l in range(node.lineno, node.end_lineno + 1):
+                                        non_code_lines.add(l)
+                            # CLI print and logging calls (print examples, do not execute deprecated libraries)
+                            elif isinstance(node, ast.Call):
+                                func_name = ""
+                                if isinstance(node.func, ast.Name):
+                                    func_name = node.func.id
+                                elif isinstance(node.func, ast.Attribute):
+                                    func_name = node.func.attr
+                                if func_name in {"print", "info", "warning", "error", "debug", "log"}:
+                                    if hasattr(node, "lineno") and hasattr(node, "end_lineno"):
+                                        for l in range(node.lineno, node.end_lineno + 1):
+                                            non_code_lines.add(l)
+                    except Exception:
+                        pass
+
                 for line_idx, line in enumerate(lines, start=1):
+                    if line_idx in non_code_lines:
+                        continue
                     line_strip = line.strip()
-                    if line_strip.startswith("#") or line_strip.startswith("//") or line_strip.startswith("*"):
+                    if not line_strip:
+                        continue
+                    if line_strip.startswith(("#", "//", "*", "/*")):
+                        continue
+                    # Skip metadata, demo presets, and dictionary string keys/values
+                    if line_strip.startswith((
+                        '"before":', "'before':", '"after":', "'after':",
+                        '"pattern":', "'pattern':", "source:", "output:",
+                        "before:", "after:", "print(", "console.log(", "logger."
+                    )):
+                        continue
+                    if (line_strip.startswith('"') and line_strip.endswith('"')) or (line_strip.startswith("'") and line_strip.endswith("'")):
+                        continue
+                    if (line_strip.startswith('"') and line_strip.endswith('",')) or (line_strip.startswith("'") and line_strip.endswith("',")):
                         continue
                     for regex, rule in compiled_rules:
+                        # Language-specific filtering: only match rules defined for this file's language
+                        if ext not in rule.get("languages", self.SUPPORTED_EXTS):
+                            continue
                         if regex.search(line):
                             finding = Finding(
                                 rule=rule,
