@@ -25,6 +25,12 @@ from apipatch.proactive_hunter import GitHubPRHunter
 from apipatch.github_client import resolve_github_token, mask_token
 from apipatch.webhook import run_webhook_server
 from apipatch.telemetry import track_cli_event
+from apipatch.report import (
+    CodebaseAuditor,
+    format_terminal_report,
+    generate_html_report,
+    generate_markdown_report
+)
 
 
 ONBOARDING_GUIDE = f"""
@@ -182,6 +188,13 @@ def main():
     radar_parser.add_argument("--port", type=int, default=8765, help="Port to bind dashboard server (default: 8765)")
     radar_parser.add_argument("--no-browser", action="store_true", help="Do not open browser automatically")
 
+    # Command: report (Enterprise Monorepo Audit & Financial ROI Report)
+    report_parser = subparsers.add_parser("report", help="Audit monorepo health score (0-100) and quantify payroll ROI saved")
+    report_parser.add_argument("path", nargs="?", default=".", help="Directory or monorepo workspace to audit (default: current dir)")
+    report_parser.add_argument("--format", choices=["terminal", "html", "md", "json", "all"], default="all", help="Output report format (default: all)")
+    report_parser.add_argument("-o", "--output", help="Custom output report file path (e.g., apipatch_audit_report.html)")
+    report_parser.add_argument("--hourly-rate", type=float, default=75.0, help="Benchmark developer hourly rate in USD (default: $75.00)")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -328,6 +341,34 @@ def main():
     elif args.command == "radar":
         from radar_server import run_server
         run_server(port=args.port, auto_open=not args.no_browser)
+
+    elif args.command == "report":
+        import os
+        import json
+        auditor = CodebaseAuditor(target_dir=args.path, hourly_rate=args.hourly_rate)
+        metrics = auditor.run_audit()
+
+        terminal_text = format_terminal_report(metrics)
+        print(terminal_text)
+
+        fmt = args.format.lower()
+        base_name = "apipatch_audit_report"
+
+        if fmt in ("html", "all"):
+            out_file = args.output if (args.output and args.output.endswith(".html")) else f"{base_name}.html"
+            generate_html_report(metrics, out_file)
+            print(f"{Colors.OKGREEN}[✓] Standalone HTML report generated → {os.path.abspath(out_file)}{Colors.ENDC}")
+
+        if fmt in ("md", "all"):
+            out_file = args.output if (args.output and args.output.endswith(".md")) else f"{base_name}.md"
+            generate_markdown_report(metrics, out_file)
+            print(f"{Colors.OKGREEN}[✓] Executive Markdown report generated → {os.path.abspath(out_file)}{Colors.ENDC}")
+
+        if fmt in ("json", "all"):
+            out_file = args.output if (args.output and args.output.endswith(".json")) else f"{base_name}.json"
+            with open(out_file, "w", encoding="utf-8") as f:
+                json.dump(metrics, f, indent=2)
+            print(f"{Colors.OKGREEN}[✓] Machine-readable JSON report generated → {os.path.abspath(out_file)}{Colors.ENDC}")
 
 
 

@@ -90,6 +90,7 @@
       <div class="nav-links">
         <a href="#how">How It Works</a>
         <a href="#milestones">Traction &amp; PRs</a>
+        <a href="#scanner" class="nav-highlight">Health Scanner ⚡</a>
         <a href="#playground">Playground</a>
         <a href="#features">Features</a>
         <a href="#cli">CLI &amp; App</a>
@@ -99,7 +100,7 @@
       </div>
       <div class="status-pill">
         <span class="dot"></span> 
-        <span class="status-text">v0.9.0 · 174 Tests Passing</span>
+        <span class="status-text">v0.9.0 · 186 Tests Passing</span>
       </div>
     </div>
   </nav>
@@ -493,6 +494,143 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Cloud Monorepo Health & ROI Scanner Section -->
+  <section class="scanner-section" id="scanner">
+    <div class="scanner-inner">
+      <div class="section-head">
+        <p class="label"><span class="badge-pill">NEW ENTERPRISE CAPABILITY</span> Self-Serve Cloud Scanner</p>
+        <h2>Instant Monorepo Health &amp; Financial ROI Audit</h2>
+        <p class="section-sub">Enter any public GitHub repository or paste your dependency manifest. ApiPatch calculates your Codebase Health Score (0–100), quantifies manual developer hours saved, and generates automated 1-click remediation pull requests.</p>
+      </div>
+
+      <!-- Scanner Input Box -->
+      <div class="scanner-box">
+        <div class="scanner-input-bar">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+          <input type="text" id="scanner-input" placeholder="e.g. CopilotKit/CopilotKit, langchain-ai/langchain, or paste requirements.txt / package.json..." value="CopilotKit/CopilotKit" />
+          <button class="btn-scan" id="btn-run-scan">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span>Scan Monorepo Health ⚡</span>
+          </button>
+        </div>
+
+        <!-- Quick Preset Chips -->
+        <div class="scanner-presets">
+          <span class="preset-label">Quick Audits:</span>
+          <button class="preset-chip active" data-repo="CopilotKit/CopilotKit">CopilotKit (FastAPI + LangChain)</button>
+          <button class="preset-chip" data-repo="mem0ai/mem0">mem0 (Pydantic v1 ➔ v2)</button>
+          <button class="preset-chip" data-repo="jedarden/duck-e">duck-e (OpenAI v0.x + Pydantic)</button>
+          <button class="preset-chip" data-repo="langchain-ai/langchain">langchain (LCEL 0.3 Migration)</button>
+          <button class="preset-chip" data-repo="custom">Custom Manifest / Code</button>
+        </div>
+
+        <!-- Scanning Status Bar -->
+        <div class="scanner-status hidden" id="scanner-status">
+          <div class="scanner-spinner"></div>
+          <span id="scanner-status-text">Scanning repository tree and dependency manifests...</span>
+        </div>
+
+        <!-- Scanner Results Dashboard -->
+        <div class="scanner-dashboard" id="scanner-results">
+          <!-- Top Meta Header -->
+          <div class="scanner-meta-header">
+            <div class="meta-repo">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+              <span id="sc-repo-name">CopilotKit / CopilotKit</span>
+              <span class="badge-audited" id="sc-stars-badge">⭐ 14,800+ Stars</span>
+            </div>
+            <div class="meta-stats">
+              <span id="sc-files-count">Scanned: <strong>142 files</strong></span>
+              <span class="dot-sep">&bull;</span>
+              <span id="sc-loc-count"><strong>38,400 LOC</strong></span>
+            </div>
+          </div>
+
+          <!-- Main KPI & Score Grid -->
+          <div class="scanner-grid">
+            <!-- Score Card -->
+            <div class="sc-score-card">
+              <div class="sc-gauge-wrap">
+                <svg class="sc-gauge-svg" viewBox="0 0 120 120">
+                  <circle class="sc-gauge-bg" cx="60" cy="60" r="54"></circle>
+                  <circle class="sc-gauge-fill" id="sc-gauge-fill" cx="60" cy="60" r="54"></circle>
+                </svg>
+                <div class="sc-gauge-text" id="sc-score-val">76</div>
+              </div>
+              <div class="sc-score-title" id="sc-grade-title">Grade C &bull; Health Score</div>
+              <div class="sc-score-sub" id="sc-score-sub">Moderate Risk — 2 Deprecations Pending</div>
+            </div>
+
+            <!-- Financial ROI KPI Cards -->
+            <div class="sc-metrics-grid">
+              <div class="sc-metric-card">
+                <div class="sc-metric-lbl">Developer Hours Saved</div>
+                <div class="sc-metric-val sc-highlight" id="sc-hours-val">20.0 hrs</div>
+                <div class="sc-metric-sub">Manual research &amp; testing</div>
+              </div>
+
+              <div class="sc-metric-card">
+                <div class="sc-metric-lbl">Payroll Capital Saved</div>
+                <div class="sc-metric-val sc-emerald" id="sc-payroll-val">$1,500.00</div>
+                <div class="sc-metric-sub">Benchmark: $75/hr engineer</div>
+              </div>
+
+              <div class="sc-metric-card">
+                <div class="sc-metric-lbl">Remediation Speedup</div>
+                <div class="sc-metric-val" id="sc-speedup-val">1,800x</div>
+                <div class="sc-metric-sub">~40s autonomous PR vs 20h manual</div>
+              </div>
+
+              <div class="sc-metric-card">
+                <div class="sc-metric-lbl">AST Validation Status</div>
+                <div class="sc-metric-val sc-emerald" id="sc-ast-val">100% Safe</div>
+                <div class="sc-metric-sub">Zero syntax or logic regressions</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Remediation Command Banner -->
+          <div class="sc-action-box">
+            <div class="sc-action-left">
+              <div class="sc-action-title">⚡ 1-Click Autonomous Remediation Available</div>
+              <div class="sc-action-desc">ApiPatch can generate an AST-shielded, test-verified Pull Request to fix all detected deprecations.</div>
+            </div>
+            <div class="sc-cmd-bar">
+              <code id="sc-cmd-text">apipatch pr CopilotKit/CopilotKit</code>
+              <button class="sc-copy-btn" id="sc-copy-cmd">Copy Command</button>
+            </div>
+          </div>
+
+          <!-- Detected Issues Breakdown Table -->
+          <div class="sc-findings-card">
+            <div class="sc-findings-header">
+              <h3>Detected Deprecations &amp; Migration Paths (<span id="sc-findings-count">2</span>)</h3>
+            </div>
+            <div class="sc-table-wrap">
+              <table class="sc-table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Framework</th>
+                    <th>Deprecated Call</th>
+                    <th>Modern Replacement</th>
+                    <th>Est. Effort</th>
+                  </tr>
+                </thead>
+                <tbody id="sc-findings-tbody">
+                  <!-- Dynamic Rows populated by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </section>
