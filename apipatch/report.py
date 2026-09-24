@@ -135,8 +135,8 @@ DEPRECATION_RULES = [
         "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "Deprecated class Config in BaseModel",
-        "pattern": r"class\s+Config\s*:",
-        "description": "Inner class Config is deprecated in Pydantic v2. Use model_config = ConfigDict(...).",
+        "pattern": r"^\s{2,8}class\s+Config\s*:",
+        "description": "Inner class Config is deprecated in Pydantic v2. Use model_config = ConfigDict(...) instead.",
         "before": "class User(BaseModel):\n    class Config:\n        orm_mode = True",
         "after": "class User(BaseModel):\n    model_config = ConfigDict(from_attributes=True)",
         "dev_hours": 6.0
@@ -147,10 +147,10 @@ DEPRECATION_RULES = [
         "languages": [".py", ".pyw"],
         "severity": "HIGH",
         "name": "Deprecated @validator decorator",
-        "pattern": r"@validator\(|from\s+pydantic\s+import\s+.*validator\b",
-        "description": "@validator is deprecated in Pydantic v2. Migrate to @field_validator with @classmethod.",
-        "before": "@validator('name')\ndef check_name(cls, v):\n    return v.title()",
-        "after": "@field_validator('name')\n@classmethod\ndef check_name(cls, v):\n    return v.title()",
+        "pattern": r"@validator\(|from\s+pydantic\s+import\s+[^#\n]*?(?<!model_)(?<!field_)\bvalidator\b",
+        "description": "@validator is deprecated in Pydantic v2. Use @field_validator with @classmethod.",
+        "before": "from pydantic import validator\n@validator('name')\ndef val(cls, v): return v",
+        "after": "from pydantic import field_validator\n@field_validator('name')\n@classmethod\ndef val(cls, v): return v",
         "dev_hours": 4.0
     },
     {
