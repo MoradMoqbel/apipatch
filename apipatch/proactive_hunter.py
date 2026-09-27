@@ -13,6 +13,13 @@ import urllib.request
 import urllib.parse
 import urllib.error
 from typing import List, Dict, Any, Optional
+
+try:
+    import requests
+    _HAS_REQUESTS = True
+except ImportError:
+    _HAS_REQUESTS = False
+
 from apipatch.engine import ApiPatchEngine, Colors
 from apipatch.github_client import GitHubClient, resolve_github_token, mask_token
 from apipatch.auto_detector import should_audit_file
@@ -86,6 +93,35 @@ class GitHubPRHunter:
         }
         if self.github_token:
             headers["Authorization"] = f"token {self.github_token}"
+
+        if _HAS_REQUESTS:
+            for attempt in range(1, 4):
+                try:
+                    resp = requests.request(
+                        method=method,
+                        url=url,
+                        headers=headers,
+                        json=payload if payload is not None else None,
+                        timeout=35
+                    )
+                    if resp.status_code == 404:
+                        return None
+                    if resp.status_code == 403 and "rate limit" in resp.text.lower():
+                        print(f"{Colors.WARNING}[!] GitHub API rate limit reached.{Colors.ENDC}")
+                        return None
+                    if not resp.ok:
+                        if resp.status_code not in (404,):
+                            print(f"{Colors.FAIL}[!] GitHub API error ({resp.status_code}) on {method} {url}: {resp.text[:200]}{Colors.ENDC}")
+                        return None
+                    if not resp.text.strip():
+                        return {"status": "ok"}
+                    return resp.json()
+                except Exception as req_err:
+                    if attempt < 3:
+                        time.sleep(1.0 * attempt)
+                        continue
+                    print(f"{Colors.FAIL}[!] Network error on GitHub API request: {req_err}{Colors.ENDC}")
+                    return None
 
         data = json.dumps(payload).encode("utf-8") if payload is not None else None
         req = urllib.request.Request(url, data=data, headers=headers, method=method)
@@ -202,6 +238,21 @@ class GitHubPRHunter:
 
     def fetch_raw_file_content(self, raw_url: str) -> Optional[str]:
         """Fetches raw code content from repository file URL."""
+        if _HAS_REQUESTS:
+            for attempt in range(1, 4):
+                try:
+                    headers = {"User-Agent": "ApiPatch-Bot/1.0"}
+                    if self.github_token:
+                        headers["Authorization"] = f"token {self.github_token}"
+                    resp = requests.get(raw_url, headers=headers, timeout=30)
+                    if resp.status_code == 200:
+                        return resp.text
+                    elif resp.status_code == 404:
+                        return None
+                except Exception:
+                    if attempt < 3:
+                        time.sleep(1.0)
+                        continue
         try:
             req = urllib.request.Request(raw_url, headers={"User-Agent": "ApiPatch-Bot/1.0"})
             if self.github_token:
@@ -496,6 +547,39 @@ class GitHubPRHunter:
             workspaces = [d or "root" for d in subprojects.keys()]
             print(f"  {Colors.OKBLUE}[*] Monorepo architecture detected: Found {len(subprojects)} distinct subproject workspace(s): {', '.join(workspaces)}.{Colors.ENDC}")
 
+        # Detect Target Runtime & CI/CD constraints from remote tree
+        repo_runtime_context: Optional[str] = None
+        try:
+            runtime_paths = [
+                p for p in all_tree_paths
+                if (
+                    (".github/workflows/" in p.replace("\\", "/").lower() and p.endswith((".yml", ".yaml")))
+                    or os.path.basename(p).lower() in {
+                        "pyproject.toml", "package.json", "setup.cfg", ".python-version",
+                        "runtime.txt", "dockerfile", ".nvmrc", ".node-version"
+                    }
+                )
+            ]
+            if runtime_paths:
+                remote_manifest_map: Dict[str, str] = {}
+                for rp in runtime_paths[:8]:
+                    try:
+                        rc = self.client.fetch_file_content(repo_name, rp, ref=audit_ref)
+                        if rc:
+                            remote_manifest_map[rp] = rc
+                    except Exception:
+                        pass
+                if remote_manifest_map:
+                    from apipatch.runtime_detector import TargetRuntimeDetector
+                    rt_ctx = TargetRuntimeDetector.detect_from_file_map(remote_manifest_map)
+                    if rt_ctx.has_constraints:
+                        repo_runtime_context = rt_ctx.to_prompt_context()
+                        pins = ", ".join(rt_ctx.python_versions or rt_ctx.node_versions)
+                        srcs = ", ".join(rt_ctx.pinned_sources)
+                        print(f"  {Colors.OKGREEN}[✓] Target Runtime & CI/CD Matrix Awareness Active: {pins} (from {srcs}){Colors.ENDC}")
+        except Exception:
+            pass
+
         if precomputed_results:
             audit_results = precomputed_results
             for r in audit_results:
@@ -572,7 +656,7 @@ class GitHubPRHunter:
                         audited_count += 1
                         current_num = audited_count
                     print(f"  {Colors.OKBLUE}[Auditing {current_num}] {path}...{Colors.ENDC}", flush=True)
-                    audit = self.engine.audit_code(path, content)
+                    audit = self.engine.audit_code(path, content, project_context=repo_runtime_context)
                     if audit.get("has_breaking_changes") and audit.get("refactored_code"):
                         diff = self.engine.generate_diff(content, audit["refactored_code"], path)
                         return {
@@ -729,9 +813,10 @@ class GitHubPRHunter:
                 if auto_subproject:
                     scope_prefix = f"[{auto_subproject.capitalize()}] "
 
+            committed_audit_results = [r for r in sub_audit_results if r.get("file") in sub_files_to_commit]
             pr_payload = self.client.generate_pr_markdown(
                 repo_name,
-                sub_audit_results,
+                committed_audit_results or sub_audit_results,
                 custom_title=custom_title,
                 scope_prefix=scope_prefix
             )

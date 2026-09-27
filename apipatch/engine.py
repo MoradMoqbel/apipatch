@@ -232,20 +232,26 @@ def shield_unaffected_functions(original_code: str, refactored_code: str, libs: 
             if not node_references_libraries(orig_n, libs):
                 orig_seg = ast.get_source_segment(original_code, orig_n)
                 ref_seg = ast.get_source_segment(refactored_code, ref_n)
-                if orig_seg and ref_seg and orig_seg.strip() != ref_seg.strip():
+                if orig_seg and ref_seg and orig_seg != ref_seg:
                     to_restore.append((ref_n, orig_seg))
 
     if not to_restore:
-        return refactored_code
+        candidate = refactored_code
+    else:
+        # Sort descending by lineno to safely replace line slices without offset drift
+        to_restore.sort(key=lambda x: x[0].lineno, reverse=True)
+        ref_lines = refactored_code.splitlines(keepends=True)
+        for ref_n, orig_seg in to_restore:
+            replacement = orig_seg if orig_seg.endswith("\n") else orig_seg + "\n"
+            ref_lines[ref_n.lineno - 1 : ref_n.end_lineno] = [replacement]
+        candidate = "".join(ref_lines)
 
-    # Sort descending by lineno to safely replace line slices without offset drift
-    to_restore.sort(key=lambda x: x[0].lineno, reverse=True)
-    ref_lines = refactored_code.splitlines(keepends=True)
-    for ref_n, orig_seg in to_restore:
-        replacement = orig_seg if orig_seg.endswith("\n") else orig_seg + "\n"
-        ref_lines[ref_n.lineno - 1 : ref_n.end_lineno] = [replacement]
+    # Preserve exact trailing newline formatting from original code
+    if original_code.endswith("\n") and not candidate.endswith("\n"):
+        candidate += "\n"
+    elif not original_code.endswith("\n") and candidate.endswith("\n"):
+        candidate = candidate.rstrip("\r\n")
 
-    candidate = "".join(ref_lines)
     try:
         ast.parse(candidate)
         return candidate
