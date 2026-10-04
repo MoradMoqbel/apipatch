@@ -615,10 +615,17 @@ class GitHubClient:
             "- [x] **Self-Healing Guard**: AI hallucinations filtered and validated against AST rules.",
             "",
             "---",
-            "*Generated autonomously with ❤️ by [ApiPatch](https://github.com/MoradMoqbel/apipatch) — The Autonomous AI Agent for Breaking API Changes.*"
+            "### ⚡ What is [ApiPatch](https://apipatch.vercel.app)?",
+            "**ApiPatch** is an autonomous deterministic AST refactoring agent that eliminates dependency drift for engineering teams:",
+            "- 🛡️ **Zero Hallucinations:** Rewrites Abstract Syntax Trees (AST) using verified vendor migration rules, not fuzzy LLM guesses.",
+            "- 🧪 **Sandbox Verified:** Automatically executes project test suites in an isolated sandbox before opening a PR.",
+            "- ⚡ **Continuous Upstream Radar:** Catches breaking SDK changes before CI breaks production.",
+            "",
+            "> 🚀 **[Install Free GitHub Action](https://apipatch.vercel.app)** &bull; 📖 **[Docs & CLI (`pip install apipatch`)](https://github.com/MoradMoqbel/apipatch)** &bull; 💬 **[Request 48h Private Repo Pilot](https://apipatch.vercel.app/#pilot)**"
         ])
 
         return {
             "title": title,
             "body": "\n".join(body_lines)
         }
+

@@ -466,13 +466,17 @@ class GitHubPRHunter:
         verify_tests: bool = False,
         per_subproject: bool = True,
         max_prs: int = 1,
-        files_per_subproject: Optional[int] = None
+        files_per_subproject: Optional[int] = None,
+        ignore_docs: bool = True,
+        ignore_tests: bool = True
     ) -> Dict[str, Any]:
         """
         Audits an entire GitHub repository (or specific sub-directory), applies refactorings to all deprecated files,
         creates a branch (directly or on a fork), commits all modified files, and opens
         a comprehensive live Pull Request.
         """
+        from apipatch.filters import should_ignore_path
+
         raw_input = repo_name
         repo_name, target_pr_number = GitHubClient.parse_pr_target(raw_input)
         print(f"\n{Colors.HEADER}{Colors.BOLD}=== ApiPatch: Autonomous GitHub PR Pipeline ==={Colors.ENDC}")
@@ -499,6 +503,13 @@ class GitHubPRHunter:
             print(f"Scope Filter (Target Path): {Colors.BOLD}{target_path}{Colors.ENDC}")
         if verify_tests:
             print(f"Verification Engine: {Colors.OKGREEN}Active (AST & Sandbox Test Validation){Colors.ENDC}")
+        if ignore_docs or ignore_tests:
+            ignored_labels = []
+            if ignore_docs:
+                ignored_labels.append("Docs (docs/, website/, *.md)")
+            if ignore_tests:
+                ignored_labels.append("Tests (tests/, __tests__/, test_*.py)")
+            print(f"Dynamic Ignore Filter: {Colors.OKGREEN}Active (Skipping {', '.join(ignored_labels)}){Colors.ENDC}")
         print(f"Auth Token: {Colors.OKBLUE}{mask_token(self.github_token)}{Colors.ENDC}")
 
         if not self.github_token:
@@ -541,7 +552,11 @@ class GitHubPRHunter:
         print(f"[✓] Retrieved {len(tree_items)} total repository files.")
 
         all_tree_paths = [it.get("path", "") for it in tree_items]
-        subprojects = MonorepoManager.discover_subprojects_from_paths(all_tree_paths)
+        subprojects = MonorepoManager.discover_subprojects_from_paths(
+            all_tree_paths,
+            ignore_docs=ignore_docs,
+            ignore_tests=ignore_tests
+        )
         is_mono = MonorepoManager.is_monorepo(subprojects)
         if is_mono and not target_path:
             workspaces = [d or "root" for d in subprojects.keys()]
@@ -591,7 +606,10 @@ class GitHubPRHunter:
             candidate_files = []
             
             # If inspecting a specific PR with changed code files, prioritize PR changed files
-            pr_code_files = [f for f in pr_changed_files if f.endswith(supported_exts)]
+            pr_code_files = [
+                f for f in pr_changed_files 
+                if f.endswith(supported_exts) and not should_ignore_path(f, ignore_docs=ignore_docs, ignore_tests=ignore_tests)
+            ]
             if pr_code_files and not target_norm:
                 candidate_files = list(pr_code_files)
                 print(f"  {Colors.OKBLUE}[*] Scoped audit to {len(candidate_files)} file(s) modified in PR #{target_pr_number}.{Colors.ENDC}")
@@ -603,6 +621,8 @@ class GitHubPRHunter:
                     if any(ignore in p for ignore in [
                         "node_modules/", ".git/", "__pycache__/", "venv/", ".env", "dist/", "build/"
                     ]):
+                        continue
+                    if should_ignore_path(p, ignore_docs=ignore_docs, ignore_tests=ignore_tests):
                         continue
                     if target_norm:
                         p_lower = p.replace("\\", "/").lower()
@@ -719,6 +739,7 @@ class GitHubPRHunter:
             item.get("path", "").replace("\\", "/")
             for item in tree_items
             if os.path.basename(item.get("path", "")).lower() in ("requirements.txt", "pyproject.toml", "package.json")
+            and not should_ignore_path(item.get("path", ""), ignore_docs=ignore_docs, ignore_tests=ignore_tests)
         ] if ('tree_items' in locals() and not precomputed_results) else []
 
         if all_manifest_paths and not precomputed_results:
@@ -991,7 +1012,14 @@ class GitHubPRHunter:
             "- [x] 100% business logic signatures preserved.",
             "- [x] Multi-layer structural safety guard passed.",
             "",
-            "> *Generated autonomously by [ApiPatch](https://github.com/MoradMoqbel/apipatch).*"
+            "---",
+            "### ⚡ What is [ApiPatch](https://apipatch.vercel.app)?",
+            "**ApiPatch** is an autonomous deterministic AST refactoring agent that eliminates dependency drift for engineering teams:",
+            "- 🛡️ **Zero Hallucinations:** Rewrites Abstract Syntax Trees (AST) using verified vendor migration rules, not fuzzy LLM guesses.",
+            "- 🧪 **Sandbox Verified:** Automatically executes project test suites in an isolated sandbox before opening a PR.",
+            "- ⚡ **Continuous Upstream Radar:** Catches breaking SDK changes before CI breaks production.",
+            "",
+            "> 🚀 **[Install Free GitHub Action](https://apipatch.vercel.app)** &bull; 📖 **[Docs & CLI (`pip install apipatch`)](https://github.com/MoradMoqbel/apipatch)** &bull; 💬 **[Request 48h Private Repo Pilot](https://apipatch.vercel.app/#pilot)**"
         ])
 
         return {

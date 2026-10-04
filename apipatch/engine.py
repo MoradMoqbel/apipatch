@@ -668,18 +668,34 @@ class ApiPatchEngine:
         self,
         target_dir: str,
         write_in_place: bool = False,
-        verify_tests: Optional[bool] = None
+        verify_tests: Optional[bool] = None,
+        ignore_docs: bool = True,
+        ignore_tests: bool = True,
+        ignore_non_prod: bool = True
     ) -> Dict[str, Any]:
         """
         Recursively and CONCURRENTLY audits all supported source files in target directory.
         Uses ThreadPoolExecutor, Smart Pre-filtering, Self-Healing, and Test Verification.
+        Dynamically ignores documentation, tests, and non-production files/directories by default.
         """
+        from apipatch.filters import DOCS_DIR_NAMES, TESTS_DIR_NAMES, NON_PROD_DIR_NAMES, should_ignore_path
+
         start_time = time.time()
         target_dir = os.path.abspath(target_dir)
         safe_print(f"{Colors.HEADER}{Colors.BOLD}=== ApiPatch: Autonomous AI Codebase Auditor ==={Colors.ENDC}")
         safe_print(f"Target Directory : {Colors.OKCYAN}{target_dir}{Colors.ENDC}")
         provider_name = self.provider.__class__.__name__ if self.provider else "No Provider (Offline)"
         safe_print(f"Active AI Engine : {Colors.OKGREEN}{provider_name}{Colors.ENDC}")
+
+        if ignore_docs or ignore_tests or ignore_non_prod:
+            ignored_labels = []
+            if ignore_docs:
+                ignored_labels.append("Docs")
+            if ignore_tests:
+                ignored_labels.append("Tests")
+            if ignore_non_prod:
+                ignored_labels.append("Samples/Benchmarks")
+            safe_print(f"Filter Engine    : {Colors.OKBLUE}Dynamic Filter Active (Skipping {' & '.join(ignored_labels)}){Colors.ENDC}")
 
         # Discover project-wide dependencies & architecture context
         detector = AutoDeprecationDetector(target_dir)
@@ -695,15 +711,26 @@ class ApiPatchEngine:
             ".git", "node_modules", "venv", ".venv", "__pycache__",
             ".gemini", "dist", "build", ".next", ".nuxt", "out", "coverage"
         }
+        if ignore_docs:
+            ignore_dirs.update(DOCS_DIR_NAMES)
+        if ignore_tests:
+            ignore_dirs.update(TESTS_DIR_NAMES)
+        if ignore_non_prod:
+            ignore_dirs.update(NON_PROD_DIR_NAMES)
+
         supported_exts = {".py", ".pyw", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"}
 
         candidate_files: List[str] = []
         for root, dirs, files in os.walk(target_dir):
-            dirs[:] = [d for d in dirs if d not in ignore_dirs]
+            dirs[:] = [d for d in dirs if d.lower() not in ignore_dirs]
             for file in files:
+                full_p = os.path.join(root, file)
+                rel_p = os.path.relpath(full_p, target_dir)
+                if should_ignore_path(rel_p, ignore_docs=ignore_docs, ignore_tests=ignore_tests, ignore_non_prod=ignore_non_prod):
+                    continue
                 _, ext = os.path.splitext(file)
                 if ext in supported_exts:
-                    candidate_files.append(os.path.join(root, file))
+                    candidate_files.append(full_p)
 
         total_scanned = len(candidate_files)
         if total_scanned == 0:

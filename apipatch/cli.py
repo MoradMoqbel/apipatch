@@ -195,6 +195,13 @@ def main():
     report_parser.add_argument("-o", "--output", help="Custom output report file path (e.g., apipatch_audit_report.html)")
     report_parser.add_argument("--hourly-rate", type=float, default=75.0, help="Benchmark developer hourly rate in USD (default: $75.00)")
 
+    # Common dynamic filtering flags for code inspection commands
+    for p in (scan_parser, fix_parser, pr_parser, hunt_parser, discover_parser):
+        p.add_argument("--include-docs", action="store_true", default=False, help="Include documentation files and directories (docs/, website/, *.md)")
+        p.add_argument("--include-tests", action="store_true", default=False, help="Include test files and directories (tests/, __tests__/, test_*.py)")
+        p.add_argument("--ignore-docs", dest="include_docs", action="store_false", help="Ignore documentation files and directories (default: active)")
+        p.add_argument("--ignore-tests", dest="include_tests", action="store_false", help="Ignore test files and directories (default: active)")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -222,7 +229,14 @@ def main():
             if getattr(args, "output", None):
                 _save_report({"results": [result]}, args.output)
         else:
-            result = engine.process_directory(args.path, write_in_place=False)
+            ignore_docs = not getattr(args, "include_docs", False)
+            ignore_tests = not getattr(args, "include_tests", False)
+            result = engine.process_directory(
+                args.path,
+                write_in_place=False,
+                ignore_docs=ignore_docs,
+                ignore_tests=ignore_tests
+            )
             if getattr(args, "output", None):
                 _save_report(result, args.output)
 
@@ -246,10 +260,14 @@ def main():
             if getattr(args, "output", None):
                 _save_report({"results": [result]}, args.output)
         else:
+            ignore_docs = not getattr(args, "include_docs", False)
+            ignore_tests = not getattr(args, "include_tests", False)
             result = engine.process_directory(
                 args.path,
                 write_in_place=args.write,
-                verify_tests=args.verify_tests
+                verify_tests=args.verify_tests,
+                ignore_docs=ignore_docs,
+                ignore_tests=ignore_tests
             )
             if getattr(args, "output", None):
                 _save_report(result, args.output)
@@ -265,6 +283,8 @@ def main():
         if not _check_provider_or_guide(engine, "pr"):
             sys.exit(1)
         hunter = GitHubPRHunter(github_token=args.token, engine=engine)
+        ignore_docs = not getattr(args, "include_docs", False)
+        ignore_tests = not getattr(args, "include_tests", False)
         hunter.audit_and_pr_repository(
             repo_name=args.repo,
             fork=args.fork,
@@ -278,7 +298,9 @@ def main():
             verify_tests=getattr(args, "verify_tests", False),
             per_subproject=getattr(args, "per_subproject", True),
             max_prs=getattr(args, "max_prs", 1),
-            files_per_subproject=getattr(args, "files_per_subproject", None)
+            files_per_subproject=getattr(args, "files_per_subproject", None),
+            ignore_docs=ignore_docs,
+            ignore_tests=ignore_tests
         )
 
     elif args.command == "webhook":
