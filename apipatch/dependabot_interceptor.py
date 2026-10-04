@@ -209,21 +209,133 @@ class DependabotInterceptor:
 
         return bumps
 
+    @staticmethod
+    def is_major_bump(old_version: str, new_version: str) -> bool:
+        """
+        Determines if a version transition crosses a major breaking threshold
+        (e.g., 3.x -> 4.x, or 0.1 -> 0.2 in semver 0.y.z).
+        """
+        def _clean_v(v: str) -> List[int]:
+            nums = re.findall(r"\d+", v)
+            return [int(n) for n in nums] if nums else [0]
+        
+        v1 = _clean_v(old_version)
+        v2 = _clean_v(new_version)
+        if not v1 or not v2:
+            return False
+        if v1[0] != v2[0]:
+            return True
+        if v1[0] == 0 and len(v1) > 1 and len(v2) > 1 and v1[1] != v2[1]:
+            return True
+        return False
+
+    def _search_prs_graphql(self, query: str, limit: int, min_stars: int = 0) -> List[Dict[str, Any]]:
+        """
+        Fast batch search using GitHub GraphQL API. Fetches PRs, stars, and CI rollup in 1 request.
+        """
+        first_count = min(max(limit * 2, 20), 50)
+        gql = f"""
+        query {{
+          search(query: "{query}", type: ISSUE, first: {first_count}) {{
+            nodes {{
+              ... on PullRequest {{
+                number
+                title
+                url
+                createdAt
+                updatedAt
+                repository {{
+                  nameWithOwner
+                  stargazerCount
+                  isFork
+                }}
+                commits(last: 1) {{
+                  nodes {{
+                    commit {{
+                      oid
+                      statusCheckRollup {{
+                        state
+                      }}
+                    }}
+                  }}
+                }}
+              }}
+            }}
+          }}
+        }}
+        """
+        try:
+            res = self.client.request("/graphql", method="POST", payload={"query": gql})
+            if not res or not isinstance(res, dict) or "data" not in res:
+                return []
+            nodes = res.get("data", {}).get("search", {}).get("nodes", [])
+            leads = []
+            for n in nodes:
+                repo_info = n.get("repository") or {}
+                stars = repo_info.get("stargazerCount", 0)
+                if min_stars > 0 and stars < min_stars:
+                    continue
+                repo_name = repo_info.get("nameWithOwner", "")
+                if not repo_name or repo_info.get("isFork"):
+                    continue
+
+                commits = n.get("commits", {}).get("nodes", [])
+                ci_state = "UNKNOWN"
+                head_sha = None
+                if commits:
+                    commit_obj = commits[0].get("commit") or {}
+                    head_sha = commit_obj.get("oid")
+                    rollup = commit_obj.get("statusCheckRollup")
+                    ci_state = rollup.get("state") if rollup else "NO_CHECKS"
+
+                title = n.get("title", "")
+                bumps = DependabotInterceptor.parse_pr_bump(title, "")
+                leads.append({
+                    "repo": repo_name,
+                    "number": n.get("number"),
+                    "title": title,
+                    "url": n.get("url"),
+                    "stars": stars,
+                    "created_at": n.get("createdAt"),
+                    "updated_at": n.get("updatedAt"),
+                    "ci_status": ci_state.lower() if ci_state else "unknown",
+                    "head_sha": head_sha,
+                    "package": bumps[0]["package"] if bumps else "unknown",
+                    "bumps": bumps,
+                    "body": ""
+                })
+                if len(leads) >= limit:
+                    break
+            return leads
+        except Exception:
+            return []
+
     def search_active_dependabot_prs(
         self,
-        package: str = "langchain",
-        limit: int = 5,
-        min_stars: int = 0
+        package: Optional[str] = None,
+        limit: int = 50,
+        min_stars: int = 100
     ) -> List[Dict[str, Any]]:
         """
-        Searches GitHub API for active open Dependabot PRs bumping a specific package,
+        Searches GitHub API for active open Dependabot PRs,
         filtering strictly by minimum repository stars.
+        Supports both package-specific and 100% dynamic sweeps across all bumped packages.
         """
         if not self.github_token:
             return []
 
-        query = f'author:app/dependabot is:pr is:open "bump {package}" sort:updated-desc'
-        endpoint = f"/search/issues?q={GitHubClient.url_quote(query)}&per_page={max(limit * 3, 10)}"
+        if package and package.lower() not in ("any", "all", "dynamic", "*"):
+            query = f'author:app/dependabot is:pr is:open "bump {package}" sort:updated-desc'
+        else:
+            query = 'author:app/dependabot is:pr is:open "bump" sort:updated-desc'
+
+        # Attempt 1: Ultra-fast GraphQL batch search
+        gql_leads = self._search_prs_graphql(query=query, limit=limit, min_stars=min_stars)
+        if gql_leads:
+            return gql_leads
+
+        # Attempt 2: REST search fallback
+        endpoint = f"/search/issues?q={GitHubClient.url_quote(query)}&per_page={min(max(limit * 2, 20), 100)}"
         data = self.client.request(endpoint)
         if not data or "items" not in data:
             return []
@@ -232,29 +344,27 @@ class DependabotInterceptor:
         for item in data.get("items", []):
             repo_url = item.get("repository_url", "")
             repo_name = "/".join(repo_url.split("/")[-2:])
-            
-            # Fetch star count if filtering by stars
-            stars = 0
-            if min_stars > 0:
-                repo_meta = self.client.get_repository(repo_name)
-                if not repo_meta:
-                    continue
-                stars = repo_meta.get("stargazers_count", 0)
-                if stars < min_stars:
-                    continue
-            else:
-                repo_meta = self.client.get_repository(repo_name)
-                stars = repo_meta.get("stargazers_count", 0) if repo_meta else 0
+
+            repo_meta = self.client.get_repository(repo_name)
+            stars = repo_meta.get("stargazers_count", 0) if repo_meta else 0
+            if min_stars > 0 and stars < min_stars:
+                continue
+
+            title = item.get("title", "")
+            body = item.get("body", "")
+            bumps = DependabotInterceptor.parse_pr_bump(title, body)
 
             leads.append({
                 "repo": repo_name,
                 "number": item.get("number"),
-                "title": item.get("title"),
+                "title": title,
                 "url": item.get("html_url"),
                 "stars": stars,
                 "created_at": item.get("created_at"),
                 "updated_at": item.get("updated_at"),
-                "body": item.get("body", "")
+                "bumps": bumps,
+                "package": bumps[0]["package"] if bumps else (package or "unknown"),
+                "body": body
             })
             if len(leads) >= limit:
                 break
@@ -263,44 +373,107 @@ class DependabotInterceptor:
     def run_autonomous_sweep(
         self,
         packages: Optional[List[str]] = None,
-        min_stars: int = 15,
-        max_prs_per_pkg: int = 3
+        min_stars: int = 100,
+        max_prs: int = 50,
+        **kwargs: Any
     ) -> List[Dict[str, Any]]:
         """
-        Autonomous cloud sweep: hunts across high-velocity ecosystems, filters for
-        genuine starred repositories, identifies real runtime code breakages,
-        and returns verified audit reports ready for the private dashboard.
+        Autonomous cloud sweep: dynamically hunts across ALL packages bumped by Dependabot,
+        filters strictly for genuine 100+ star repositories, detects real runtime/CI breakages,
+        and returns verified audit reports ready for the private vault dashboard.
         """
-        pkgs = packages or ["langchain", "anthropic", "pydantic", "fastapi", "redis", "zod"]
+        # Support legacy argument max_prs_per_pkg
+        scan_limit = kwargs.get("max_prs_per_pkg", max_prs)
         verified_leads = []
 
-        print(f"[*] Starting Autonomous Dependabot Sweep across {len(pkgs)} ecosystems (min_stars: {min_stars})...")
-        for pkg in pkgs:
-            prs = self.search_active_dependabot_prs(package=pkg, limit=max_prs_per_pkg, min_stars=min_stars)
-            for pr in prs:
-                repo = pr["repo"]
-                num = pr["number"]
-                ci_res = self.inspect_pr_ci_status(repo, num)
-                subpath_match = re.search(r"in\s+([a-zA-Z0-9_\-\.\/]+)", pr.get("title", ""))
-                subpath = subpath_match.group(1).strip("/") if subpath_match else None
-                audit_res = self.audit_repo_against_bump(repo, pkg, ref=ci_res.get("head_sha"), subpath=subpath)
-                
-                # We record if CI failed or if AST detected critical breaking files
-                has_break = audit_res.get("is_broken") or ci_res.get("status") == "failure"
-                verified_leads.append({
-                    "id": f"{repo.replace('/', '_')}_{num}",
-                    "repo": repo,
-                    "pr_number": num,
-                    "pr_url": pr["url"],
-                    "pr_title": pr["title"],
-                    "stars": pr["stars"],
-                    "package": pkg,
-                    "ci_status": ci_res.get("status"),
-                    "ci_failures": ci_res.get("failures", []),
-                    "is_broken": has_break,
-                    "breaking_files": audit_res.get("breaking_files", []),
-                    "discovered_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-                })
+        if packages:
+            print(f"[*] Starting Package-Targeted Sweep across {len(packages)} ecosystems (min_stars: {min_stars}, limit: {scan_limit})...")
+            candidate_prs = []
+            for pkg in packages:
+                prs = self.search_active_dependabot_prs(package=pkg, limit=max(scan_limit // len(packages), 5), min_stars=min_stars)
+                candidate_prs.extend(prs)
+        else:
+            print(f"[*] Starting 100% Dynamic Dependabot Sweep (min_stars: {min_stars}, scan limit: {scan_limit})...")
+            candidate_prs = self.search_active_dependabot_prs(package=None, limit=scan_limit, min_stars=min_stars)
+
+        print(f"[*] Analyzing {len(candidate_prs)} qualified Dependabot PR candidates (>= {min_stars} stars)...")
+        seen_leads = set()
+
+        for pr in candidate_prs:
+            repo = pr["repo"]
+            num = pr["number"]
+            lead_key = f"{repo}#{num}"
+            if lead_key in seen_leads:
+                continue
+            seen_leads.add(lead_key)
+
+            title = pr.get("title", "")
+            bumps = pr.get("bumps") or DependabotInterceptor.parse_pr_bump(title, pr.get("body", ""))
+            pkg = bumps[0]["package"] if bumps else pr.get("package", "unknown")
+
+            ci_res = self.inspect_pr_ci_status(repo, num)
+
+            subpath_match = re.search(r"in\s+([a-zA-Z0-9_\-\.\/]+)", title)
+            subpath = subpath_match.group(1).strip("/") if subpath_match else None
+
+            audit_res = self.audit_repo_against_bump(repo, pkg, ref=ci_res.get("head_sha") or pr.get("head_sha"), subpath=subpath)
+
+            is_failing_ci = ci_res.get("status") == "failure" or pr.get("ci_status") == "failure"
+            has_ast_break = audit_res.get("is_broken", False)
+            is_major = False
+            if bumps:
+                is_major = DependabotInterceptor.is_major_bump(bumps[0].get("old_version", ""), bumps[0].get("new_version", ""))
+
+            is_broken = is_failing_ci or has_ast_break or is_major
+
+            if is_failing_ci or has_ast_break:
+                severity = "CRITICAL"
+            elif is_major:
+                severity = "HIGH"
+            else:
+                severity = "MEDIUM"
+
+            if has_ast_break:
+                runtime_impact = f"{pkg} breaking change detected by AST engine in production source files."
+            elif is_failing_ci:
+                fails = [f["name"] for f in ci_res.get("failures", [])]
+                runtime_impact = f"Dependabot bump caused CI failure: {', '.join(fails[:3]) if fails else 'Pipeline failing'}."
+            elif is_major and bumps:
+                runtime_impact = f"Major version bump ({bumps[0]['old_version']} -> {bumps[0]['new_version']}) requiring API compatibility verification."
+            else:
+                runtime_impact = f"Active Dependabot dependency update."
+
+            affected_files = []
+            for bf in audit_res.get("breaking_files", []):
+                for v in bf.get("violations", []):
+                    affected_files.append({
+                        "file": bf["file"],
+                        "line": v["lines"][0] if v["lines"] else 1,
+                        "call": v.get("error_type", ""),
+                        "fix": v.get("hint", "")
+                    })
+
+            lead_record = {
+                "id": f"{repo.replace('/', '_')}_{num}",
+                "repo": repo,
+                "pr_number": num,
+                "pr_url": pr["url"],
+                "pr_title": title,
+                "stars": pr["stars"],
+                "package": pkg,
+                "created_at": pr.get("created_at"),
+                "state": "open",
+                "ci_status": ci_res.get("status", pr.get("ci_status", "unknown")),
+                "is_broken": is_broken,
+                "break_severity": severity,
+                "runtime_impact": runtime_impact,
+                "failed_checks": [f["name"] for f in ci_res.get("failures", [])],
+                "affected_files": affected_files,
+                "apipatch_patch_available": len(affected_files) > 0 or has_ast_break,
+                "discovered_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            }
+            verified_leads.append(lead_record)
+
         return verified_leads
 
     def inspect_pr_ci_status(self, repo_name: str, pr_number: int) -> Dict[str, Any]:

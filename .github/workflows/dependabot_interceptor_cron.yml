@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Starting Autonomous Dependabot Interceptor Sweep (100+ Stars)..."
-          python -m apipatch intercept sweep --min-stars 100 --max 4 --output front/vault_data.json
+          python -m apipatch intercept sweep --min-stars 100 --max 50 --output front/vault_data.json
 
       - name: Commit and Push Updated Vault Leads
         run: |

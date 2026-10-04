@@ -4,11 +4,13 @@ Provides modern terminal commands for autonomous API code audits, automated refa
 sandbox test verification, live GitHub PR submission, and GitHub App Webhook daemon.
 """
 
+import os
 import sys
 import re
 import json
 import socket
 import argparse
+import time
 from typing import Optional
 
 try:
@@ -186,9 +188,9 @@ def main():
 
     # Command: intercept (Autonomous Dependabot & Breaking-Change Interceptor)
     intercept_parser = subparsers.add_parser("intercept", help="Intercept Dependabot PRs, detect if version bumps break production code, and propose fixes")
-    intercept_parser.add_argument("target", nargs="?", default="langchain", help="Package name (e.g., langchain, anthropic, pydantic) or specific Dependabot PR URL")
-    intercept_parser.add_argument("--max", type=int, default=3, help="Max candidate Dependabot PRs to inspect (default: 3)")
-    intercept_parser.add_argument("--min-stars", type=int, default=0, help="Minimum star count filter for candidate repositories (default: 0)")
+    intercept_parser.add_argument("target", nargs="?", default="sweep", help="Package name (e.g., langchain, zod), specific PR URL, or 'sweep' for autonomous dynamic sweep (default: sweep)")
+    intercept_parser.add_argument("--max", type=int, default=50, help="Max candidate Dependabot PRs to inspect (default: 50)")
+    intercept_parser.add_argument("--min-stars", type=int, default=100, help="Minimum star count filter for candidate repositories (default: 100)")
     intercept_parser.add_argument("-o", "--output", help="Save intercept results as a JSON file for the private dashboard")
     intercept_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered if omitted)")
 
@@ -218,7 +220,6 @@ def main():
         sys.exit(0)
 
     if getattr(args, "no_telemetry", False):
-        import os
         os.environ["APIPATCH_NO_TELEMETRY"] = "1"
 
     track_cli_event(args.command, {"has_provider": bool(getattr(args, "provider", None))})
@@ -392,17 +393,39 @@ def main():
             rep = interceptor.generate_interceptor_report(repo_name, pr_number, pkgs, audit_res, ci_res)
             print(rep)
         elif target.lower() == "sweep":
-            min_stars = getattr(args, "min_stars", 15)
-            sweep_results = interceptor.run_autonomous_sweep(min_stars=min_stars, max_prs_per_pkg=args.max)
+            min_stars = getattr(args, "min_stars", 100)
+            max_prs = getattr(args, "max", 50)
+            sweep_results = interceptor.run_autonomous_sweep(min_stars=min_stars, max_prs=max_prs)
             print(f"\n{Colors.OKGREEN}[✓] Autonomous Sweep Completed: Discovered {len(sweep_results)} lead(s) with stars >= {min_stars}.{Colors.ENDC}")
             for r in sweep_results:
-                status_icon = "❌" if r["is_broken"] else "✓"
-                print(f"  {status_icon} [{r['repo']}] (⭐ {r['stars']}) PR #{r['pr_number']}: {r['package']} | Broken: {r['is_broken']}")
+                status_icon = "❌" if r.get("is_broken") else "✓"
+                print(f"  {status_icon} [{r['repo']}] (⭐ {r['stars']}) PR #{r['pr_number']}: {r['package']} | Broken: {r.get('is_broken')}")
             if getattr(args, "output", None):
-                import json
-                with open(args.output, "w", encoding="utf-8") as f:
-                    json.dump({"updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "leads": sweep_results}, f, indent=2)
-                print(f"{Colors.OKGREEN}[✓] Saved sweep results to {args.output}{Colors.ENDC}")
+                out_path = args.output
+                merged_leads_dict = {}
+                if os.path.exists(out_path):
+                    try:
+                        with open(out_path, "r", encoding="utf-8") as f:
+                            existing_data = json.load(f)
+                            for l in existing_data.get("leads", []):
+                                merged_leads_dict[l["id"]] = l
+                    except Exception:
+                        pass
+                for r in sweep_results:
+                    merged_leads_dict[r["id"]] = r
+
+                all_leads = list(merged_leads_dict.values())
+                all_leads.sort(key=lambda x: (0 if x.get("is_broken") else 1, -x.get("stars", 0)))
+
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump({
+                        "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                        "radar_status": "ONLINE_HOURLY",
+                        "min_stars_threshold": min_stars,
+                        "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
+                        "leads": all_leads
+                    }, f, indent=2)
+                print(f"{Colors.OKGREEN}[✓] Saved {len(all_leads)} cumulative lead(s) to {out_path}{Colors.ENDC}")
         else:
             min_stars = getattr(args, "min_stars", 0)
             print(f"Searching GitHub for active Dependabot PRs bumping '{target}' (min_stars: {min_stars})...")
