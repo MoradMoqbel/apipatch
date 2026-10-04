@@ -231,84 +231,101 @@ class DependabotInterceptor:
 
     def _search_prs_graphql(self, query: str, limit: int, min_stars: int = 0) -> List[Dict[str, Any]]:
         """
-        Fast batch search using GitHub GraphQL API. Fetches PRs, stars, and CI rollup in 1 request.
+        Fast batch search using GitHub GraphQL API with cursor pagination.
+        Fetches PRs, stars, and CI rollup in fast batched requests.
         """
-        first_count = min(max(limit * 2, 20), 50)
-        gql = f"""
-        query {{
-          search(query: "{query}", type: ISSUE, first: {first_count}) {{
-            nodes {{
-              ... on PullRequest {{
-                number
-                title
-                url
-                createdAt
-                updatedAt
-                repository {{
-                  nameWithOwner
-                  stargazerCount
-                  isFork
+        escaped_query = query.replace('"', '\\"')
+        leads = []
+        cursor = None
+        max_pages = 4  # fetch up to 400 candidate PRs across pages
+
+        for _ in range(max_pages):
+            after_clause = f', after: "{cursor}"' if cursor else ''
+            gql = f"""
+            query {{
+              search(query: "{escaped_query}", type: ISSUE, first: 100{after_clause}) {{
+                pageInfo {{
+                  hasNextPage
+                  endCursor
                 }}
-                commits(last: 1) {{
-                  nodes {{
-                    commit {{
-                      oid
-                      statusCheckRollup {{
-                        state
+                nodes {{
+                  ... on PullRequest {{
+                    number
+                    title
+                    url
+                    createdAt
+                    updatedAt
+                    repository {{
+                      nameWithOwner
+                      stargazerCount
+                      isFork
+                    }}
+                    commits(last: 1) {{
+                      nodes {{
+                        commit {{
+                          oid
+                          statusCheckRollup {{
+                            state
+                          }}
+                        }}
                       }}
                     }}
                   }}
                 }}
               }}
             }}
-          }}
-        }}
-        """
-        try:
-            res = self.client.request("/graphql", method="POST", payload={"query": gql})
-            if not res or not isinstance(res, dict) or "data" not in res:
-                return []
-            nodes = res.get("data", {}).get("search", {}).get("nodes", [])
-            leads = []
-            for n in nodes:
-                repo_info = n.get("repository") or {}
-                stars = repo_info.get("stargazerCount", 0)
-                if min_stars > 0 and stars < min_stars:
-                    continue
-                repo_name = repo_info.get("nameWithOwner", "")
-                if not repo_name or repo_info.get("isFork"):
-                    continue
-
-                commits = n.get("commits", {}).get("nodes", [])
-                ci_state = "UNKNOWN"
-                head_sha = None
-                if commits:
-                    commit_obj = commits[0].get("commit") or {}
-                    head_sha = commit_obj.get("oid")
-                    rollup = commit_obj.get("statusCheckRollup")
-                    ci_state = rollup.get("state") if rollup else "NO_CHECKS"
-
-                title = n.get("title", "")
-                bumps = DependabotInterceptor.parse_pr_bump(title, "")
-                leads.append({
-                    "repo": repo_name,
-                    "number": n.get("number"),
-                    "title": title,
-                    "url": n.get("url"),
-                    "stars": stars,
-                    "created_at": n.get("createdAt"),
-                    "updated_at": n.get("updatedAt"),
-                    "ci_status": ci_state.lower() if ci_state else "unknown",
-                    "head_sha": head_sha,
-                    "package": bumps[0]["package"] if bumps else "unknown",
-                    "bumps": bumps,
-                    "body": ""
-                })
-                if len(leads) >= limit:
+            """
+            try:
+                res = self.client.request("/graphql", method="POST", payload={"query": gql})
+                if not res or not isinstance(res, dict) or "data" not in res:
                     break
-            return leads
-        except Exception:
-            return []
+                search_data = res.get("data", {}).get("search", {})
+                nodes = search_data.get("nodes", [])
+                for n in nodes:
+                    repo_info = n.get("repository") or {}
+                    stars = repo_info.get("stargazerCount", 0)
+                    if min_stars > 0 and stars < min_stars:
+                        continue
+                    repo_name = repo_info.get("nameWithOwner", "")
+                    if not repo_name or repo_info.get("isFork"):
+                        continue
+
+                    commits = n.get("commits", {}).get("nodes", [])
+                    ci_state = "UNKNOWN"
+                    head_sha = None
+                    if commits:
+                        commit_obj = commits[0].get("commit") or {}
+                        head_sha = commit_obj.get("oid")
+                        rollup = commit_obj.get("statusCheckRollup")
+                        ci_state = rollup.get("state") if rollup else "NO_CHECKS"
+
+                    title = n.get("title", "")
+                    bumps = DependabotInterceptor.parse_pr_bump(title, "")
+                    leads.append({
+                        "repo": repo_name,
+                        "number": n.get("number"),
+                        "title": title,
+                        "url": n.get("url"),
+                        "stars": stars,
+                        "created_at": n.get("createdAt"),
+                        "updated_at": n.get("updatedAt"),
+                        "ci_status": ci_state.lower() if ci_state else "unknown",
+                        "head_sha": head_sha,
+                        "package": bumps[0]["package"] if bumps else "unknown",
+                        "bumps": bumps,
+                        "body": ""
+                    })
+                    if len(leads) >= limit:
+                        return leads
+
+                page_info = search_data.get("pageInfo", {})
+                if not page_info.get("hasNextPage") or not page_info.get("endCursor"):
+                    break
+                cursor = page_info.get("endCursor")
+            except Exception:
+                break
+
+        return leads
 
     def search_active_dependabot_prs(
         self,
@@ -327,7 +344,7 @@ class DependabotInterceptor:
         if package and package.lower() not in ("any", "all", "dynamic", "*"):
             query = f'author:app/dependabot is:pr is:open "bump {package}" sort:updated-desc'
         else:
-            query = 'author:app/dependabot is:pr is:open "bump" sort:updated-desc'
+            query = 'author:app/dependabot is:pr is:open sort:updated-desc'
 
         # Attempt 1: Ultra-fast GraphQL batch search
         gql_leads = self._search_prs_graphql(query=query, limit=limit, min_stars=min_stars)

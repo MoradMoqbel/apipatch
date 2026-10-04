@@ -531,12 +531,8 @@
           <div class="leads-title">
             <span>Verified 100+ Star Repositories with Open Breaking PRs</span>
           </div>
-          <div class="leads-filter">
-            <button class="filter-btn active" data-filter="all">All Packages</button>
-            <button class="filter-btn" data-filter="zod">Zod</button>
-            <button class="filter-btn" data-filter="typescript">TypeScript</button>
-            <button class="filter-btn" data-filter="sqlalchemy">SQLAlchemy</button>
-            <button class="filter-btn" data-filter="google-genai">Google GenAI</button>
+          <div class="leads-filter" id="filterContainer">
+            <!-- Dynamically generated package filter tabs -->
           </div>
         </div>
 
@@ -602,6 +598,7 @@
           document.getElementById('metricLastSweep').textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
 
+        renderFilters(allLeads);
         renderLeads(allLeads);
       } catch (err) {
         console.error('Error fetching vault data:', err);
@@ -677,19 +674,30 @@
       alert('Copied command to clipboard:\n' + cmd);
     }
 
-    // Filter Buttons
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filter = btn.dataset.filter;
-        if (filter === 'all') {
-          renderLeads(allLeads);
-        } else {
-          renderLeads(allLeads.filter(l => l.package.toLowerCase() === filter.toLowerCase()));
-        }
+    function renderFilters(leads) {
+      const container = document.getElementById('filterContainer');
+      if (!container) return;
+      const pkgs = Array.from(new Set(leads.map(l => l.package).filter(p => p && p !== 'unknown')));
+      let html = `<button class="filter-btn active" data-filter="all">All Packages (${leads.length})</button>`;
+      pkgs.forEach(p => {
+        const count = leads.filter(l => l.package && l.package.toLowerCase() === p.toLowerCase()).length;
+        html += `<button class="filter-btn" data-filter="${p.toLowerCase()}">${p.toUpperCase()} (${count})</button>`;
       });
-    });
+      container.innerHTML = html;
+
+      container.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+          if (filter === 'all') {
+            renderLeads(allLeads);
+          } else {
+            renderLeads(allLeads.filter(l => l.package && l.package.toLowerCase() === filter.toLowerCase()));
+          }
+        });
+      });
+    }
 
     // Run auth check on load
     checkAuth();

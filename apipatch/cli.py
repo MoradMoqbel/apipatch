@@ -456,7 +456,6 @@ def main():
                     "breaking_files": audit_res.get("breaking_files", [])
                 })
             if getattr(args, "output", None) and sweep_records:
-                import json
                 with open(args.output, "w", encoding="utf-8") as f:
                     json.dump({"updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "leads": sweep_records}, f, indent=2)
                 print(f"\n{Colors.OKGREEN}[✓] Saved results to {args.output}{Colors.ENDC}")
@@ -466,8 +465,6 @@ def main():
         run_server(port=args.port, auto_open=not args.no_browser)
 
     elif args.command == "report":
-        import os
-        import json
         auditor = CodebaseAuditor(target_dir=args.path, hourly_rate=args.hourly_rate)
         metrics = auditor.run_audit()
 
