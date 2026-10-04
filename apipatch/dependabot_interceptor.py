@@ -14,7 +14,7 @@ from typing import List, Dict, Any, Optional, Tuple
 
 from apipatch.engine import ApiPatchEngine, Colors
 from apipatch.github_client import GitHubClient, resolve_github_token, GITHUB_API_BASE
-from apipatch.filters import is_non_prod_path
+from apipatch.filters import is_non_prod_path, is_test_path, is_doc_path
 
 # Modern (2024 - 2026) Breaking Change Knowledge Delta
 # Maps (package, from_version_prefix, to_version_prefix) -> list of breaking symbols & instructions
@@ -139,6 +139,37 @@ BREAKING_DELTA_CATALOG: Dict[str, Dict[str, Any]] = {
                 "severity": "MEDIUM"
             }
         ]
+    },
+    "zod": {
+        "description": "Zod v3 -> v4 Unified Error Migration",
+        "breaking_rules": [
+            {
+                "id": "zod_invalid_type_error",
+                "pattern": r"invalid_type_error\s*:",
+                "replacement_hint": "In Zod 4, replace invalid_type_error: with error: (e.g. { error: 'Enter a number' })",
+                "error_type": "TS2353: 'invalid_type_error' does not exist in type '$ZodParams'",
+                "severity": "CRITICAL"
+            },
+            {
+                "id": "zod_required_error",
+                "pattern": r"required_error\s*:",
+                "replacement_hint": "In Zod 4, replace required_error: with error: or an error handler function",
+                "error_type": "TS2353: 'required_error' does not exist in type '$ZodParams'",
+                "severity": "CRITICAL"
+            }
+        ]
+    },
+    "typescript": {
+        "description": "TypeScript Modern Compiler Strictness",
+        "breaking_rules": [
+            {
+                "id": "typescript_module_resolution",
+                "pattern": r"\"moduleResolution\"\s*:\s*\"node\"",
+                "replacement_hint": "Migrate \"moduleResolution\": \"node\" to \"moduleResolution\": \"bundler\"",
+                "error_type": "TS5110: Compiler option 'moduleResolution: node' deprecated",
+                "severity": "HIGH"
+            }
+        ]
     }
 }
 
@@ -240,7 +271,7 @@ class DependabotInterceptor:
         genuine starred repositories, identifies real runtime code breakages,
         and returns verified audit reports ready for the private dashboard.
         """
-        pkgs = packages or ["langchain", "anthropic", "pydantic", "fastapi", "redis"]
+        pkgs = packages or ["langchain", "anthropic", "pydantic", "fastapi", "redis", "zod"]
         verified_leads = []
 
         print(f"[*] Starting Autonomous Dependabot Sweep across {len(pkgs)} ecosystems (min_stars: {min_stars})...")
@@ -250,7 +281,9 @@ class DependabotInterceptor:
                 repo = pr["repo"]
                 num = pr["number"]
                 ci_res = self.inspect_pr_ci_status(repo, num)
-                audit_res = self.audit_repo_against_bump(repo, pkg, ref=ci_res.get("head_sha"))
+                subpath_match = re.search(r"in\s+([a-zA-Z0-9_\-\.\/]+)", pr.get("title", ""))
+                subpath = subpath_match.group(1).strip("/") if subpath_match else None
+                audit_res = self.audit_repo_against_bump(repo, pkg, ref=ci_res.get("head_sha"), subpath=subpath)
                 
                 # We record if CI failed or if AST detected critical breaking files
                 has_break = audit_res.get("is_broken") or ci_res.get("status") == "failure"
@@ -309,7 +342,8 @@ class DependabotInterceptor:
         repo_name: str,
         packages: Any,
         ref: Optional[str] = None,
-        max_files: int = 15
+        max_files: int = 25,
+        subpath: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Inspects production code files in a repository to detect if they contain
@@ -345,17 +379,34 @@ class DependabotInterceptor:
                 "summary": "Could not fetch git tree."
             }
 
+        schema_pkgs = {"zod", "pydantic", "marshmallow", "cerberus", "joi"}
+        is_schema_bump = any(p.lower() in schema_pkgs for p in pkg_list)
+
         candidate_files = []
         for item in tree_data.get("tree", []):
             p = item.get("path", "")
             if not p.endswith((".py", ".ts", ".js", ".tsx")):
                 continue
-            if is_non_prod_path(p):
+            if is_non_prod_path(p) or is_test_path(p) or is_doc_path(p):
                 continue
             candidate_files.append(p)
 
-        # Prioritize key entrypoints
-        candidate_files.sort(key=lambda x: 0 if any(e in x.lower() for e in ("app.py", "main.py", "agent.py", "server.py")) else 1)
+        # Prioritize files in subpath if specified, and prioritize schema/model/validator or key entrypoints
+        clean_sub = subpath.strip("/\\").lower() if subpath else None
+        def _rank_file(p: str) -> int:
+            p_lower = p.lower()
+            in_sub = clean_sub and (p_lower.startswith(clean_sub) or f"/{clean_sub}/" in f"/{p_lower}")
+            if clean_sub and not in_sub:
+                return 99
+            if is_schema_bump and any(k in p_lower for k in ("schema", "validator", "validation", "model", "types", "dto", "contract")):
+                return 0
+            if any(k in p_lower for k in ("lib/", "core/", "api/", "services/", "app.", "main.", "server.")):
+                return 1
+            if any(k in p_lower for k in ("page.", "layout.", "view.", "component")):
+                return 3
+            return 2
+
+        candidate_files.sort(key=_rank_file)
         inspected_files = candidate_files[:max_files]
 
         breaking_findings = []

@@ -5,6 +5,7 @@ sandbox test verification, live GitHub PR submission, and GitHub App Webhook dae
 """
 
 import sys
+import re
 import json
 import socket
 import argparse
@@ -385,7 +386,9 @@ def main():
             pkgs = [b["package"] for b in bumps] if bumps else [target]
             print(f"Target PR: {repo_name}#{pr_number} (Packages: {', '.join(pkgs)})")
             ci_res = interceptor.inspect_pr_ci_status(repo_name, pr_number)
-            audit_res = interceptor.audit_repo_against_bump(repo_name, pkgs, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"))
+            subpath_match = re.search(r"in\s+([a-zA-Z0-9_\-\.\/]+)", pr_data.get("title", ""))
+            subpath = subpath_match.group(1).strip("/") if subpath_match else None
+            audit_res = interceptor.audit_repo_against_bump(repo_name, pkgs, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"), subpath=subpath)
             rep = interceptor.generate_interceptor_report(repo_name, pr_number, pkgs, audit_res, ci_res)
             print(rep)
         elif target.lower() == "sweep":
@@ -412,7 +415,9 @@ def main():
                 print(f"PR: {lead['url']} (⭐ {lead.get('stars', 0)} stars)")
                 print(f"Title: {lead['title']}")
                 ci_res = interceptor.inspect_pr_ci_status(lead['repo'], lead['number'])
-                audit_res = interceptor.audit_repo_against_bump(lead['repo'], target, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"))
+                subpath_match = re.search(r"in\s+([a-zA-Z0-9_\-\.\/]+)", lead.get("title", ""))
+                subpath = subpath_match.group(1).strip("/") if subpath_match else None
+                audit_res = interceptor.audit_repo_against_bump(lead['repo'], target, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"), subpath=subpath)
                 rep = interceptor.generate_interceptor_report(lead['repo'], lead['number'], target, audit_res, ci_res)
                 print(rep)
                 sweep_records.append({
