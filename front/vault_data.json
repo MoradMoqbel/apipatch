@@ -24,10 +24,10 @@
       ],
       "affected_files": [
         {
-          "file": "open-security-dashboard/src/schemas/security.ts",
-          "line": 18,
-          "call": "z.infer<typeof LegacySecuritySchema>",
-          "fix": "z.output<typeof ModernSecuritySchema>"
+          "file": "open-security-dashboard/src/lib/tool-schema.ts",
+          "line": 316,
+          "call": "let n = z.number({ invalid_type_error: 'Enter a number' }).finite('Enter a number')",
+          "fix": "let n = z.number({ error: 'Enter a number' }).finite('Enter a number')"
         }
       ],
       "apipatch_patch_available": true
