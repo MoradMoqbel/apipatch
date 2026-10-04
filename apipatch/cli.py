@@ -187,6 +187,8 @@ def main():
     intercept_parser = subparsers.add_parser("intercept", help="Intercept Dependabot PRs, detect if version bumps break production code, and propose fixes")
     intercept_parser.add_argument("target", nargs="?", default="langchain", help="Package name (e.g., langchain, anthropic, pydantic) or specific Dependabot PR URL")
     intercept_parser.add_argument("--max", type=int, default=3, help="Max candidate Dependabot PRs to inspect (default: 3)")
+    intercept_parser.add_argument("--min-stars", type=int, default=0, help="Minimum star count filter for candidate repositories (default: 0)")
+    intercept_parser.add_argument("-o", "--output", help="Save intercept results as a JSON file for the private dashboard")
     intercept_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered if omitted)")
 
     # Command: radar
@@ -386,19 +388,50 @@ def main():
             audit_res = interceptor.audit_repo_against_bump(repo_name, pkgs, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"))
             rep = interceptor.generate_interceptor_report(repo_name, pr_number, pkgs, audit_res, ci_res)
             print(rep)
+        elif target.lower() == "sweep":
+            min_stars = getattr(args, "min_stars", 15)
+            sweep_results = interceptor.run_autonomous_sweep(min_stars=min_stars, max_prs_per_pkg=args.max)
+            print(f"\n{Colors.OKGREEN}[✓] Autonomous Sweep Completed: Discovered {len(sweep_results)} lead(s) with stars >= {min_stars}.{Colors.ENDC}")
+            for r in sweep_results:
+                status_icon = "❌" if r["is_broken"] else "✓"
+                print(f"  {status_icon} [{r['repo']}] (⭐ {r['stars']}) PR #{r['pr_number']}: {r['package']} | Broken: {r['is_broken']}")
+            if getattr(args, "output", None):
+                import json
+                with open(args.output, "w", encoding="utf-8") as f:
+                    json.dump({"updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "leads": sweep_results}, f, indent=2)
+                print(f"{Colors.OKGREEN}[✓] Saved sweep results to {args.output}{Colors.ENDC}")
         else:
-            print(f"Searching GitHub for active Dependabot PRs bumping '{target}'...")
-            leads = interceptor.search_active_dependabot_prs(package=target, limit=args.max)
+            min_stars = getattr(args, "min_stars", 0)
+            print(f"Searching GitHub for active Dependabot PRs bumping '{target}' (min_stars: {min_stars})...")
+            leads = interceptor.search_active_dependabot_prs(package=target, limit=args.max, min_stars=min_stars)
             if not leads:
                 print(f"{Colors.WARNING}[!] No active Dependabot PRs found for package '{target}'.{Colors.ENDC}")
+            sweep_records = []
             for lead in leads:
                 print(f"\n{Colors.OKBLUE}━" * 50 + f"{Colors.ENDC}")
-                print(f"PR: {lead['url']}")
+                print(f"PR: {lead['url']} (⭐ {lead.get('stars', 0)} stars)")
                 print(f"Title: {lead['title']}")
                 ci_res = interceptor.inspect_pr_ci_status(lead['repo'], lead['number'])
                 audit_res = interceptor.audit_repo_against_bump(lead['repo'], target, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"))
                 rep = interceptor.generate_interceptor_report(lead['repo'], lead['number'], target, audit_res, ci_res)
                 print(rep)
+                sweep_records.append({
+                    "repo": lead["repo"],
+                    "pr_number": lead["number"],
+                    "pr_url": lead["url"],
+                    "pr_title": lead["title"],
+                    "stars": lead.get("stars", 0),
+                    "package": target,
+                    "ci_status": ci_res.get("status"),
+                    "ci_failures": ci_res.get("failures", []),
+                    "is_broken": audit_res.get("is_broken") or ci_res.get("status") == "failure",
+                    "breaking_files": audit_res.get("breaking_files", [])
+                })
+            if getattr(args, "output", None) and sweep_records:
+                import json
+                with open(args.output, "w", encoding="utf-8") as f:
+                    json.dump({"updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "leads": sweep_records}, f, indent=2)
+                print(f"\n{Colors.OKGREEN}[✓] Saved results to {args.output}{Colors.ENDC}")
 
     elif args.command == "radar":
         from radar_server import run_server
