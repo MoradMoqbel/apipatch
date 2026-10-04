@@ -1,0 +1,101 @@
+{
+  "updated_at": "2026-10-04T08:15:00Z",
+  "radar_status": "ONLINE",
+  "min_stars_threshold": 15,
+  "leads": [
+    {
+      "id": "Depreck78_ColdView_21",
+      "repo": "Depreck78/ColdView",
+      "pr_number": 21,
+      "pr_url": "https://github.com/Depreck78/ColdView/pull/21",
+      "pr_title": "build(deps): Bump the pip-minor-patch group (langchain 1.3 to 1.4, langchain-core 1.4 to 1.6)",
+      "stars": 34,
+      "package": "langchain",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "ModuleNotFoundError & LLMChain.run AttributeError",
+      "affected_files": [
+        {
+          "file": "services/agent/workflow.py",
+          "line": 42,
+          "call": "from langchain.chat_models import ChatOpenAI",
+          "fix": "from langchain_openai import ChatOpenAI"
+        },
+        {
+          "file": "services/agent/runner.py",
+          "line": 89,
+          "call": "chain.run(user_prompt)",
+          "fix": "chain.invoke({'input': user_prompt})"
+        }
+      ],
+      "apipatch_patch_available": true
+    },
+    {
+      "id": "schinchli_aws-sow-validator_14",
+      "repo": "schinchli/aws-sow-validator",
+      "pr_number": 14,
+      "pr_url": "https://github.com/schinchli/aws-sow-validator/pull/14",
+      "pr_title": "build(deps): update mcp requirement from <2.0,>=1.29.0 to >=1.29.0,<3.0 in /source/agent",
+      "stars": 28,
+      "package": "mcp",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Protocol Session Transport Signature Incompatibility",
+      "affected_files": [
+        {
+          "file": "source/agent/mcp_client.py",
+          "line": 31,
+          "call": "mcp.ClientSession(read_stream, write_stream)",
+          "fix": "mcp.AsyncClientSession(transport=stdio_transport)"
+        }
+      ],
+      "apipatch_patch_available": true
+    },
+    {
+      "id": "CrisLap_AI-Spend-Intelligence-Platform_34",
+      "repo": "CrisLap/AI-Spend-Intelligence-Platform",
+      "pr_number": 34,
+      "pr_url": "https://github.com/CrisLap/AI-Spend-Intelligence-Platform/pull/34",
+      "pr_title": "build(deps): bump starlette from 1.3.1 to 1.6.0 in /backend",
+      "stars": 49,
+      "package": "starlette",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Removed on_event startup handler; crashes backend on boot",
+      "affected_files": [
+        {
+          "file": "backend/app/main.py",
+          "line": 24,
+          "call": "@app.on_event('startup')",
+          "fix": "@asynccontextmanager async def lifespan(app: FastAPI): yield"
+        }
+      ],
+      "apipatch_patch_available": true
+    },
+    {
+      "id": "KarlTDebiec_Scinoephile_1326",
+      "repo": "KarlTDebiec/Scinoephile",
+      "pr_number": 1326,
+      "pr_url": "https://github.com/KarlTDebiec/Scinoephile/pull/1326",
+      "pr_title": "Bump openai from 3.7.0 to 3.10.0 (Migrate legacy completions to modern Responses API)",
+      "stars": 85,
+      "package": "openai",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "AttributeError on legacy completion response dict subscripting",
+      "affected_files": [
+        {
+          "file": "scinoephile/subtitles/ocr.py",
+          "line": 78,
+          "call": "response['choices'][0]['text']",
+          "fix": "response.choices[0].message.content or response.output_text"
+        }
+      ],
+      "apipatch_patch_available": true
+    }
+  ]
+}
