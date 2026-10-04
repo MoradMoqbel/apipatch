@@ -509,8 +509,8 @@
 
       <div class="metrics-row">
         <div class="metric-card">
-          <div class="metric-label">Min Stars Filter</div>
-          <div class="metric-val" id="metricMinStars">15+ ⭐</div>
+          <div class="metric-label">Min Stars Threshold</div>
+          <div class="metric-val" id="metricMinStars">100+ ⭐</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Verified Broken Leads</div>
@@ -521,22 +521,22 @@
           <div class="metric-val" style="color: var(--danger);" id="metricCiFails">0</div>
         </div>
         <div class="metric-card">
-          <div class="metric-label">Last Sweep Run</div>
-          <div class="metric-val" style="font-size: 16px; margin-top: 14px;" id="metricLastSweep">Just now</div>
+          <div class="metric-label">Cloud Daemon Radar</div>
+          <div class="metric-val" style="font-size: 15px; color: var(--success); margin-top: 14px;" id="metricLastSweep">Hourly 24/7 Active</div>
         </div>
       </div>
 
       <div class="leads-section">
         <div class="leads-header">
           <div class="leads-title">
-            <span>Starred Repositories with Active Breaking Bumps</span>
+            <span>Verified 100+ Star Repositories with Open Breaking PRs</span>
           </div>
           <div class="leads-filter">
-            <button class="filter-btn active" data-filter="all">All Ecosystems</button>
-            <button class="filter-btn" data-filter="langchain">LangChain</button>
-            <button class="filter-btn" data-filter="mcp">MCP</button>
-            <button class="filter-btn" data-filter="openai">OpenAI</button>
-            <button class="filter-btn" data-filter="starlette">Starlette / FastAPI</button>
+            <button class="filter-btn active" data-filter="all">All Packages</button>
+            <button class="filter-btn" data-filter="zod">Zod</button>
+            <button class="filter-btn" data-filter="typescript">TypeScript</button>
+            <button class="filter-btn" data-filter="sqlalchemy">SQLAlchemy</button>
+            <button class="filter-btn" data-filter="google-genai">Google GenAI</button>
           </div>
         </div>
 
@@ -629,24 +629,35 @@
           </div>
         `).join('');
 
+        const failedChecksHtml = (l.failed_checks || []).map(c => `
+          <div style="color: #f87171; font-size: 11px; margin-top: 4px;">❌ ${c}</div>
+        `).join('');
+
+        const createdDate = l.created_at ? new Date(l.created_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Today';
+
         row.innerHTML = `
           <div class="lead-top">
             <div>
-              <a href="${l.pr_url}" target="_blank" rel="noopener" class="repo-link">
-                <span>${l.repo}</span>
-                <span class="star-badge">★ ${l.stars}</span>
-              </a>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <a href="${l.pr_url}" target="_blank" rel="noopener" class="repo-link">
+                  <span>${l.repo}</span>
+                </a>
+                <span class="star-badge">★ ${l.stars} Stars</span>
+                <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; font-family: var(--font-mono); font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">● OPEN PR</span>
+                <span style="color: var(--text-dim); font-size: 11px; font-family: var(--font-mono);">${createdDate}</span>
+              </div>
               <div class="pr-title">#${l.pr_number}: ${l.pr_title}</div>
             </div>
             <div class="break-meta">
               <span class="badge-critical">${l.break_severity || 'CRITICAL'}</span>
-              <span class="badge-ci-fail">❌ CI FAILED</span>
+              ${l.ci_status === 'failure' ? '<span class="badge-ci-fail">❌ CI FAILED</span>' : '<span style="color: #f59e0b; font-size: 11px;">⚠️ PENDING CHECK</span>'}
               <span style="color: var(--text-dim);">${l.package.toUpperCase()}</span>
             </div>
           </div>
 
           <div style="font-size: 13px; color: #cbd5e1;">
             <strong>Runtime Impact:</strong> ${l.runtime_impact || 'Fatal runtime exception under bumped version.'}
+            ${failedChecksHtml}
           </div>
 
           ${filesHtml}
