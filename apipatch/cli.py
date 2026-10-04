@@ -183,6 +183,12 @@ def main():
     discover_parser.add_argument("--submit", "--open-pr", dest="submit", action="store_true", help="Submit live Pull Requests directly")
     discover_parser.add_argument("--dry-run", dest="dry_run", action="store_true", default=True, help="Preview PRs without opening (default: True)")
 
+    # Command: intercept (Autonomous Dependabot & Breaking-Change Interceptor)
+    intercept_parser = subparsers.add_parser("intercept", help="Intercept Dependabot PRs, detect if version bumps break production code, and propose fixes")
+    intercept_parser.add_argument("target", nargs="?", default="langchain", help="Package name (e.g., langchain, anthropic, pydantic) or specific Dependabot PR URL")
+    intercept_parser.add_argument("--max", type=int, default=3, help="Max candidate Dependabot PRs to inspect (default: 3)")
+    intercept_parser.add_argument("--token", help="GitHub Personal Access Token (auto-discovered if omitted)")
+
     # Command: radar
     radar_parser = subparsers.add_parser("radar", help="Launch the local interactive ApiPatch Radar Web Dashboard")
     radar_parser.add_argument("--port", type=int, default=8765, help="Port to bind dashboard server (default: 8765)")
@@ -359,6 +365,40 @@ def main():
             max_repos=args.max_repos,
             dry_run=dry_run
         )
+
+    elif args.command == "intercept":
+        from apipatch.dependabot_interceptor import DependabotInterceptor
+        interceptor = DependabotInterceptor(github_token=args.token)
+        print(f"\n{Colors.HEADER}{Colors.BOLD}⚡ ApiPatch: Dependabot Breaking-Change Interceptor{Colors.ENDC}")
+        target = args.target.strip()
+        if "github.com" in target and "/pull/" in target:
+            parts = target.split("github.com/")[-1].split("/pull/")
+            repo_name = parts[0]
+            pr_number = int(parts[1].split("/")[0].split("?")[0])
+            pr_data = interceptor.client.get_pull_request(repo_name, pr_number)
+            if not pr_data:
+                print(f"{Colors.FAIL}[!] Could not retrieve PR details for {target}{Colors.ENDC}")
+                sys.exit(1)
+            bumps = DependabotInterceptor.parse_pr_bump(pr_data.get("title", ""), pr_data.get("body", ""))
+            pkgs = [b["package"] for b in bumps] if bumps else [target]
+            print(f"Target PR: {repo_name}#{pr_number} (Packages: {', '.join(pkgs)})")
+            ci_res = interceptor.inspect_pr_ci_status(repo_name, pr_number)
+            audit_res = interceptor.audit_repo_against_bump(repo_name, pkgs, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"))
+            rep = interceptor.generate_interceptor_report(repo_name, pr_number, pkgs, audit_res, ci_res)
+            print(rep)
+        else:
+            print(f"Searching GitHub for active Dependabot PRs bumping '{target}'...")
+            leads = interceptor.search_active_dependabot_prs(package=target, limit=args.max)
+            if not leads:
+                print(f"{Colors.WARNING}[!] No active Dependabot PRs found for package '{target}'.{Colors.ENDC}")
+            for lead in leads:
+                print(f"\n{Colors.OKBLUE}━" * 50 + f"{Colors.ENDC}")
+                print(f"PR: {lead['url']}")
+                print(f"Title: {lead['title']}")
+                ci_res = interceptor.inspect_pr_ci_status(lead['repo'], lead['number'])
+                audit_res = interceptor.audit_repo_against_bump(lead['repo'], target, ref=ci_res.get("head_sha") or ci_res.get("pr_branch"))
+                rep = interceptor.generate_interceptor_report(lead['repo'], lead['number'], target, audit_res, ci_res)
+                print(rep)
 
     elif args.command == "radar":
         from radar_server import run_server

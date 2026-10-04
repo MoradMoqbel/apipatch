@@ -194,6 +194,28 @@ class GitHubClient:
                 print(f"[!] Network error on GitHub API request ({method} {url}): {e}")
                 return None
 
+    def request(
+        self,
+        endpoint: str,
+        method: str = "GET",
+        payload: Optional[Dict[str, Any]] = None,
+        full_url: Optional[str] = None,
+        headers_override: Optional[Dict[str, str]] = None
+    ) -> Optional[Any]:
+        """Public proxy for authenticated GitHub API requests."""
+        return self._request(
+            endpoint=endpoint,
+            method=method,
+            payload=payload,
+            full_url=full_url,
+            headers_override=headers_override
+        )
+
+    @staticmethod
+    def url_quote(string: str) -> str:
+        """URL encodes a string safely for query parameters."""
+        return urllib.parse.quote(string)
+
     # ── User & Repository Metadata ──────────────────────────────────────────
 
     def get_authenticated_user(self) -> Optional[str]:
