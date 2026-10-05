@@ -11,7 +11,7 @@
       "pr_url": "https://github.com/OI-wiki/OI-wiki/pull/6995",
       "pr_title": "chore(deps): bump the uv group across 1 directory with 2 updates",
       "stars": 26811,
-      "package": "unknown",
+      "package": "pygments",
       "created_at": "2026-10-04T13:04:22Z",
       "state": "open",
       "ci_status": "failure",
@@ -23,10 +23,10 @@
       ],
       "affected_files": [
         {
-          "file": "pyproject.toml",
-          "line": 42,
-          "call": "uv group dependency bump broke LaTeX document build tools in CI",
-          "fix": "Pin compatible LaTeX toolchain dependencies in pyproject.toml / uv.lock"
+          "file": "uv.lock",
+          "line": 368,
+          "call": "name = \"pygments\"\n- version = \"2.20.0\"",
+          "fix": "name = \"pygments\"\n+ version = \"2.19.2\"  # Pin to <2.20 to fix LaTeX build syntax"
         }
       ],
       "apipatch_patch_available": true,
@@ -136,7 +136,7 @@
       "pr_url": "https://github.com/ColeMurray/background-agents/pull/2285",
       "pr_title": "chore(deps): bump the npm-minor-patch group across 1 directory with 41 updates",
       "stars": 3318,
-      "package": "unknown",
+      "package": "knip",
       "created_at": "2026-10-04T08:04:52Z",
       "state": "open",
       "ci_status": "failure",
@@ -154,10 +154,10 @@
       ],
       "affected_files": [
         {
-          "file": "control-plane/package.json",
-          "line": 19,
-          "call": "npm-minor-patch group bump broke TypeScript typecheck & test coverage",
-          "fix": "Resolve type declaration conflict in control-plane module"
+          "file": "package.json",
+          "line": 46,
+          "call": "\"knip\": \"^6.38.0\"",
+          "fix": "\"knip\": \"^6.32.1\"  // Revert bump to restore TypeScript TypeCheck & Coverage"
         }
       ],
       "apipatch_patch_available": true,
@@ -260,7 +260,7 @@
       "pr_url": "https://github.com/moq-dev/moq/pull/4793",
       "pr_title": "chore(deps): bump the cargo group with 2 updates",
       "stars": 1555,
-      "package": "unknown",
+      "package": "mp4-atom",
       "created_at": "2026-10-04T14:26:14Z",
       "state": "open",
       "ci_status": "failure",
@@ -275,10 +275,10 @@
       ],
       "affected_files": [
         {
-          "file": "Cargo.toml",
-          "line": 18,
-          "call": "cargo group bump broke Android and Windows OBS cross-compilation",
-          "fix": "Pin compatible transport crates across cross-platform target matrix"
+          "file": "rs/moq-mux/Cargo.toml",
+          "line": 29,
+          "call": "mp4-atom = { version = \"0.16\", features = [\"tokio\"] }",
+          "fix": "mp4-atom = { version = \"0.15\", features = [\"tokio\"] }  // Pin to resolve cross-compilation"
         }
       ],
       "apipatch_patch_available": true,
@@ -293,7 +293,7 @@
       "pr_url": "https://github.com/smartcontractkit/documentation/pull/4271",
       "pr_title": "Bump the solana-ecosystem group with 10 updates",
       "stars": 527,
-      "package": "unknown",
+      "package": "@solana/web3.js",
       "created_at": "2026-10-04T22:07:48Z",
       "state": "open",
       "ci_status": "failure",
@@ -307,10 +307,10 @@
       ],
       "affected_files": [
         {
-          "file": ".github/workflows/ci.yml",
-          "line": 1,
-          "call": "Dependency bump broke CI check: setup, sigscanner-check",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
+          "file": "package.json",
+          "line": 52,
+          "call": "\"@solana/web3.js\": \"^1.95.5\"",
+          "fix": "\"@solana/web3.js\": \"^1.95.3\"  // Pin to resolve setup script check"
         }
       ],
       "apipatch_patch_available": true,
@@ -325,7 +325,7 @@
       "pr_url": "https://github.com/StanMarek/ghost-complete/pull/206",
       "pr_title": "chore(deps): bump the cargo-compatible group with 24 updates",
       "stars": 306,
-      "package": "unknown",
+      "package": "aws-config",
       "created_at": "2026-10-04T13:12:52Z",
       "state": "open",
       "ci_status": "failure",
@@ -341,10 +341,10 @@
       ],
       "affected_files": [
         {
-          "file": "Cargo.toml",
+          "file": "crates/gc-suggest/Cargo.toml",
           "line": 14,
-          "call": "cargo-compatible group bump triggered Clippy type error in tripwire check",
-          "fix": "Update tripwire compile flags or run cargo clippy --fix"
+          "call": "aws-config = { version = \"=1.8.17\" }",
+          "fix": "aws-config = { version = \"=1.8.16\" }  // Pin to pass tripwire compile-check & Clippy"
         }
       ],
       "apipatch_patch_available": true,
