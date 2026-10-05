@@ -1,9 +1,40 @@
 {
-  "updated_at": "2026-10-05T07:37:25Z",
+  "updated_at": "2026-10-05T07:48:33Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
   "leads": [
+    {
+      "id": "aws_mcp_proxy_for_aws_430",
+      "repo": "aws/mcp-proxy-for-aws",
+      "pr_number": 430,
+      "pr_url": "https://github.com/aws/mcp-proxy-for-aws/pull/430",
+      "pr_title": "chore(deps): update uv: bump the uv-version-updates group across 1 directory with 16 updates",
+      "stars": 358,
+      "package": "langchain",
+      "created_at": "2026-10-04T12:00:00Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "LangChain v0.3 migration broke build: AttributeError: 'Runnable' object has no attribute 'run'.",
+      "failed_checks": [
+        "Build MCP Proxy for AWS (Build)"
+      ],
+      "affected_files": [
+        {
+          "file": "mcp_proxy_for_aws/server.py",
+          "line": 277,
+          "call": "result = chain.run(input_text)",
+          "fix": "result = chain.invoke(input_text)"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T07:48:33Z",
+      "is_real_code_break": true,
+      "break_category": "AST_CODE_BREAK",
+      "patch_type": "AST_CODE_REWRITE"
+    },
     {
       "id": "shopware_frontends_2809",
       "repo": "shopware/frontends",
