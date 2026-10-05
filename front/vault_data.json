@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-05T08:06:18Z",
+  "updated_at": "2026-10-05T17:43:14Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
@@ -100,6 +100,63 @@
       "patch_type": "MANIFEST_PIN"
     },
     {
+      "id": "LearningCircuit_local-deep-research_6706",
+      "repo": "LearningCircuit/local-deep-research",
+      "pr_number": 6706,
+      "pr_url": "https://github.com/LearningCircuit/local-deep-research/pull/6706",
+      "pr_title": "chore(deps): bump google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml from 2.5.1 to 2.6.0",
+      "stars": 9154,
+      "package": "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml",
+      "created_at": "2026-09-21T04:18:03Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: All Pytest Tests + Coverage, scan / osv-scan.",
+      "failed_checks": [
+        "All Pytest Tests + Coverage",
+        "scan / osv-scan"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "\"google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml\": \"2.5.1\" // Bumped to 2.6.0 which broke CI: All Pytest Tests + Coverage, scan / osv-scan",
+          "fix": "\"google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml\": \"2.6.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T17:43:05Z"
+    },
+    {
+      "id": "LearningCircuit_local-deep-research_6705",
+      "repo": "LearningCircuit/local-deep-research",
+      "pr_number": 6705,
+      "pr_url": "https://github.com/LearningCircuit/local-deep-research/pull/6705",
+      "pr_title": "chore(deps): bump the codeql-action group across 1 directory with 3 updates",
+      "stars": 9154,
+      "package": "unknown",
+      "created_at": "2026-09-21T04:17:55Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: All Pytest Tests + Coverage.",
+      "failed_checks": [
+        "All Pytest Tests + Coverage"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: All Pytest Tests + Coverage",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T17:43:08Z"
+    },
+    {
       "id": "VueTorrent_VueTorrent_2944",
       "repo": "VueTorrent/VueTorrent",
       "pr_number": 2944,
@@ -160,6 +217,34 @@
       "is_real_code_break": false,
       "break_category": "PEER_CONFLICT",
       "patch_type": "PEER_DEPENDENCY_ALIGN"
+    },
+    {
+      "id": "Trusted-AI_adversarial-robustness-toolbox_2835",
+      "repo": "Trusted-AI/adversarial-robustness-toolbox",
+      "pr_number": 2835,
+      "pr_url": "https://github.com/Trusted-AI/adversarial-robustness-toolbox/pull/2835",
+      "pr_title": "build(deps): bump actions/checkout from 6 to 7",
+      "stars": 6254,
+      "package": "unknown",
+      "created_at": "2026-10-02T07:52:35Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: codecov/project.",
+      "failed_checks": [
+        "codecov/project"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: codecov/project",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T17:43:13Z"
     },
     {
       "id": "pdfme_pdfme_1652",
@@ -383,6 +468,53 @@
       "is_real_code_break": false,
       "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
+    },
+    {
+      "id": "cloudposse_atmos_3260",
+      "repo": "cloudposse/atmos",
+      "pr_number": 3260,
+      "pr_url": "https://github.com/cloudposse/atmos/pull/3260",
+      "pr_title": "build(deps): bump the cicd group with 10 updates",
+      "stars": 1396,
+      "package": "cloudposse/.github/.github/workflows/shared-release-branches.yml",
+      "created_at": "2026-10-04T00:18:01Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.171.0 -> 0.173.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T17:43:11Z"
+    },
+    {
+      "id": "basementstudio_xmcp_665",
+      "repo": "basementstudio/xmcp",
+      "pr_number": 665,
+      "pr_url": "https://github.com/basementstudio/xmcp/pull/665",
+      "pr_title": "chore(deps): bump js-yaml from 4.3.2 to 5.4.1 in /apps/website",
+      "stars": 1332,
+      "package": "js-yaml",
+      "created_at": "2026-09-17T17:33:02Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: e2e-conformance.",
+      "failed_checks": [
+        "e2e-conformance"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"js-yaml\": \"4.3.2\" // Bumped to 5.4.1 which broke CI: e2e-conformance",
+          "fix": "\"js-yaml\": \"5.4.1\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T17:43:14Z"
     },
     {
       "id": "mivano_azure-cost-cli_361",
@@ -935,6 +1067,25 @@
       "discovered_at": "2026-10-05T08:06:16Z"
     },
     {
+      "id": "smallrye_jandex_729",
+      "repo": "smallrye/jandex",
+      "pr_number": 729,
+      "pr_url": "https://github.com/smallrye/jandex/pull/729",
+      "pr_title": "Bump io.quarkus.gizmo:gizmo2 from 2.3.0 to 2.3.1",
+      "stars": 454,
+      "package": "unknown",
+      "created_at": "2026-10-05T17:42:29Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T17:43:02Z"
+    },
+    {
       "id": "thewca_worldcubeassociation.org_15930",
       "repo": "thewca/worldcubeassociation.org",
       "pr_number": 15930,
@@ -992,6 +1143,25 @@
       "discovered_at": "2026-10-05T08:06:14Z"
     },
     {
+      "id": "Tight-Line_ballast_118",
+      "repo": "Tight-Line/ballast",
+      "pr_number": 118,
+      "pr_url": "https://github.com/Tight-Line/ballast/pull/118",
+      "pr_title": "build(deps): bump the actions-all group with 6 updates",
+      "stars": 203,
+      "package": "github/codeql-action/init",
+      "created_at": "2026-10-05T17:42:14Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T17:43:09Z"
+    },
+    {
       "id": "jhipster_generator-jhipster-quarkus_714",
       "repo": "jhipster/generator-jhipster-quarkus",
       "pr_number": 714,
@@ -1030,6 +1200,25 @@
       "discovered_at": "2026-10-05T08:06:05Z"
     },
     {
+      "id": "Kanahiro_chiitiler_258",
+      "repo": "Kanahiro/chiitiler",
+      "pr_number": 258,
+      "pr_url": "https://github.com/Kanahiro/chiitiler/pull/258",
+      "pr_title": "build(deps): bump brace-expansion",
+      "stars": 120,
+      "package": "unknown",
+      "created_at": "2026-10-05T17:41:58Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T17:43:12Z"
+    },
+    {
       "id": "buildkite_agent-stack-k8s_957",
       "repo": "buildkite/agent-stack-k8s",
       "pr_number": 957,
@@ -1066,6 +1255,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:06:12Z"
+    },
+    {
+      "id": "temporalio_ai-cookbook_236",
+      "repo": "temporalio/ai-cookbook",
+      "pr_number": 236,
+      "pr_url": "https://github.com/temporalio/ai-cookbook/pull/236",
+      "pr_title": "Bump undici from 7.29.0 to 7.30.0 in /agents/ai_sdk_by_vercel_typescript",
+      "stars": 100,
+      "package": "undici",
+      "created_at": "2026-09-29T05:44:36Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T17:43:03Z"
     }
   ]
 }
