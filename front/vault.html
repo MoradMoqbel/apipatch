@@ -530,16 +530,16 @@
         <!-- Quick View Mode Filter -->
         <div style="display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap;">
           <button class="filter-btn active" id="modeBtnAll" onclick="setModeFilter('all')">
-            🌐 All Active Leads (<span id="countModeAll">0</span>)
+            🌐 All Verified Breaking Leads (<span id="countModeAll">0</span>)
           </button>
-          <button class="filter-btn" id="modeBtnReal" onclick="setModeFilter('real')" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: #ef4444; font-weight: 700;">
-            🎯 Verified True Code Breaks (<span id="countModeReal">0</span>)
+          <button class="filter-btn" id="modeBtnAst" onclick="setModeFilter('ast')" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border-color: #a855f7; font-weight: 700;">
+            ⚡ AST Source Code Rewrites (<span id="countModeAst">0</span>)
           </button>
-          <button class="filter-btn" id="modeBtnBroken" onclick="setModeFilter('broken')" style="color: #fbbf24; border-color: rgba(245, 158, 11, 0.4);">
-            ⚠️ All CI Failures (incl. Admin/Lint) (<span id="countModeBroken">0</span>)
+          <button class="filter-btn" id="modeBtnPeer" onclick="setModeFilter('peer')" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: #3b82f6; font-weight: 700;">
+            🔗 Peer Dependency Alignments (<span id="countModePeer">0</span>)
           </button>
-          <button class="filter-btn" id="modeBtnFix" onclick="setModeFilter('fix')" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);">
-            ⚡ Code Fix / AST Patch Available (<span id="countModeFix">0</span>)
+          <button class="filter-btn" id="modeBtnManifest" onclick="setModeFilter('manifest')" style="color: #94a3b8; border-color: #64748b;">
+            📌 Manifest Pins & Rollbacks (<span id="countModeManifest">0</span>)
           </button>
         </div>
 
@@ -604,20 +604,20 @@
     function setModeFilter(mode) {
       currentMode = mode;
       document.getElementById('modeBtnAll').classList.toggle('active', mode === 'all');
-      document.getElementById('modeBtnReal').classList.toggle('active', mode === 'real');
-      document.getElementById('modeBtnBroken').classList.toggle('active', mode === 'broken');
-      document.getElementById('modeBtnFix').classList.toggle('active', mode === 'fix');
+      document.getElementById('modeBtnAst').classList.toggle('active', mode === 'ast');
+      document.getElementById('modeBtnPeer').classList.toggle('active', mode === 'peer');
+      document.getElementById('modeBtnManifest').classList.toggle('active', mode === 'manifest');
       applyFilters();
     }
 
     function applyFilters() {
       let filtered = allLeads;
-      if (currentMode === 'real') {
-        filtered = filtered.filter(l => l.is_real_code_break === true);
-      } else if (currentMode === 'broken') {
-        filtered = filtered.filter(l => l.ci_status === 'failure');
-      } else if (currentMode === 'fix') {
-        filtered = filtered.filter(l => l.affected_files && l.affected_files.length > 0);
+      if (currentMode === 'ast') {
+        filtered = filtered.filter(l => l.patch_type === 'AST_CODE_REWRITE');
+      } else if (currentMode === 'peer') {
+        filtered = filtered.filter(l => l.patch_type === 'PEER_DEPENDENCY_ALIGN');
+      } else if (currentMode === 'manifest') {
+        filtered = filtered.filter(l => l.patch_type === 'MANIFEST_PIN');
       }
 
       if (currentPkg !== 'all') {
@@ -634,7 +634,7 @@
         allLeads = data.leads || [];
 
         // Render Metrics
-        document.getElementById('metricBrokenLeads').textContent = allLeads.filter(l => l.is_broken).length;
+        document.getElementById('metricBrokenLeads').textContent = allLeads.length;
         document.getElementById('metricCiFails').textContent = allLeads.filter(l => l.ci_status === 'failure').length;
         if (data.updated_at) {
           const d = new Date(data.updated_at);
@@ -643,9 +643,9 @@
 
         // Mode Counts
         document.getElementById('countModeAll').textContent = allLeads.length;
-        document.getElementById('countModeReal').textContent = allLeads.filter(l => l.is_real_code_break).length;
-        document.getElementById('countModeBroken').textContent = allLeads.filter(l => l.ci_status === 'failure').length;
-        document.getElementById('countModeFix').textContent = allLeads.filter(l => l.affected_files && l.affected_files.length > 0).length;
+        document.getElementById('countModeAst').textContent = allLeads.filter(l => l.patch_type === 'AST_CODE_REWRITE').length;
+        document.getElementById('countModePeer').textContent = allLeads.filter(l => l.patch_type === 'PEER_DEPENDENCY_ALIGN').length;
+        document.getElementById('countModeManifest').textContent = allLeads.filter(l => l.patch_type === 'MANIFEST_PIN').length;
 
         renderFilters(allLeads);
         applyFilters();
