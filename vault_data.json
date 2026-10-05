@@ -5,35 +5,6 @@
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
   "leads": [
     {
-      "id": "strapi_strapi_27852",
-      "repo": "strapi/strapi",
-      "pr_number": 27852,
-      "pr_url": "https://github.com/strapi/strapi/pull/27852",
-      "pr_title": "chore(deps-dev): bump nx from 20.8.4 to 22.7.7 in the nx-security group across 1 directory",
-      "stars": 73275,
-      "package": "nx",
-      "created_at": "2026-09-28T22:52:51Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: check-pr-status, check-pr-status.",
-      "failed_checks": [
-        "check-pr-status",
-        "check-pr-status"
-      ],
-      "affected_files": [
-        {
-          "file": ".github/workflows/ci.yml",
-          "line": 1,
-          "call": "Dependency bump broke CI check: check-pr-status, check-pr-status",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T22:09:45Z"
-    },
-    {
       "id": "OI-wiki_OI-wiki_6995",
       "repo": "OI-wiki/OI-wiki",
       "pr_number": 6995,
@@ -59,7 +30,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T13:09:56Z"
+      "discovered_at": "2026-10-04T13:09:56Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "lucide-icons_lucide_4959",
@@ -92,7 +65,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T14:33:54Z"
+      "discovered_at": "2026-10-04T14:33:54Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "VueTorrent_VueTorrent_2944",
@@ -120,7 +95,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T13:09:14Z"
+      "discovered_at": "2026-10-04T13:09:14Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "VueTorrent_VueTorrent_2943",
@@ -148,65 +125,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T13:09:35Z"
-    },
-    {
-      "id": "chipsalliance_chisel_5505",
-      "repo": "chipsalliance/chisel",
-      "pr_number": 5505,
-      "pr_url": "https://github.com/chipsalliance/chisel/pull/5505",
-      "pr_title": "Bump serialize-javascript from 7.1.1 to 7.1.2 in /website",
-      "stars": 4806,
-      "package": "serialize-javascript",
-      "created_at": "2026-10-04T18:25:03Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Check Labels, Check Labels, Check Labels.",
-      "failed_checks": [
-        "Check Labels",
-        "Check Labels",
-        "Check Labels"
-      ],
-      "affected_files": [
-        {
-          "file": ".github/workflows/ci.yml",
-          "line": 1,
-          "call": "Dependency bump broke CI check: Check Labels, Check Labels",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T18:30:51Z"
-    },
-    {
-      "id": "microsoft_agent-academy_3220",
-      "repo": "microsoft/agent-academy",
-      "pr_number": 3220,
-      "pr_url": "https://github.com/microsoft/agent-academy/pull/3220",
-      "pr_title": "chore(deps-dev): bump dompurify from 3.4.13 to 3.4.16",
-      "stars": 3489,
-      "package": "dompurify",
-      "created_at": "2026-10-04T18:25:37Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Lint markdown files.",
-      "failed_checks": [
-        "Lint markdown files"
-      ],
-      "affected_files": [
-        {
-          "file": ".github/workflows/ci.yml",
-          "line": 1,
-          "call": "Dependency bump broke CI check: Lint markdown files",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T18:30:46Z"
+      "discovered_at": "2026-10-04T13:09:35Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "ColeMurray_background-agents_2285",
@@ -240,7 +161,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T22:09:55Z"
+      "discovered_at": "2026-10-04T22:09:55Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "ferronweb_ferron_907",
@@ -295,35 +218,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T14:33:55Z"
-    },
-    {
-      "id": "fossasia_eventyay_6184",
-      "repo": "fossasia/eventyay",
-      "pr_number": 6184,
-      "pr_url": "https://github.com/fossasia/eventyay/pull/6184",
-      "pr_title": "chore(deps): bump the tiptap group in /app/eventyay/webapp/video with 8 updates",
-      "stars": 1699,
-      "package": "unknown",
-      "created_at": "2026-10-04T22:05:43Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Sourcery review.",
-      "failed_checks": [
-        "Sourcery review"
-      ],
-      "affected_files": [
-        {
-          "file": ".github/workflows/ci.yml",
-          "line": 1,
-          "call": "Dependency bump broke CI check: Sourcery review",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T22:09:54Z"
+      "discovered_at": "2026-10-04T14:33:55Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "fossasia_eventyay_6193",
@@ -352,7 +249,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T22:10:02Z"
+      "discovered_at": "2026-10-04T22:10:02Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "moq-dev_moq_4793",
@@ -383,7 +282,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T14:33:59Z"
+      "discovered_at": "2026-10-04T14:33:59Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "smartcontractkit_documentation_4271",
@@ -413,35 +314,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T22:09:49Z"
-    },
-    {
-      "id": "smartcontractkit_documentation_4272",
-      "repo": "smartcontractkit/documentation",
-      "pr_number": 4272,
-      "pr_url": "https://github.com/smartcontractkit/documentation/pull/4272",
-      "pr_title": "Bump path-to-regexp from 6.1.0 to 6.3.0",
-      "stars": 527,
-      "package": "path-to-regexp",
-      "created_at": "2026-10-04T22:07:59Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: sigscanner-check.",
-      "failed_checks": [
-        "sigscanner-check"
-      ],
-      "affected_files": [
-        {
-          "file": ".github/workflows/ci.yml",
-          "line": 1,
-          "call": "Dependency bump broke CI check: sigscanner-check",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T22:09:50Z"
+      "discovered_at": "2026-10-04T22:09:49Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "StanMarek_ghost-complete_206",
@@ -473,7 +348,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T13:15:39Z"
+      "discovered_at": "2026-10-04T13:15:39Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "ecency_vision-mobile_3563",
@@ -501,7 +378,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T14:33:56Z"
+      "discovered_at": "2026-10-04T14:33:56Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "shopware_frontends_2809",
@@ -534,7 +413,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T18:30:40Z"
+      "discovered_at": "2026-10-04T18:30:40Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "timescale_rsigma_494",
@@ -564,7 +445,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T18:30:29Z"
+      "discovered_at": "2026-10-04T18:30:29Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "timescale_rsigma_495",
@@ -594,7 +477,9 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T18:30:32Z"
+      "discovered_at": "2026-10-04T18:30:32Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
       "id": "fabriziosalmi_wildbox_667",
@@ -623,349 +508,162 @@
         }
       ],
       "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T07:53:12Z"
+      "discovered_at": "2026-10-04T07:53:12Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH"
     },
     {
-      "id": "RayWangQvQ_BiliBiliToolPro_1201",
-      "repo": "RayWangQvQ/BiliBiliToolPro",
-      "pr_number": 1201,
-      "pr_url": "https://github.com/RayWangQvQ/BiliBiliToolPro/pull/1201",
-      "pr_title": "Bump xunit.runner.visualstudio from 3.1.5 to 4.0.0",
-      "stars": 8939,
-      "package": "xunit.runner.visualstudio",
-      "created_at": "2026-10-05T01:27:47Z",
+      "id": "strapi_strapi_27852",
+      "repo": "strapi/strapi",
+      "pr_number": 27852,
+      "pr_url": "https://github.com/strapi/strapi/pull/27852",
+      "pr_title": "chore(deps-dev): bump nx from 20.8.4 to 22.7.7 in the nx-security group across 1 directory",
+      "stars": 73275,
+      "package": "nx",
+      "created_at": "2026-09-28T22:52:51Z",
       "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (3.1.5 -> 4.0.0) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T01:28:43Z"
-    },
-    {
-      "id": "MaterializeInc_materialize_39539",
-      "repo": "MaterializeInc/materialize",
-      "pr_number": 39539,
-      "pr_url": "https://github.com/MaterializeInc/materialize/pull/39539",
-      "pr_title": "build(deps-dev): bump msw from 2.6.4 to 3.0.1 in /console",
-      "stars": 6380,
-      "package": "msw",
-      "created_at": "2026-10-04T22:07:27Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (2.6.4 -> 3.0.1) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:56Z"
-    },
-    {
-      "id": "Chachamaru127_claude-code-harness_370",
-      "repo": "Chachamaru127/claude-code-harness",
-      "pr_number": 370,
-      "pr_url": "https://github.com/Chachamaru127/claude-code-harness/pull/370",
-      "pr_title": "chore(deps): bump @vercel/agent-eval from 1.4.0 to 2.4.0 in /benchmarks/breezing-bench/agent-eval",
-      "stars": 3149,
-      "package": "@vercel/agent-eval",
-      "created_at": "2026-10-05T01:24:31Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (1.4.0 -> 2.4.0) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T01:28:41Z"
-    },
-    {
-      "id": "fossasia_eventyay_6200",
-      "repo": "fossasia/eventyay",
-      "pr_number": 6200,
-      "pr_url": "https://github.com/fossasia/eventyay/pull/6200",
-      "pr_title": "chore(deps): bump msgspec from 0.21.1 to 0.22.0 in /app",
-      "stars": 1699,
-      "package": "msgspec",
-      "created_at": "2026-10-04T22:08:06Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (0.21.1 -> 0.22.0) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:46Z"
-    },
-    {
-      "id": "fussybeaver_bollard_807",
-      "repo": "fussybeaver/bollard",
-      "pr_number": 807,
-      "pr_url": "https://github.com/fussybeaver/bollard/pull/807",
-      "pr_title": "build(deps): bump sha2 from 0.10.9 to 0.11.0",
-      "stars": 1380,
-      "package": "sha2",
-      "created_at": "2026-09-17T07:33:12Z",
-      "state": "open",
-      "ci_status": "pending",
+      "ci_status": "failure",
       "is_broken": true,
       "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:58Z"
+      "runtime_impact": "Dependabot bump caused CI failure: check-pr-status, check-pr-status.",
+      "failed_checks": [
+        "check-pr-status",
+        "check-pr-status"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: check-pr-status, check-pr-status",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T22:09:45Z",
+      "is_real_code_break": false,
+      "break_category": "ADMIN_LINT"
     },
     {
-      "id": "hashgraph-online_hol-guard_3252",
-      "repo": "hashgraph-online/hol-guard",
-      "pr_number": 3252,
-      "pr_url": "https://github.com/hashgraph-online/hol-guard/pull/3252",
-      "pr_title": "deps(pip): bump the pip-major group across 1 directory with 10 updates",
-      "stars": 764,
-      "package": "unknown",
-      "created_at": "2026-09-30T00:38:09Z",
+      "id": "chipsalliance_chisel_5505",
+      "repo": "chipsalliance/chisel",
+      "pr_number": 5505,
+      "pr_url": "https://github.com/chipsalliance/chisel/pull/5505",
+      "pr_title": "Bump serialize-javascript from 7.1.1 to 7.1.2 in /website",
+      "stars": 4806,
+      "package": "serialize-javascript",
+      "created_at": "2026-10-04T18:25:03Z",
       "state": "open",
-      "ci_status": "success",
+      "ci_status": "failure",
       "is_broken": true,
       "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:44Z"
+      "runtime_impact": "Dependabot bump caused CI failure: Check Labels, Check Labels, Check Labels.",
+      "failed_checks": [
+        "Check Labels",
+        "Check Labels",
+        "Check Labels"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Check Labels, Check Labels",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T18:30:51Z",
+      "is_real_code_break": false,
+      "break_category": "ADMIN_LINT"
     },
     {
-      "id": "awais-vteams_laravel-crud-generator_98",
-      "repo": "awais-vteams/laravel-crud-generator",
-      "pr_number": 98,
-      "pr_url": "https://github.com/awais-vteams/laravel-crud-generator/pull/98",
-      "pr_title": "Bump league/commonmark from 2.10.0 to 2.10.3",
-      "stars": 702,
-      "package": "league/commonmark",
-      "created_at": "2026-10-04T18:29:19Z",
-      "state": "open",
-      "ci_status": "pending",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:27Z"
-    },
-    {
-      "id": "penso_herdr-gpui_268",
-      "repo": "penso/herdr-gpui",
-      "pr_number": 268,
-      "pr_url": "https://github.com/penso/herdr-gpui/pull/268",
-      "pr_title": "chore: bump base64 from 0.22.1 to 0.23.1",
-      "stars": 579,
-      "package": "base64",
-      "created_at": "2026-10-04T18:25:41Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (0.22.1 -> 0.23.1) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:45Z"
-    },
-    {
-      "id": "penso_herdr-gpui_267",
-      "repo": "penso/herdr-gpui",
-      "pr_number": 267,
-      "pr_url": "https://github.com/penso/herdr-gpui/pull/267",
-      "pr_title": "chore: bump sysinfo from 0.31.4 to 0.39.6",
-      "stars": 579,
-      "package": "sysinfo",
-      "created_at": "2026-10-04T18:25:28Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (0.31.4 -> 0.39.6) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:47Z"
-    },
-    {
-      "id": "penso_herdr-gpui_266",
-      "repo": "penso/herdr-gpui",
-      "pr_number": 266,
-      "pr_url": "https://github.com/penso/herdr-gpui/pull/266",
-      "pr_title": "chore: bump rusqlite from 0.37.0 to 0.40.2",
-      "stars": 579,
-      "package": "rusqlite",
-      "created_at": "2026-10-04T18:25:20Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (0.37.0 -> 0.40.2) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:49Z"
-    },
-    {
-      "id": "sigstore_sigstore-python_1931",
-      "repo": "sigstore/sigstore-python",
-      "pr_number": 1931,
-      "pr_url": "https://github.com/sigstore/sigstore-python/pull/1931",
-      "pr_title": "build(deps): bump urllib3 from 2.7.0 to 2.8.0",
-      "stars": 334,
-      "package": "urllib3",
-      "created_at": "2026-10-04T18:27:00Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:41Z"
-    },
-    {
-      "id": "sigstore_sigstore-python_1930",
-      "repo": "sigstore/sigstore-python",
-      "pr_number": 1930,
-      "pr_url": "https://github.com/sigstore/sigstore-python/pull/1930",
-      "pr_title": "build(deps): bump urllib3 from 2.7.0 to 2.8.0 in /install",
-      "stars": 334,
-      "package": "urllib3",
-      "created_at": "2026-10-04T18:26:58Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:42Z"
-    },
-    {
-      "id": "devantler-tech_ksail_7500",
-      "repo": "devantler-tech/ksail",
-      "pr_number": 7500,
-      "pr_url": "https://github.com/devantler-tech/ksail/pull/7500",
-      "pr_title": "chore(deps): bump devantler-tech/.github/.github/workflows/scan-for-todo-comments.yaml from 4.9.1 to 6.0.1",
-      "stars": 166,
-      "package": "devantler-tech/.github/.github/workflows/scan-for-todo-comments.yaml",
-      "created_at": "2026-10-04T12:06:29Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (4.9.1 -> 6.0.1) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:34:02Z"
-    },
-    {
-      "id": "socialincome-san_public_3028",
-      "repo": "socialincome-san/public",
-      "pr_number": 3028,
-      "pr_url": "https://github.com/socialincome-san/public/pull/3028",
-      "pr_title": "chore(deps): bump @fastify/busboy from 3.2.0 to 3.2.2 in /website",
-      "stars": 156,
-      "package": "@fastify/busboy",
-      "created_at": "2026-10-03T02:02:51Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:40Z"
-    },
-    {
-      "id": "socialincome-san_public_3017",
-      "repo": "socialincome-san/public",
-      "pr_number": 3017,
-      "pr_url": "https://github.com/socialincome-san/public/pull/3017",
-      "pr_title": "chore(deps): bump dompurify from 3.4.15 to 3.4.16 in /website",
-      "stars": 156,
+      "id": "microsoft_agent-academy_3220",
+      "repo": "microsoft/agent-academy",
+      "pr_number": 3220,
+      "pr_url": "https://github.com/microsoft/agent-academy/pull/3220",
+      "pr_title": "chore(deps-dev): bump dompurify from 3.4.13 to 3.4.16",
+      "stars": 3489,
       "package": "dompurify",
-      "created_at": "2026-10-01T15:54:24Z",
+      "created_at": "2026-10-04T18:25:37Z",
       "state": "open",
-      "ci_status": "success",
+      "ci_status": "failure",
       "is_broken": true,
       "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:43Z"
+      "runtime_impact": "Dependabot bump caused CI failure: Lint markdown files.",
+      "failed_checks": [
+        "Lint markdown files"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Lint markdown files",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T18:30:46Z",
+      "is_real_code_break": false,
+      "break_category": "ADMIN_LINT"
     },
     {
-      "id": "socialincome-san_public_3006",
-      "repo": "socialincome-san/public",
-      "pr_number": 3006,
-      "pr_url": "https://github.com/socialincome-san/public/pull/3006",
-      "pr_title": "chore(deps-dev): bump ip-address from 10.3.1 to 10.7.3 in /website",
-      "stars": 156,
-      "package": "ip-address",
-      "created_at": "2026-09-29T00:00:04Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:44Z"
-    },
-    {
-      "id": "socialincome-san_public_3014",
-      "repo": "socialincome-san/public",
-      "pr_number": 3014,
-      "pr_url": "https://github.com/socialincome-san/public/pull/3014",
-      "pr_title": "chore(deps-dev): bump brace-expansion from 1.1.16 to 1.1.21 in /website",
-      "stars": 156,
-      "package": "brace-expansion",
-      "created_at": "2026-09-30T01:35:15Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:46Z"
-    },
-    {
-      "id": "IntelPython_dpnp_3086",
-      "repo": "IntelPython/dpnp",
-      "pr_number": 3086,
-      "pr_url": "https://github.com/IntelPython/dpnp/pull/3086",
-      "pr_title": "Bump the github-actions group with 2 updates",
-      "stars": 133,
+      "id": "fossasia_eventyay_6184",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6184,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6184",
+      "pr_title": "chore(deps): bump the tiptap group in /app/eventyay/webapp/video with 8 updates",
+      "stars": 1699,
       "package": "unknown",
-      "created_at": "2026-10-03T13:06:04Z",
+      "created_at": "2026-10-04T22:05:43Z",
       "state": "open",
-      "ci_status": "success",
+      "ci_status": "failure",
       "is_broken": true,
       "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:31Z"
+      "runtime_impact": "Dependabot bump caused CI failure: Sourcery review.",
+      "failed_checks": [
+        "Sourcery review"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Sourcery review",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T22:09:54Z",
+      "is_real_code_break": false,
+      "break_category": "ADMIN_LINT"
+    },
+    {
+      "id": "smartcontractkit_documentation_4272",
+      "repo": "smartcontractkit/documentation",
+      "pr_number": 4272,
+      "pr_url": "https://github.com/smartcontractkit/documentation/pull/4272",
+      "pr_title": "Bump path-to-regexp from 6.1.0 to 6.3.0",
+      "stars": 527,
+      "package": "path-to-regexp",
+      "created_at": "2026-10-04T22:07:59Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: sigscanner-check.",
+      "failed_checks": [
+        "sigscanner-check"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: sigscanner-check",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T22:09:50Z",
+      "is_real_code_break": false,
+      "break_category": "ADMIN_LINT"
     },
     {
       "id": "chartjs_Chart.js_12329",
@@ -984,7 +682,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:07:32Z"
+      "discovered_at": "2026-10-04T13:07:32Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "OI-wiki_OI-wiki_6996",
@@ -1003,7 +703,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:08:39Z"
+      "discovered_at": "2026-10-04T13:08:39Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "teng-lin_notebooklm-py_2470",
@@ -1022,7 +724,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:58Z"
+      "discovered_at": "2026-10-04T22:09:58Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "RayWangQvQ_BiliBiliToolPro_1201",
+      "repo": "RayWangQvQ/BiliBiliToolPro",
+      "pr_number": 1201,
+      "pr_url": "https://github.com/RayWangQvQ/BiliBiliToolPro/pull/1201",
+      "pr_title": "Bump xunit.runner.visualstudio from 3.1.5 to 4.0.0",
+      "stars": 8939,
+      "package": "xunit.runner.visualstudio",
+      "created_at": "2026-10-05T01:27:47Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (3.1.5 -> 4.0.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T01:28:43Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "mockoon_mockoon_2376",
@@ -1041,7 +766,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:07:19Z"
+      "discovered_at": "2026-10-04T13:07:19Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "OpenCoworkAI_open-codesign_469",
@@ -1060,7 +787,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:10:06Z"
+      "discovered_at": "2026-10-04T22:10:06Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "VueTorrent_VueTorrent_2941",
@@ -1079,7 +808,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:08:54Z"
+      "discovered_at": "2026-10-04T13:08:54Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "VueTorrent_VueTorrent_2945",
@@ -1098,7 +829,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:09:10Z"
+      "discovered_at": "2026-10-04T13:09:10Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "VueTorrent_VueTorrent_2942",
@@ -1117,7 +850,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:09:17Z"
+      "discovered_at": "2026-10-04T13:09:17Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "MaterializeInc_materialize_39539",
+      "repo": "MaterializeInc/materialize",
+      "pr_number": 39539,
+      "pr_url": "https://github.com/MaterializeInc/materialize/pull/39539",
+      "pr_title": "build(deps-dev): bump msw from 2.6.4 to 3.0.1 in /console",
+      "stars": 6380,
+      "package": "msw",
+      "created_at": "2026-10-04T22:07:27Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (2.6.4 -> 3.0.1) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T22:09:56Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "MaterializeInc_materialize_39540",
@@ -1136,7 +892,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:52Z"
+      "discovered_at": "2026-10-04T22:09:52Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "MaterializeInc_materialize_39490",
@@ -1155,7 +913,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:10:01Z"
+      "discovered_at": "2026-10-04T22:10:01Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "MaterializeInc_materialize_39538",
@@ -1174,7 +934,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:10:03Z"
+      "discovered_at": "2026-10-04T22:10:03Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "Chachamaru127_claude-code-harness_370",
+      "repo": "Chachamaru127/claude-code-harness",
+      "pr_number": 370,
+      "pr_url": "https://github.com/Chachamaru127/claude-code-harness/pull/370",
+      "pr_title": "chore(deps): bump @vercel/agent-eval from 1.4.0 to 2.4.0 in /benchmarks/breezing-bench/agent-eval",
+      "stars": 3149,
+      "package": "@vercel/agent-eval",
+      "created_at": "2026-10-05T01:24:31Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (1.4.0 -> 2.4.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T01:28:41Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "bestofjs_bestofjs_520",
@@ -1193,7 +976,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:44Z"
+      "discovered_at": "2026-10-04T18:30:44Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "spiceai_spiceai_14763",
@@ -1212,7 +997,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:37Z"
+      "discovered_at": "2026-10-04T13:15:37Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "owncloud_ocis_13063",
@@ -1231,7 +1018,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:43Z"
+      "discovered_at": "2026-10-04T22:09:43Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "fossasia_eventyay_6200",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6200,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6200",
+      "pr_title": "chore(deps): bump msgspec from 0.21.1 to 0.22.0 in /app",
+      "stars": 1699,
+      "package": "msgspec",
+      "created_at": "2026-10-04T22:08:06Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.21.1 -> 0.22.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T22:09:46Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6199",
@@ -1250,7 +1060,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:47Z"
+      "discovered_at": "2026-10-04T22:09:47Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6197",
@@ -1269,7 +1081,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:52Z"
+      "discovered_at": "2026-10-04T22:09:52Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6183",
@@ -1288,7 +1102,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:53Z"
+      "discovered_at": "2026-10-04T22:09:53Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6198",
@@ -1307,7 +1123,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:55Z"
+      "discovered_at": "2026-10-04T22:09:55Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6195",
@@ -1326,7 +1144,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:57Z"
+      "discovered_at": "2026-10-04T22:09:57Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6182",
@@ -1345,7 +1165,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:59Z"
+      "discovered_at": "2026-10-04T22:09:59Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6194",
@@ -1364,7 +1186,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:59Z"
+      "discovered_at": "2026-10-04T22:09:59Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fossasia_eventyay_6196",
@@ -1383,7 +1207,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:10:04Z"
+      "discovered_at": "2026-10-04T22:10:04Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "StuffAnThings_qbit_manage_1392",
@@ -1402,7 +1228,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T01:28:41Z"
+      "discovered_at": "2026-10-05T01:28:41Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "StuffAnThings_qbit_manage_1391",
@@ -1421,7 +1249,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T01:28:44Z"
+      "discovered_at": "2026-10-05T01:28:44Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "fussybeaver_bollard_807",
+      "repo": "fussybeaver/bollard",
+      "pr_number": 807,
+      "pr_url": "https://github.com/fussybeaver/bollard/pull/807",
+      "pr_title": "build(deps): bump sha2 from 0.10.9 to 0.11.0",
+      "stars": 1380,
+      "package": "sha2",
+      "created_at": "2026-09-17T07:33:12Z",
+      "state": "open",
+      "ci_status": "pending",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T14:33:58Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "fussybeaver_bollard_817",
@@ -1440,7 +1291,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:57Z"
+      "discovered_at": "2026-10-04T14:33:57Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "SkriptLang_Skript_8885",
@@ -1459,7 +1312,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:34Z"
+      "discovered_at": "2026-10-04T13:15:34Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "wolfi-dev_os_78754",
@@ -1478,7 +1333,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:59Z"
+      "discovered_at": "2026-10-04T14:33:59Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "wolfi-dev_os_78753",
@@ -1497,7 +1354,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:34:00Z"
+      "discovered_at": "2026-10-04T14:34:00Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "octokit_core.js_802",
@@ -1516,7 +1375,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:23Z"
+      "discovered_at": "2026-10-04T18:30:23Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "octokit_core.js_805",
@@ -1535,7 +1396,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:24Z"
+      "discovered_at": "2026-10-04T18:30:24Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "NVIDIA_cuda-quantum_5536",
@@ -1554,7 +1417,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:26Z"
+      "discovered_at": "2026-10-04T18:30:26Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "reuseman_flashcards-obsidian_243",
@@ -1573,7 +1438,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:56Z"
+      "discovered_at": "2026-10-04T14:33:56Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "tektoncd_dashboard_5284",
@@ -1592,7 +1459,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:48Z"
+      "discovered_at": "2026-10-04T22:09:48Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "swiftwave-org_swiftwave_1433",
@@ -1611,7 +1480,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:28Z"
+      "discovered_at": "2026-10-04T18:30:28Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "apisyouwonthate_openapi.tools_845",
@@ -1630,7 +1501,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:48Z"
+      "discovered_at": "2026-10-04T14:33:48Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "tschoffelen_react-native-map-link_362",
@@ -1649,7 +1522,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:27Z"
+      "discovered_at": "2026-10-04T13:15:27Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "tschoffelen_react-native-map-link_360",
@@ -1668,7 +1543,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:28Z"
+      "discovered_at": "2026-10-04T13:15:28Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "tschoffelen_react-native-map-link_361",
@@ -1687,7 +1564,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:33Z"
+      "discovered_at": "2026-10-04T13:15:33Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "DisnakeDev_disnake_1611",
@@ -1706,7 +1585,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:52Z"
+      "discovered_at": "2026-10-04T14:33:52Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "hashgraph-online_hol-guard_3252",
+      "repo": "hashgraph-online/hol-guard",
+      "pr_number": 3252,
+      "pr_url": "https://github.com/hashgraph-online/hol-guard/pull/3252",
+      "pr_title": "deps(pip): bump the pip-major group across 1 directory with 10 updates",
+      "stars": 764,
+      "package": "unknown",
+      "created_at": "2026-09-30T00:38:09Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T22:09:44Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "pdovhomilja_nextcrm-app_310",
@@ -1725,7 +1627,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:08:34Z"
+      "discovered_at": "2026-10-04T13:08:34Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "awais-vteams_laravel-crud-generator_98",
+      "repo": "awais-vteams/laravel-crud-generator",
+      "pr_number": 98,
+      "pr_url": "https://github.com/awais-vteams/laravel-crud-generator/pull/98",
+      "pr_title": "Bump league/commonmark from 2.10.0 to 2.10.3",
+      "stars": 702,
+      "package": "league/commonmark",
+      "created_at": "2026-10-04T18:29:19Z",
+      "state": "open",
+      "ci_status": "pending",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T18:30:27Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "shinyoshiaki_werift-webrtc_732",
@@ -1744,7 +1669,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:36Z"
+      "discovered_at": "2026-10-04T13:15:36Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "AtomGraph_LinkedDataHub_396",
@@ -1763,7 +1690,72 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:51Z"
+      "discovered_at": "2026-10-04T22:09:51Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "penso_herdr-gpui_268",
+      "repo": "penso/herdr-gpui",
+      "pr_number": 268,
+      "pr_url": "https://github.com/penso/herdr-gpui/pull/268",
+      "pr_title": "chore: bump base64 from 0.22.1 to 0.23.1",
+      "stars": 579,
+      "package": "base64",
+      "created_at": "2026-10-04T18:25:41Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.22.1 -> 0.23.1) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T18:30:45Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "penso_herdr-gpui_267",
+      "repo": "penso/herdr-gpui",
+      "pr_number": 267,
+      "pr_url": "https://github.com/penso/herdr-gpui/pull/267",
+      "pr_title": "chore: bump sysinfo from 0.31.4 to 0.39.6",
+      "stars": 579,
+      "package": "sysinfo",
+      "created_at": "2026-10-04T18:25:28Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.31.4 -> 0.39.6) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T18:30:47Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "penso_herdr-gpui_266",
+      "repo": "penso/herdr-gpui",
+      "pr_number": 266,
+      "pr_url": "https://github.com/penso/herdr-gpui/pull/266",
+      "pr_title": "chore: bump rusqlite from 0.37.0 to 0.40.2",
+      "stars": 579,
+      "package": "rusqlite",
+      "created_at": "2026-10-04T18:25:20Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.37.0 -> 0.40.2) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T18:30:49Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "penso_herdr-gpui_265",
@@ -1782,7 +1774,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:50Z"
+      "discovered_at": "2026-10-04T18:30:50Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "HDCharts_charts_644",
@@ -1801,7 +1795,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:53Z"
+      "discovered_at": "2026-10-04T14:33:53Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "IBM_mobx-react-router_402",
@@ -1820,7 +1816,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:08:21Z"
+      "discovered_at": "2026-10-04T13:08:21Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "flathub-infra_website_7105",
@@ -1839,7 +1837,51 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:45Z"
+      "discovered_at": "2026-10-04T13:15:45Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "sigstore_sigstore-python_1931",
+      "repo": "sigstore/sigstore-python",
+      "pr_number": 1931,
+      "pr_url": "https://github.com/sigstore/sigstore-python/pull/1931",
+      "pr_title": "build(deps): bump urllib3 from 2.7.0 to 2.8.0",
+      "stars": 334,
+      "package": "urllib3",
+      "created_at": "2026-10-04T18:27:00Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T18:30:41Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "sigstore_sigstore-python_1930",
+      "repo": "sigstore/sigstore-python",
+      "pr_number": 1930,
+      "pr_url": "https://github.com/sigstore/sigstore-python/pull/1930",
+      "pr_title": "build(deps): bump urllib3 from 2.7.0 to 2.8.0 in /install",
+      "stars": 334,
+      "package": "urllib3",
+      "created_at": "2026-10-04T18:26:58Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T18:30:42Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "StanMarek_ghost-complete_207",
@@ -1858,7 +1900,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:32Z"
+      "discovered_at": "2026-10-04T13:15:32Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "octokit_request.js_842",
@@ -1877,7 +1921,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:34Z"
+      "discovered_at": "2026-10-04T18:30:34Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "octokit_request.js_837",
@@ -1896,7 +1942,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:37Z"
+      "discovered_at": "2026-10-04T18:30:37Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "inference-gateway_inference-gateway_765",
@@ -1915,7 +1963,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:26Z"
+      "discovered_at": "2026-10-04T13:15:26Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "cdklabs_cdk-ecr-deployment_1396",
@@ -1934,7 +1984,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:46Z"
+      "discovered_at": "2026-10-04T14:33:46Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "cdklabs_cdk-ecr-deployment_1398",
@@ -1953,7 +2005,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:49Z"
+      "discovered_at": "2026-10-04T14:33:49Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "cdklabs_cdk-ecr-deployment_1402",
@@ -1972,7 +2026,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:50Z"
+      "discovered_at": "2026-10-04T14:33:50Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "sitepins_sitepins_39",
@@ -1991,7 +2047,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:35Z"
+      "discovered_at": "2026-10-04T13:15:35Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "shm11C3_HardwareVisualizer_2353",
@@ -2010,7 +2068,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:10:05Z"
+      "discovered_at": "2026-10-04T22:10:05Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "devantler-tech_ksail_7500",
+      "repo": "devantler-tech/ksail",
+      "pr_number": 7500,
+      "pr_url": "https://github.com/devantler-tech/ksail/pull/7500",
+      "pr_title": "chore(deps): bump devantler-tech/.github/.github/workflows/scan-for-todo-comments.yaml from 4.9.1 to 6.0.1",
+      "stars": 166,
+      "package": "devantler-tech/.github/.github/workflows/scan-for-todo-comments.yaml",
+      "created_at": "2026-10-04T12:06:29Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (4.9.1 -> 6.0.1) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T14:34:02Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "MaskingTechnology_jitar_827",
@@ -2029,7 +2110,93 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:22Z"
+      "discovered_at": "2026-10-04T18:30:22Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "socialincome-san_public_3028",
+      "repo": "socialincome-san/public",
+      "pr_number": 3028,
+      "pr_url": "https://github.com/socialincome-san/public/pull/3028",
+      "pr_title": "chore(deps): bump @fastify/busboy from 3.2.0 to 3.2.2 in /website",
+      "stars": 156,
+      "package": "@fastify/busboy",
+      "created_at": "2026-10-03T02:02:51Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T13:15:40Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "socialincome-san_public_3017",
+      "repo": "socialincome-san/public",
+      "pr_number": 3017,
+      "pr_url": "https://github.com/socialincome-san/public/pull/3017",
+      "pr_title": "chore(deps): bump dompurify from 3.4.15 to 3.4.16 in /website",
+      "stars": 156,
+      "package": "dompurify",
+      "created_at": "2026-10-01T15:54:24Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T13:15:43Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "socialincome-san_public_3006",
+      "repo": "socialincome-san/public",
+      "pr_number": 3006,
+      "pr_url": "https://github.com/socialincome-san/public/pull/3006",
+      "pr_title": "chore(deps-dev): bump ip-address from 10.3.1 to 10.7.3 in /website",
+      "stars": 156,
+      "package": "ip-address",
+      "created_at": "2026-09-29T00:00:04Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T13:15:44Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "socialincome-san_public_3014",
+      "repo": "socialincome-san/public",
+      "pr_number": 3014,
+      "pr_url": "https://github.com/socialincome-san/public/pull/3014",
+      "pr_title": "chore(deps-dev): bump brace-expansion from 1.1.16 to 1.1.21 in /website",
+      "stars": 156,
+      "package": "brace-expansion",
+      "created_at": "2026-09-30T01:35:15Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T13:15:46Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "PrzemekSkw_imagemagick-webui_115",
@@ -2048,7 +2215,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:38Z"
+      "discovered_at": "2026-10-04T18:30:38Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "mrgrain_cdk-esbuild_1862",
@@ -2067,7 +2236,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:51Z"
+      "discovered_at": "2026-10-04T14:33:51Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "Pokled_nodyx_797",
@@ -2086,7 +2257,30 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T01:28:42Z"
+      "discovered_at": "2026-10-05T01:28:42Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
+    },
+    {
+      "id": "IntelPython_dpnp_3086",
+      "repo": "IntelPython/dpnp",
+      "pr_number": 3086,
+      "pr_url": "https://github.com/IntelPython/dpnp/pull/3086",
+      "pr_title": "Bump the github-actions group with 2 updates",
+      "stars": 133,
+      "package": "unknown",
+      "created_at": "2026-10-03T13:06:04Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T18:30:31Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "aws-solutions-library-samples_live-streaming-on-aws-with-amazon-s3_61",
@@ -2105,7 +2299,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:34:01Z"
+      "discovered_at": "2026-10-04T14:34:01Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     },
     {
       "id": "jvondermarck_dinosaur-exploder_500",
@@ -2124,7 +2320,9 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:30Z"
+      "discovered_at": "2026-10-04T13:15:30Z",
+      "is_real_code_break": false,
+      "break_category": "ROUTINE_UPDATE"
     }
   ]
 }

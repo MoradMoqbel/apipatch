@@ -532,8 +532,11 @@
           <button class="filter-btn active" id="modeBtnAll" onclick="setModeFilter('all')">
             🌐 All Active Leads (<span id="countModeAll">0</span>)
           </button>
-          <button class="filter-btn" id="modeBtnBroken" onclick="setModeFilter('broken')" style="color: #f87171; border-color: rgba(239, 68, 68, 0.4);">
-            🔥 Fatal CI Failures Only (<span id="countModeBroken">0</span>)
+          <button class="filter-btn" id="modeBtnReal" onclick="setModeFilter('real')" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: #ef4444; font-weight: 700;">
+            🎯 Verified True Code Breaks (<span id="countModeReal">0</span>)
+          </button>
+          <button class="filter-btn" id="modeBtnBroken" onclick="setModeFilter('broken')" style="color: #fbbf24; border-color: rgba(245, 158, 11, 0.4);">
+            ⚠️ All CI Failures (incl. Admin/Lint) (<span id="countModeBroken">0</span>)
           </button>
           <button class="filter-btn" id="modeBtnFix" onclick="setModeFilter('fix')" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);">
             ⚡ Code Fix / AST Patch Available (<span id="countModeFix">0</span>)
@@ -601,6 +604,7 @@
     function setModeFilter(mode) {
       currentMode = mode;
       document.getElementById('modeBtnAll').classList.toggle('active', mode === 'all');
+      document.getElementById('modeBtnReal').classList.toggle('active', mode === 'real');
       document.getElementById('modeBtnBroken').classList.toggle('active', mode === 'broken');
       document.getElementById('modeBtnFix').classList.toggle('active', mode === 'fix');
       applyFilters();
@@ -608,7 +612,9 @@
 
     function applyFilters() {
       let filtered = allLeads;
-      if (currentMode === 'broken') {
+      if (currentMode === 'real') {
+        filtered = filtered.filter(l => l.is_real_code_break === true);
+      } else if (currentMode === 'broken') {
         filtered = filtered.filter(l => l.ci_status === 'failure');
       } else if (currentMode === 'fix') {
         filtered = filtered.filter(l => l.affected_files && l.affected_files.length > 0);
@@ -637,6 +643,7 @@
 
         // Mode Counts
         document.getElementById('countModeAll').textContent = allLeads.length;
+        document.getElementById('countModeReal').textContent = allLeads.filter(l => l.is_real_code_break).length;
         document.getElementById('countModeBroken').textContent = allLeads.filter(l => l.ci_status === 'failure').length;
         document.getElementById('countModeFix').textContent = allLeads.filter(l => l.affected_files && l.affected_files.length > 0).length;
 
@@ -674,6 +681,11 @@
 
         const createdDate = l.created_at ? new Date(l.created_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Today';
 
+        const breakBadge = l.is_real_code_break ?
+          '<span style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; font-size: 11px; font-family: var(--font-mono); font-weight: 700; padding: 2px 7px; border-radius: 4px;">🔥 TRUE CODE BREAK</span>' :
+          (l.break_category === 'ADMIN_LINT' ?
+          '<span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 11px; font-family: var(--font-mono); font-weight: 600; padding: 2px 7px; border-radius: 4px;">⚠️ ADMIN / LINT CHECK</span>' : '');
+
         row.innerHTML = `
           <div class="lead-top">
             <div>
@@ -683,6 +695,7 @@
                 </a>
                 <span class="star-badge">★ ${l.stars} Stars</span>
                 <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; font-family: var(--font-mono); font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">● OPEN PR</span>
+                ${breakBadge}
                 <span style="color: var(--text-dim); font-size: 11px; font-family: var(--font-mono);">${createdDate}</span>
               </div>
               <div class="pr-title">#${l.pr_number}: ${l.pr_title}</div>
