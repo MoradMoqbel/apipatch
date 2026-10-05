@@ -5,6 +5,136 @@
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
   "leads": [
     {
+      "id": "shopware_frontends_2809",
+      "repo": "shopware/frontends",
+      "pr_number": 2809,
+      "pr_url": "https://github.com/shopware/frontends/pull/2809",
+      "pr_title": "chore(deps): bump axios from 1.19.0 to 1.20.0",
+      "stars": 229,
+      "package": "axios",
+      "created_at": "2026-10-04T18:26:44Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Build, Templates manifest, Lint.",
+      "failed_checks": [
+        "Build",
+        "Templates manifest",
+        "Lint",
+        "Test",
+        "Check audit",
+        "Build examples"
+      ],
+      "affected_files": [
+        {
+          "file": "packages/api-client/src/index.ts",
+          "line": 15,
+          "call": "import { AxiosError } from 'axios'; // Axios 1.20 stricter request config generics",
+          "fix": "import type { AxiosError, InternalAxiosRequestConfig } from 'axios';"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T18:30:40Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH",
+      "patch_type": "AST_CODE_REWRITE"
+    },
+    {
+      "id": "fabriziosalmi_wildbox_667",
+      "repo": "fabriziosalmi/wildbox",
+      "pr_number": 667,
+      "pr_url": "https://github.com/fabriziosalmi/wildbox/pull/667",
+      "pr_title": "build(deps): bump zod from 3.25.76 to 4.6.5 in /open-security-dashboard",
+      "stars": 134,
+      "package": "zod",
+      "created_at": "2026-10-04T07:53:12Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Zod v4 schema syntax deprecations detonated Playwright E2E and dashboard type checking (2 failing CI checks).",
+      "failed_checks": [
+        "Dashboard Lint / Format / Types (Playwright CI)",
+        "E2E Tests (Playwright)"
+      ],
+      "affected_files": [
+        {
+          "file": "open-security-dashboard/src/lib/tool-schema.ts",
+          "line": 316,
+          "call": "let n = z.number({ invalid_type_error: 'Enter a number' }).finite('Enter a number')",
+          "fix": "let n = z.number({ error: 'Enter a number' }).finite('Enter a number')"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T07:53:12Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH",
+      "patch_type": "AST_CODE_REWRITE"
+    },
+    {
+      "id": "VueTorrent_VueTorrent_2944",
+      "repo": "VueTorrent/VueTorrent",
+      "pr_number": 2944,
+      "pr_url": "https://github.com/VueTorrent/VueTorrent/pull/2944",
+      "pr_title": "chore(deps-dev): bump @pinia/testing from 1.0.3 to 2.0.1",
+      "stars": 6982,
+      "package": "@pinia/testing",
+      "created_at": "2026-10-02T23:33:41Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: test.",
+      "failed_checks": [
+        "test"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 36,
+          "call": "\"pinia\": \"^3.0.4\"  // Incompatible peer dependency with @pinia/testing v2.x",
+          "fix": "\"pinia\": \"^4.0.3\"  // Bump core pinia package in tandem to resolve CI test failure"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T13:09:14Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH",
+      "patch_type": "PEER_DEPENDENCY_ALIGN"
+    },
+    {
+      "id": "VueTorrent_VueTorrent_2943",
+      "repo": "VueTorrent/VueTorrent",
+      "pr_number": 2943,
+      "pr_url": "https://github.com/VueTorrent/VueTorrent/pull/2943",
+      "pr_title": "chore(deps): bump pinia from 3.0.4 to 4.0.3",
+      "stars": 6982,
+      "package": "pinia",
+      "created_at": "2026-10-02T23:33:31Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: test.",
+      "failed_checks": [
+        "test"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 48,
+          "call": "\"@pinia/testing\": \"^1.0.3\"  // Incompatible peer dependency with Pinia v4.x",
+          "fix": "\"@pinia/testing\": \"^2.0.1\"  // Align peer dependency to resolve CI test failure"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T13:09:35Z",
+      "is_real_code_break": true,
+      "break_category": "CODE_CRASH",
+      "patch_type": "PEER_DEPENDENCY_ALIGN"
+    },
+    {
       "id": "OI-wiki_OI-wiki_6995",
       "repo": "OI-wiki/OI-wiki",
       "pr_number": 6995,
@@ -32,7 +162,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:09:56Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "lucide-icons_lucide_4959",
@@ -67,67 +198,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:54Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
-    },
-    {
-      "id": "VueTorrent_VueTorrent_2944",
-      "repo": "VueTorrent/VueTorrent",
-      "pr_number": 2944,
-      "pr_url": "https://github.com/VueTorrent/VueTorrent/pull/2944",
-      "pr_title": "chore(deps-dev): bump @pinia/testing from 1.0.3 to 2.0.1",
-      "stars": 6982,
-      "package": "@pinia/testing",
-      "created_at": "2026-10-02T23:33:41Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: test.",
-      "failed_checks": [
-        "test"
-      ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 36,
-          "call": "\"pinia\": \"^3.0.4\"  // Incompatible peer dependency with @pinia/testing v2.x",
-          "fix": "\"pinia\": \"^4.0.3\"  // Bump core pinia package in tandem to resolve CI test failure"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T13:09:14Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
-    },
-    {
-      "id": "VueTorrent_VueTorrent_2943",
-      "repo": "VueTorrent/VueTorrent",
-      "pr_number": 2943,
-      "pr_url": "https://github.com/VueTorrent/VueTorrent/pull/2943",
-      "pr_title": "chore(deps): bump pinia from 3.0.4 to 4.0.3",
-      "stars": 6982,
-      "package": "pinia",
-      "created_at": "2026-10-02T23:33:31Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: test.",
-      "failed_checks": [
-        "test"
-      ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 48,
-          "call": "\"@pinia/testing\": \"^1.0.3\"  // Incompatible peer dependency with Pinia v4.x",
-          "fix": "\"@pinia/testing\": \"^2.0.1\"  // Align peer dependency to resolve CI test failure"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T13:09:35Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "ColeMurray_background-agents_2285",
@@ -163,7 +235,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:55Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "ferronweb_ferron_907",
@@ -220,7 +293,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:55Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "fossasia_eventyay_6193",
@@ -251,7 +325,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:10:02Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "moq-dev_moq_4793",
@@ -284,7 +359,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:59Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "smartcontractkit_documentation_4271",
@@ -316,7 +392,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:49Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "StanMarek_ghost-complete_206",
@@ -350,7 +427,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:15:39Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "ecency_vision-mobile_3563",
@@ -380,42 +458,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:56Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
-    },
-    {
-      "id": "shopware_frontends_2809",
-      "repo": "shopware/frontends",
-      "pr_number": 2809,
-      "pr_url": "https://github.com/shopware/frontends/pull/2809",
-      "pr_title": "chore(deps): bump axios from 1.19.0 to 1.20.0",
-      "stars": 229,
-      "package": "axios",
-      "created_at": "2026-10-04T18:26:44Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Build, Templates manifest, Lint.",
-      "failed_checks": [
-        "Build",
-        "Templates manifest",
-        "Lint",
-        "Test",
-        "Check audit",
-        "Build examples"
-      ],
-      "affected_files": [
-        {
-          "file": "packages/api-client/src/index.ts",
-          "line": 15,
-          "call": "import { AxiosError } from 'axios'; // Axios 1.20 stricter request config generics",
-          "fix": "import type { AxiosError, InternalAxiosRequestConfig } from 'axios';"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T18:30:40Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "timescale_rsigma_494",
@@ -447,7 +491,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:29Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "timescale_rsigma_495",
@@ -479,38 +524,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:32Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
-    },
-    {
-      "id": "fabriziosalmi_wildbox_667",
-      "repo": "fabriziosalmi/wildbox",
-      "pr_number": 667,
-      "pr_url": "https://github.com/fabriziosalmi/wildbox/pull/667",
-      "pr_title": "build(deps): bump zod from 3.25.76 to 4.6.5 in /open-security-dashboard",
-      "stars": 134,
-      "package": "zod",
-      "created_at": "2026-10-04T07:53:12Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Zod v4 schema syntax deprecations detonated Playwright E2E and dashboard type checking (2 failing CI checks).",
-      "failed_checks": [
-        "Dashboard Lint / Format / Types (Playwright CI)",
-        "E2E Tests (Playwright)"
-      ],
-      "affected_files": [
-        {
-          "file": "open-security-dashboard/src/lib/tool-schema.ts",
-          "line": 316,
-          "call": "let n = z.number({ invalid_type_error: 'Enter a number' }).finite('Enter a number')",
-          "fix": "let n = z.number({ error: 'Enter a number' }).finite('Enter a number')"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-04T07:53:12Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH"
+      "break_category": "CODE_CRASH",
+      "patch_type": "MANIFEST_PIN"
     },
     {
       "id": "strapi_strapi_27852",
@@ -541,7 +556,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:45Z",
       "is_real_code_break": false,
-      "break_category": "ADMIN_LINT"
+      "break_category": "ADMIN_LINT",
+      "patch_type": "WORKFLOW_PATCH"
     },
     {
       "id": "chipsalliance_chisel_5505",
@@ -573,7 +589,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:51Z",
       "is_real_code_break": false,
-      "break_category": "ADMIN_LINT"
+      "break_category": "ADMIN_LINT",
+      "patch_type": "WORKFLOW_PATCH"
     },
     {
       "id": "microsoft_agent-academy_3220",
@@ -603,7 +620,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:46Z",
       "is_real_code_break": false,
-      "break_category": "ADMIN_LINT"
+      "break_category": "ADMIN_LINT",
+      "patch_type": "WORKFLOW_PATCH"
     },
     {
       "id": "fossasia_eventyay_6184",
@@ -633,7 +651,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:54Z",
       "is_real_code_break": false,
-      "break_category": "ADMIN_LINT"
+      "break_category": "ADMIN_LINT",
+      "patch_type": "WORKFLOW_PATCH"
     },
     {
       "id": "smartcontractkit_documentation_4272",
@@ -663,7 +682,8 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:50Z",
       "is_real_code_break": false,
-      "break_category": "ADMIN_LINT"
+      "break_category": "ADMIN_LINT",
+      "patch_type": "WORKFLOW_PATCH"
     },
     {
       "id": "chartjs_Chart.js_12329",
@@ -684,7 +704,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:07:32Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "OI-wiki_OI-wiki_6996",
@@ -705,7 +726,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:08:39Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "teng-lin_notebooklm-py_2470",
@@ -726,7 +748,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:58Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "RayWangQvQ_BiliBiliToolPro_1201",
@@ -747,7 +770,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T01:28:43Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "mockoon_mockoon_2376",
@@ -768,7 +792,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:07:19Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "OpenCoworkAI_open-codesign_469",
@@ -789,7 +814,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:10:06Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "VueTorrent_VueTorrent_2941",
@@ -810,7 +836,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:08:54Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "VueTorrent_VueTorrent_2945",
@@ -831,7 +858,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:09:10Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "VueTorrent_VueTorrent_2942",
@@ -852,7 +880,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:09:17Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "MaterializeInc_materialize_39539",
@@ -873,7 +902,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:56Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "MaterializeInc_materialize_39540",
@@ -894,7 +924,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:52Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "MaterializeInc_materialize_39490",
@@ -915,7 +946,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:10:01Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "MaterializeInc_materialize_39538",
@@ -936,7 +968,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:10:03Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "Chachamaru127_claude-code-harness_370",
@@ -957,7 +990,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T01:28:41Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "bestofjs_bestofjs_520",
@@ -978,7 +1012,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:44Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "spiceai_spiceai_14763",
@@ -999,7 +1034,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:37Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "owncloud_ocis_13063",
@@ -1020,7 +1056,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:43Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6200",
@@ -1041,7 +1078,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:46Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6199",
@@ -1062,7 +1100,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:47Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6197",
@@ -1083,7 +1122,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:52Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6183",
@@ -1104,7 +1144,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:53Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6198",
@@ -1125,7 +1166,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:55Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6195",
@@ -1146,7 +1188,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:57Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6182",
@@ -1167,7 +1210,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:59Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6194",
@@ -1188,7 +1232,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:59Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fossasia_eventyay_6196",
@@ -1209,7 +1254,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:10:04Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "StuffAnThings_qbit_manage_1392",
@@ -1230,7 +1276,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T01:28:41Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "StuffAnThings_qbit_manage_1391",
@@ -1251,7 +1298,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T01:28:44Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fussybeaver_bollard_807",
@@ -1272,7 +1320,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:58Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "fussybeaver_bollard_817",
@@ -1293,7 +1342,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:57Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "SkriptLang_Skript_8885",
@@ -1314,7 +1364,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:34Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "wolfi-dev_os_78754",
@@ -1335,7 +1386,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:59Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "wolfi-dev_os_78753",
@@ -1356,7 +1408,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:34:00Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "octokit_core.js_802",
@@ -1377,7 +1430,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:23Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "octokit_core.js_805",
@@ -1398,7 +1452,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:24Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "NVIDIA_cuda-quantum_5536",
@@ -1419,7 +1474,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:26Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "reuseman_flashcards-obsidian_243",
@@ -1440,7 +1496,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:56Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "tektoncd_dashboard_5284",
@@ -1461,7 +1518,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:48Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "swiftwave-org_swiftwave_1433",
@@ -1482,7 +1540,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:28Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "apisyouwonthate_openapi.tools_845",
@@ -1503,7 +1562,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:48Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "tschoffelen_react-native-map-link_362",
@@ -1524,7 +1584,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:27Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "tschoffelen_react-native-map-link_360",
@@ -1545,7 +1606,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:28Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "tschoffelen_react-native-map-link_361",
@@ -1566,7 +1628,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:33Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "DisnakeDev_disnake_1611",
@@ -1587,7 +1650,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:52Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "hashgraph-online_hol-guard_3252",
@@ -1608,7 +1672,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:44Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "pdovhomilja_nextcrm-app_310",
@@ -1629,7 +1694,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:08:34Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "awais-vteams_laravel-crud-generator_98",
@@ -1650,7 +1716,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:27Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "shinyoshiaki_werift-webrtc_732",
@@ -1671,7 +1738,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:36Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "AtomGraph_LinkedDataHub_396",
@@ -1692,7 +1760,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:09:51Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "penso_herdr-gpui_268",
@@ -1713,7 +1782,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:45Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "penso_herdr-gpui_267",
@@ -1734,7 +1804,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:47Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "penso_herdr-gpui_266",
@@ -1755,7 +1826,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:49Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "penso_herdr-gpui_265",
@@ -1776,7 +1848,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:50Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "HDCharts_charts_644",
@@ -1797,7 +1870,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:53Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "IBM_mobx-react-router_402",
@@ -1818,7 +1892,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:08:21Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "flathub-infra_website_7105",
@@ -1839,7 +1914,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:45Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "sigstore_sigstore-python_1931",
@@ -1860,7 +1936,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:41Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "sigstore_sigstore-python_1930",
@@ -1881,7 +1958,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:42Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "StanMarek_ghost-complete_207",
@@ -1902,7 +1980,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:32Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "octokit_request.js_842",
@@ -1923,7 +2002,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:34Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "octokit_request.js_837",
@@ -1944,7 +2024,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:37Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "inference-gateway_inference-gateway_765",
@@ -1965,7 +2046,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:26Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "cdklabs_cdk-ecr-deployment_1396",
@@ -1986,7 +2068,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:46Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "cdklabs_cdk-ecr-deployment_1398",
@@ -2007,7 +2090,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:49Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "cdklabs_cdk-ecr-deployment_1402",
@@ -2028,7 +2112,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:50Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "sitepins_sitepins_39",
@@ -2049,7 +2134,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:35Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "shm11C3_HardwareVisualizer_2353",
@@ -2070,7 +2156,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:10:05Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "devantler-tech_ksail_7500",
@@ -2091,7 +2178,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:34:02Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "MaskingTechnology_jitar_827",
@@ -2112,7 +2200,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:22Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "socialincome-san_public_3028",
@@ -2133,7 +2222,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:40Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "socialincome-san_public_3017",
@@ -2154,7 +2244,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:43Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "socialincome-san_public_3006",
@@ -2175,7 +2266,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:44Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "socialincome-san_public_3014",
@@ -2196,7 +2288,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:46Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "PrzemekSkw_imagemagick-webui_115",
@@ -2217,7 +2310,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:38Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "mrgrain_cdk-esbuild_1862",
@@ -2238,7 +2332,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:51Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "Pokled_nodyx_797",
@@ -2259,7 +2354,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T01:28:42Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "IntelPython_dpnp_3086",
@@ -2280,7 +2376,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:31Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "aws-solutions-library-samples_live-streaming-on-aws-with-amazon-s3_61",
@@ -2301,7 +2398,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:34:01Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     },
     {
       "id": "jvondermarck_dinosaur-exploder_500",
@@ -2322,7 +2420,8 @@
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:30Z",
       "is_real_code_break": false,
-      "break_category": "ROUTINE_UPDATE"
+      "break_category": "ROUTINE_UPDATE",
+      "patch_type": "NONE"
     }
   ]
 }

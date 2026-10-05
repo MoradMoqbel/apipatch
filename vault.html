@@ -686,16 +686,26 @@
           (l.break_category === 'ADMIN_LINT' ?
           '<span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 11px; font-family: var(--font-mono); font-weight: 600; padding: 2px 7px; border-radius: 4px;">⚠️ ADMIN / LINT CHECK</span>' : '');
 
+        let patchTypeBadge = '';
+        if (l.patch_type === 'AST_CODE_REWRITE') {
+          patchTypeBadge = '<span style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; font-size: 11px; font-family: var(--font-mono); font-weight: 700; padding: 2px 7px; border-radius: 4px;">⚡ AST CODE REWRITE</span>';
+        } else if (l.patch_type === 'PEER_DEPENDENCY_ALIGN') {
+          patchTypeBadge = '<span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; font-size: 11px; font-family: var(--font-mono); font-weight: 700; padding: 2px 7px; border-radius: 4px;">🔗 PEER DEP ALIGN</span>';
+        } else if (l.patch_type === 'MANIFEST_PIN') {
+          patchTypeBadge = '<span style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #64748b; font-size: 11px; font-family: var(--font-mono); font-weight: 600; padding: 2px 7px; border-radius: 4px;">📌 MANIFEST PIN</span>';
+        }
+
         row.innerHTML = `
           <div class="lead-top">
             <div>
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
                 <a href="${l.pr_url}" target="_blank" rel="noopener" class="repo-link">
                   <span>${l.repo}</span>
                 </a>
                 <span class="star-badge">★ ${l.stars} Stars</span>
                 <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; font-family: var(--font-mono); font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">● OPEN PR</span>
                 ${breakBadge}
+                ${patchTypeBadge}
                 <span style="color: var(--text-dim); font-size: 11px; font-family: var(--font-mono);">${createdDate}</span>
               </div>
               <div class="pr-title">#${l.pr_number}: ${l.pr_title}</div>
