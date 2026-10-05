@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-05T05:53:54Z",
+  "updated_at": "2026-10-05T07:37:25Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
@@ -30,14 +30,14 @@
         {
           "file": "packages/api-client/src/index.ts",
           "line": 15,
-          "call": "import { AxiosError } from 'axios'; // Axios 1.20 stricter request config generics",
+          "call": "import { AxiosError } from 'axios';",
           "fix": "import type { AxiosError, InternalAxiosRequestConfig } from 'axios';"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:40Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "break_category": "AST_CODE_BREAK",
       "patch_type": "AST_CODE_REWRITE"
     },
     {
@@ -69,7 +69,7 @@
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T07:53:12Z",
       "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "break_category": "AST_CODE_BREAK",
       "patch_type": "AST_CODE_REWRITE"
     },
     {
@@ -93,14 +93,14 @@
         {
           "file": "package.json",
           "line": 36,
-          "call": "\"pinia\": \"^3.0.4\"  // Incompatible peer dependency with @pinia/testing v2.x",
+          "call": "\"pinia\": \"^3.0.4\"",
           "fix": "\"pinia\": \"^4.0.3\"  // Bump core pinia package in tandem to resolve CI test failure"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:09:14Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "PEER_CONFLICT",
       "patch_type": "PEER_DEPENDENCY_ALIGN"
     },
     {
@@ -124,14 +124,14 @@
         {
           "file": "package.json",
           "line": 48,
-          "call": "\"@pinia/testing\": \"^1.0.3\"  // Incompatible peer dependency with Pinia v4.x",
+          "call": "\"@pinia/testing\": \"^1.0.3\"",
           "fix": "\"@pinia/testing\": \"^2.0.1\"  // Align peer dependency to resolve CI test failure"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:09:35Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "PEER_CONFLICT",
       "patch_type": "PEER_DEPENDENCY_ALIGN"
     },
     {
@@ -161,8 +161,8 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:09:56Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -172,7 +172,7 @@
       "pr_url": "https://github.com/lucide-icons/lucide/pull/4959",
       "pr_title": "chore(deps): bump the solid-deps group across 1 directory with 6 updates",
       "stars": 24846,
-      "package": "unknown",
+      "package": "solid-js",
       "created_at": "2026-10-04T14:29:52Z",
       "state": "open",
       "ci_status": "failure",
@@ -191,14 +191,14 @@
         {
           "file": "packages/lucide-solid/package.json",
           "line": 28,
-          "call": "\"solid-js\": \"^1.8.0\"  // Solid group bump broke reactivity type definitions in component export",
+          "call": "\"solid-js\": \"^1.8.0\"",
           "fix": "\"solid-js\": \"^1.9.0\"  // Update JSX element factory types and companion solid runtime"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:54Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -234,8 +234,8 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:55Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -286,14 +286,14 @@
         {
           "file": "Cargo.toml",
           "line": 24,
-          "call": "num-bigint = \"0.5.1\"  // Trait ToPrimitive breaking signature in target builds",
+          "call": "num-bigint = \"0.5.1\"",
           "fix": "num-bigint = \"0.4.8\"  // Pin to stable 0.4.x API or update ToPrimitive calls"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:55Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -318,14 +318,14 @@
         {
           "file": "webapp/video/package.json",
           "line": 22,
-          "call": "\"globals\": \"17.13.0\"  // Broke Video build (Vite) bundle syntax",
+          "call": "\"globals\": \"17.13.0\"",
           "fix": "\"globals\": \"17.12.0\"  // Revert globals or update Vite define plugin configuration"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:10:02Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -358,8 +358,8 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:59Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -391,8 +391,8 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:49Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -426,8 +426,8 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:15:39Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -451,14 +451,14 @@
         {
           "file": "package.json",
           "line": 35,
-          "call": "\"axios\": \"1.20.0\"  // Broke React Native iOS build linking and adapter",
+          "call": "\"axios\": \"1.20.0\"",
           "fix": "\"axios\": \"1.18.0\"  // Pin axios to 1.18.x compatible with React Native Hermes"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:56Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -484,14 +484,14 @@
         {
           "file": "Cargo.toml",
           "line": 31,
-          "call": "yamlpatch bump requires Rust MSRV >= 1.96, current project MSRV is 1.95.0",
-          "fix": "Pin yamlpatch or upgrade repository rust-toolchain.toml to 1.96.0"
+          "call": "yamlpatch = \"1.30.1\"",
+          "fix": "yamlpatch = \"1.26.1\"  # Pin to MSRV 1.95 compatible release"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:29Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     },
     {
@@ -517,14 +517,14 @@
         {
           "file": "Cargo.toml",
           "line": 31,
-          "call": "yamlpath bump requires Rust MSRV >= 1.96, current project MSRV is 1.95.0",
-          "fix": "Pin yamlpath or upgrade repository rust-toolchain.toml to 1.96.0"
+          "call": "yamlpath = \"1.30.1\"",
+          "fix": "yamlpath = \"1.27.0\"  # Pin to MSRV 1.95 compatible release"
         }
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:32Z",
-      "is_real_code_break": true,
-      "break_category": "CODE_CRASH",
+      "is_real_code_break": false,
+      "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
     }
   ]
