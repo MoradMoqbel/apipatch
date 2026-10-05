@@ -11,6 +11,7 @@ import json
 import socket
 import argparse
 import time
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 try:
@@ -414,7 +415,12 @@ def main():
                 for r in sweep_results:
                     merged_leads_dict[r["id"]] = r
 
-                all_leads = list(merged_leads_dict.values())
+                # Strictly prune leads older than 30 days
+                cutoff_date = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
+                all_leads = [
+                    l for l in merged_leads_dict.values()
+                    if (l.get("created_at") or "")[:10] >= cutoff_date
+                ]
                 all_leads.sort(key=lambda x: (0 if x.get("is_broken") else 1, -x.get("stars", 0)))
 
                 with open(out_path, "w", encoding="utf-8") as f:

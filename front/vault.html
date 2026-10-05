@@ -527,6 +527,19 @@
       </div>
 
       <div class="leads-section">
+        <!-- Quick View Mode Filter -->
+        <div style="display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap;">
+          <button class="filter-btn active" id="modeBtnAll" onclick="setModeFilter('all')">
+            🌐 All Active Leads (<span id="countModeAll">0</span>)
+          </button>
+          <button class="filter-btn" id="modeBtnBroken" onclick="setModeFilter('broken')" style="color: #f87171; border-color: rgba(239, 68, 68, 0.4);">
+            🔥 Fatal CI Failures Only (<span id="countModeBroken">0</span>)
+          </button>
+          <button class="filter-btn" id="modeBtnFix" onclick="setModeFilter('fix')" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);">
+            ⚡ Code Fix / AST Patch Available (<span id="countModeFix">0</span>)
+          </button>
+        </div>
+
         <div class="leads-header">
           <div class="leads-title">
             <span>Verified 100+ Star Repositories with Open Breaking PRs</span>
@@ -582,6 +595,30 @@
     });
 
     let allLeads = [];
+    let currentMode = 'all';
+    let currentPkg = 'all';
+
+    function setModeFilter(mode) {
+      currentMode = mode;
+      document.getElementById('modeBtnAll').classList.toggle('active', mode === 'all');
+      document.getElementById('modeBtnBroken').classList.toggle('active', mode === 'broken');
+      document.getElementById('modeBtnFix').classList.toggle('active', mode === 'fix');
+      applyFilters();
+    }
+
+    function applyFilters() {
+      let filtered = allLeads;
+      if (currentMode === 'broken') {
+        filtered = filtered.filter(l => l.ci_status === 'failure');
+      } else if (currentMode === 'fix') {
+        filtered = filtered.filter(l => l.affected_files && l.affected_files.length > 0);
+      }
+
+      if (currentPkg !== 'all') {
+        filtered = filtered.filter(l => l.package && l.package.toLowerCase() === currentPkg.toLowerCase());
+      }
+      renderLeads(filtered);
+    }
 
     async function loadVaultData() {
       try {
@@ -598,8 +635,13 @@
           document.getElementById('metricLastSweep').textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
 
+        // Mode Counts
+        document.getElementById('countModeAll').textContent = allLeads.length;
+        document.getElementById('countModeBroken').textContent = allLeads.filter(l => l.ci_status === 'failure').length;
+        document.getElementById('countModeFix').textContent = allLeads.filter(l => l.affected_files && l.affected_files.length > 0).length;
+
         renderFilters(allLeads);
-        renderLeads(allLeads);
+        applyFilters();
       } catch (err) {
         console.error('Error fetching vault data:', err);
       }
@@ -689,12 +731,8 @@
         btn.addEventListener('click', () => {
           container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          const filter = btn.dataset.filter;
-          if (filter === 'all') {
-            renderLeads(allLeads);
-          } else {
-            renderLeads(allLeads.filter(l => l.package && l.package.toLowerCase() === filter.toLowerCase()));
-          }
+          currentPkg = btn.dataset.filter;
+          applyFilters();
         });
       });
     }

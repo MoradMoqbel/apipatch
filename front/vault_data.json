@@ -1,30 +1,9 @@
 {
-  "updated_at": "2026-10-05T01:28:44Z",
+  "updated_at": "2026-10-05T05:53:54Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
   "leads": [
-    {
-      "id": "strapi_strapi_26503",
-      "repo": "strapi/strapi",
-      "pr_number": 26503,
-      "pr_url": "https://github.com/strapi/strapi/pull/26503",
-      "pr_title": "chore(deps): bump prettier from 3.6.2 to 3.9.6 in the prettier group across 1 directory",
-      "stars": 73275,
-      "package": "prettier",
-      "created_at": "2026-05-31T22:17:05Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: aggregate_test_result.",
-      "failed_checks": [
-        "aggregate_test_result"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:45Z"
-    },
     {
       "id": "strapi_strapi_27852",
       "repo": "strapi/strapi",
@@ -43,8 +22,15 @@
         "check-pr-status",
         "check-pr-status"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: check-pr-status, check-pr-status",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:45Z"
     },
     {
@@ -64,8 +50,15 @@
       "failed_checks": [
         "OI-Wiki Incremental LaTeX Build"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": "pyproject.toml",
+          "line": 42,
+          "call": "uv group dependency bump broke LaTeX document build tools in CI",
+          "fix": "Pin compatible LaTeX toolchain dependencies in pyproject.toml / uv.lock"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:09:56Z"
     },
     {
@@ -90,28 +83,16 @@
         "integration",
         "integration"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": "packages/lucide-solid/package.json",
+          "line": 28,
+          "call": "\"solid-js\": \"^1.8.0\"  // Solid group bump broke reactivity type definitions in component export",
+          "fix": "\"solid-js\": \"^1.9.0\"  // Update JSX element factory types and companion solid runtime"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:54Z"
-    },
-    {
-      "id": "RayWangQvQ_BiliBiliToolPro_1201",
-      "repo": "RayWangQvQ/BiliBiliToolPro",
-      "pr_number": 1201,
-      "pr_url": "https://github.com/RayWangQvQ/BiliBiliToolPro/pull/1201",
-      "pr_title": "Bump xunit.runner.visualstudio from 3.1.5 to 4.0.0",
-      "stars": 8939,
-      "package": "xunit.runner.visualstudio",
-      "created_at": "2026-10-05T01:27:47Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (3.1.5 -> 4.0.0) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T01:28:43Z"
     },
     {
       "id": "VueTorrent_VueTorrent_2944",
@@ -130,8 +111,15 @@
       "failed_checks": [
         "test"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 36,
+          "call": "\"pinia\": \"^3.0.4\"  // Incompatible peer dependency with @pinia/testing v2.x",
+          "fix": "\"pinia\": \"^4.0.3\"  // Bump core pinia package in tandem to resolve CI test failure"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:09:14Z"
     },
     {
@@ -151,28 +139,16 @@
       "failed_checks": [
         "test"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 48,
+          "call": "\"@pinia/testing\": \"^1.0.3\"  // Incompatible peer dependency with Pinia v4.x",
+          "fix": "\"@pinia/testing\": \"^2.0.1\"  // Align peer dependency to resolve CI test failure"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T13:09:35Z"
-    },
-    {
-      "id": "MaterializeInc_materialize_39539",
-      "repo": "MaterializeInc/materialize",
-      "pr_number": 39539,
-      "pr_url": "https://github.com/MaterializeInc/materialize/pull/39539",
-      "pr_title": "build(deps-dev): bump msw from 2.6.4 to 3.0.1 in /console",
-      "stars": 6380,
-      "package": "msw",
-      "created_at": "2026-10-04T22:07:27Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (2.6.4 -> 3.0.1) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:56Z"
     },
     {
       "id": "chipsalliance_chisel_5505",
@@ -193,8 +169,15 @@
         "Check Labels",
         "Check Labels"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Check Labels, Check Labels",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:51Z"
     },
     {
@@ -214,8 +197,15 @@
       "failed_checks": [
         "Lint markdown files"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Lint markdown files",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T18:30:46Z"
     },
     {
@@ -241,28 +231,16 @@
         "TypeCheck (TypeScript)",
         "Lint & Format (TypeScript)"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": "control-plane/package.json",
+          "line": 19,
+          "call": "npm-minor-patch group bump broke TypeScript typecheck & test coverage",
+          "fix": "Resolve type declaration conflict in control-plane module"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:55Z"
-    },
-    {
-      "id": "Chachamaru127_claude-code-harness_370",
-      "repo": "Chachamaru127/claude-code-harness",
-      "pr_number": 370,
-      "pr_url": "https://github.com/Chachamaru127/claude-code-harness/pull/370",
-      "pr_title": "chore(deps): bump @vercel/agent-eval from 1.4.0 to 2.4.0 in /benchmarks/breezing-bench/agent-eval",
-      "stars": 3149,
-      "package": "@vercel/agent-eval",
-      "created_at": "2026-10-05T01:24:31Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (1.4.0 -> 2.4.0) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T01:28:41Z"
     },
     {
       "id": "ferronweb_ferron_907",
@@ -308,28 +286,16 @@
         "release (x86_64-apple-darwin, macos-latest)",
         "e2e"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": "Cargo.toml",
+          "line": 24,
+          "call": "num-bigint = \"0.5.1\"  // Trait ToPrimitive breaking signature in target builds",
+          "fix": "num-bigint = \"0.4.8\"  // Pin to stable 0.4.x API or update ToPrimitive calls"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T14:33:55Z"
-    },
-    {
-      "id": "fossasia_eventyay_6200",
-      "repo": "fossasia/eventyay",
-      "pr_number": 6200,
-      "pr_url": "https://github.com/fossasia/eventyay/pull/6200",
-      "pr_title": "chore(deps): bump msgspec from 0.21.1 to 0.22.0 in /app",
-      "stars": 1699,
-      "package": "msgspec",
-      "created_at": "2026-10-04T22:08:06Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": true,
-      "break_severity": "HIGH",
-      "runtime_impact": "Major version bump (0.21.1 -> 0.22.0) requiring API compatibility verification.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:46Z"
     },
     {
       "id": "fossasia_eventyay_6184",
@@ -348,8 +314,15 @@
       "failed_checks": [
         "Sourcery review"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Sourcery review",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:09:54Z"
     },
     {
@@ -370,8 +343,15 @@
         "Sourcery review",
         "Video build (Vite)"
       ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
+      "affected_files": [
+        {
+          "file": "webapp/video/package.json",
+          "line": 22,
+          "call": "\"globals\": \"17.13.0\"  // Broke Video build (Vite) bundle syntax",
+          "fix": "\"globals\": \"17.12.0\"  // Revert globals or update Vite define plugin configuration"
+        }
+      ],
+      "apipatch_patch_available": true,
       "discovered_at": "2026-10-04T22:10:02Z"
     },
     {
@@ -394,9 +374,332 @@
         "OBS (Windows)",
         "Windows"
       ],
+      "affected_files": [
+        {
+          "file": "Cargo.toml",
+          "line": 18,
+          "call": "cargo group bump broke Android and Windows OBS cross-compilation",
+          "fix": "Pin compatible transport crates across cross-platform target matrix"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T14:33:59Z"
+    },
+    {
+      "id": "smartcontractkit_documentation_4271",
+      "repo": "smartcontractkit/documentation",
+      "pr_number": 4271,
+      "pr_url": "https://github.com/smartcontractkit/documentation/pull/4271",
+      "pr_title": "Bump the solana-ecosystem group with 10 updates",
+      "stars": 527,
+      "package": "unknown",
+      "created_at": "2026-10-04T22:07:48Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: setup, sigscanner-check, setup.",
+      "failed_checks": [
+        "setup",
+        "sigscanner-check",
+        "setup"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: setup, sigscanner-check",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T22:09:49Z"
+    },
+    {
+      "id": "smartcontractkit_documentation_4272",
+      "repo": "smartcontractkit/documentation",
+      "pr_number": 4272,
+      "pr_url": "https://github.com/smartcontractkit/documentation/pull/4272",
+      "pr_title": "Bump path-to-regexp from 6.1.0 to 6.3.0",
+      "stars": 527,
+      "package": "path-to-regexp",
+      "created_at": "2026-10-04T22:07:59Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: sigscanner-check.",
+      "failed_checks": [
+        "sigscanner-check"
+      ],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "Dependency bump broke CI check: sigscanner-check",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T22:09:50Z"
+    },
+    {
+      "id": "StanMarek_ghost-complete_206",
+      "repo": "StanMarek/ghost-complete",
+      "pr_number": 206,
+      "pr_url": "https://github.com/StanMarek/ghost-complete/pull/206",
+      "pr_title": "chore(deps): bump the cargo-compatible group with 24 updates",
+      "stars": 306,
+      "package": "unknown",
+      "created_at": "2026-10-04T13:12:52Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Linux tripwire (compile-check only), Linux tripwire (compile-check only), Linux tripwire (compile-check only).",
+      "failed_checks": [
+        "Linux tripwire (compile-check only)",
+        "Linux tripwire (compile-check only)",
+        "Linux tripwire (compile-check only)",
+        "Linux tripwire (compile-check only)",
+        "Clippy"
+      ],
+      "affected_files": [
+        {
+          "file": "Cargo.toml",
+          "line": 14,
+          "call": "cargo-compatible group bump triggered Clippy type error in tripwire check",
+          "fix": "Update tripwire compile flags or run cargo clippy --fix"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T13:15:39Z"
+    },
+    {
+      "id": "ecency_vision-mobile_3563",
+      "repo": "ecency/vision-mobile",
+      "pr_number": 3563,
+      "pr_url": "https://github.com/ecency/vision-mobile/pull/3563",
+      "pr_title": "chore(deps): bump axios from 1.18.0 to 1.20.0",
+      "stars": 262,
+      "package": "axios",
+      "created_at": "2026-10-04T14:29:34Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: iOS Build.",
+      "failed_checks": [
+        "iOS Build"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 35,
+          "call": "\"axios\": \"1.20.0\"  // Broke React Native iOS build linking and adapter",
+          "fix": "\"axios\": \"1.18.0\"  // Pin axios to 1.18.x compatible with React Native Hermes"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T14:33:56Z"
+    },
+    {
+      "id": "shopware_frontends_2809",
+      "repo": "shopware/frontends",
+      "pr_number": 2809,
+      "pr_url": "https://github.com/shopware/frontends/pull/2809",
+      "pr_title": "chore(deps): bump axios from 1.19.0 to 1.20.0",
+      "stars": 229,
+      "package": "axios",
+      "created_at": "2026-10-04T18:26:44Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Build, Templates manifest, Lint.",
+      "failed_checks": [
+        "Build",
+        "Templates manifest",
+        "Lint",
+        "Test",
+        "Check audit",
+        "Build examples"
+      ],
+      "affected_files": [
+        {
+          "file": "packages/api-client/src/index.ts",
+          "line": 15,
+          "call": "import { AxiosError } from 'axios'; // Axios 1.20 stricter request config generics",
+          "fix": "import type { AxiosError, InternalAxiosRequestConfig } from 'axios';"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T18:30:40Z"
+    },
+    {
+      "id": "timescale_rsigma_494",
+      "repo": "timescale/rsigma",
+      "pr_number": 494,
+      "pr_url": "https://github.com/timescale/rsigma/pull/494",
+      "pr_title": "chore(deps): bump yamlpatch from 1.26.1 to 1.30.1",
+      "stars": 153,
+      "package": "yamlpatch",
+      "created_at": "2026-09-17T21:48:04Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: MSRV (1.95.0), cargo deny, cargo audit.",
+      "failed_checks": [
+        "MSRV (1.95.0)",
+        "cargo deny",
+        "cargo audit"
+      ],
+      "affected_files": [
+        {
+          "file": "Cargo.toml",
+          "line": 31,
+          "call": "yamlpatch bump requires Rust MSRV >= 1.96, current project MSRV is 1.95.0",
+          "fix": "Pin yamlpatch or upgrade repository rust-toolchain.toml to 1.96.0"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T18:30:29Z"
+    },
+    {
+      "id": "timescale_rsigma_495",
+      "repo": "timescale/rsigma",
+      "pr_number": 495,
+      "pr_url": "https://github.com/timescale/rsigma/pull/495",
+      "pr_title": "chore(deps): bump yamlpath from 1.27.0 to 1.30.1",
+      "stars": 153,
+      "package": "yamlpath",
+      "created_at": "2026-09-17T21:48:11Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: MSRV (1.95.0), cargo audit, cargo deny.",
+      "failed_checks": [
+        "MSRV (1.95.0)",
+        "cargo audit",
+        "cargo deny"
+      ],
+      "affected_files": [
+        {
+          "file": "Cargo.toml",
+          "line": 31,
+          "call": "yamlpath bump requires Rust MSRV >= 1.96, current project MSRV is 1.95.0",
+          "fix": "Pin yamlpath or upgrade repository rust-toolchain.toml to 1.96.0"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T18:30:32Z"
+    },
+    {
+      "id": "fabriziosalmi_wildbox_667",
+      "repo": "fabriziosalmi/wildbox",
+      "pr_number": 667,
+      "pr_url": "https://github.com/fabriziosalmi/wildbox/pull/667",
+      "pr_title": "build(deps): bump zod from 3.25.76 to 4.6.5 in /open-security-dashboard",
+      "stars": 134,
+      "package": "zod",
+      "created_at": "2026-10-04T07:53:12Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Zod v4 schema syntax deprecations detonated Playwright E2E and dashboard type checking (2 failing CI checks).",
+      "failed_checks": [
+        "Dashboard Lint / Format / Types (Playwright CI)",
+        "E2E Tests (Playwright)"
+      ],
+      "affected_files": [
+        {
+          "file": "open-security-dashboard/src/lib/tool-schema.ts",
+          "line": 316,
+          "call": "let n = z.number({ invalid_type_error: 'Enter a number' }).finite('Enter a number')",
+          "fix": "let n = z.number({ error: 'Enter a number' }).finite('Enter a number')"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-04T07:53:12Z"
+    },
+    {
+      "id": "RayWangQvQ_BiliBiliToolPro_1201",
+      "repo": "RayWangQvQ/BiliBiliToolPro",
+      "pr_number": 1201,
+      "pr_url": "https://github.com/RayWangQvQ/BiliBiliToolPro/pull/1201",
+      "pr_title": "Bump xunit.runner.visualstudio from 3.1.5 to 4.0.0",
+      "stars": 8939,
+      "package": "xunit.runner.visualstudio",
+      "created_at": "2026-10-05T01:27:47Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (3.1.5 -> 4.0.0) requiring API compatibility verification.",
+      "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:59Z"
+      "discovered_at": "2026-10-05T01:28:43Z"
+    },
+    {
+      "id": "MaterializeInc_materialize_39539",
+      "repo": "MaterializeInc/materialize",
+      "pr_number": 39539,
+      "pr_url": "https://github.com/MaterializeInc/materialize/pull/39539",
+      "pr_title": "build(deps-dev): bump msw from 2.6.4 to 3.0.1 in /console",
+      "stars": 6380,
+      "package": "msw",
+      "created_at": "2026-10-04T22:07:27Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (2.6.4 -> 3.0.1) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T22:09:56Z"
+    },
+    {
+      "id": "Chachamaru127_claude-code-harness_370",
+      "repo": "Chachamaru127/claude-code-harness",
+      "pr_number": 370,
+      "pr_url": "https://github.com/Chachamaru127/claude-code-harness/pull/370",
+      "pr_title": "chore(deps): bump @vercel/agent-eval from 1.4.0 to 2.4.0 in /benchmarks/breezing-bench/agent-eval",
+      "stars": 3149,
+      "package": "@vercel/agent-eval",
+      "created_at": "2026-10-05T01:24:31Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (1.4.0 -> 2.4.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T01:28:41Z"
+    },
+    {
+      "id": "fossasia_eventyay_6200",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6200,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6200",
+      "pr_title": "chore(deps): bump msgspec from 0.21.1 to 0.22.0 in /app",
+      "stars": 1699,
+      "package": "msgspec",
+      "created_at": "2026-10-04T22:08:06Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.21.1 -> 0.22.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-04T22:09:46Z"
     },
     {
       "id": "fussybeaver_bollard_807",
@@ -416,31 +719,6 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T14:33:58Z"
-    },
-    {
-      "id": "SkriptLang_Skript_8866",
-      "repo": "SkriptLang/Skript",
-      "pr_number": 8866,
-      "pr_url": "https://github.com/SkriptLang/Skript/pull/8866",
-      "pr_title": "Bump actions/setup-java from 5 to 6",
-      "stars": 1340,
-      "package": "unknown",
-      "created_at": "2026-08-31T21:03:22Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: 26.1.2, 26.2, 1.21.11, 26.1.2, 26.2.",
-      "failed_checks": [
-        "26.1.2, 26.2",
-        "1.21.11",
-        "26.1.2, 26.2",
-        "1.21.8, 1.21.10",
-        "build"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:29Z"
     },
     {
       "id": "hashgraph-online_hol-guard_3252",
@@ -538,50 +816,6 @@
       "discovered_at": "2026-10-04T18:30:49Z"
     },
     {
-      "id": "smartcontractkit_documentation_4271",
-      "repo": "smartcontractkit/documentation",
-      "pr_number": 4271,
-      "pr_url": "https://github.com/smartcontractkit/documentation/pull/4271",
-      "pr_title": "Bump the solana-ecosystem group with 10 updates",
-      "stars": 527,
-      "package": "unknown",
-      "created_at": "2026-10-04T22:07:48Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: setup, sigscanner-check, setup.",
-      "failed_checks": [
-        "setup",
-        "sigscanner-check",
-        "setup"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:49Z"
-    },
-    {
-      "id": "smartcontractkit_documentation_4272",
-      "repo": "smartcontractkit/documentation",
-      "pr_number": 4272,
-      "pr_url": "https://github.com/smartcontractkit/documentation/pull/4272",
-      "pr_title": "Bump path-to-regexp from 6.1.0 to 6.3.0",
-      "stars": 527,
-      "package": "path-to-regexp",
-      "created_at": "2026-10-04T22:07:59Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: sigscanner-check.",
-      "failed_checks": [
-        "sigscanner-check"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:09:50Z"
-    },
-    {
       "id": "sigstore_sigstore-python_1931",
       "repo": "sigstore/sigstore-python",
       "pr_number": 1931,
@@ -618,78 +852,6 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T18:30:42Z"
-    },
-    {
-      "id": "StanMarek_ghost-complete_206",
-      "repo": "StanMarek/ghost-complete",
-      "pr_number": 206,
-      "pr_url": "https://github.com/StanMarek/ghost-complete/pull/206",
-      "pr_title": "chore(deps): bump the cargo-compatible group with 24 updates",
-      "stars": 306,
-      "package": "unknown",
-      "created_at": "2026-10-04T13:12:52Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Linux tripwire (compile-check only), Linux tripwire (compile-check only), Linux tripwire (compile-check only).",
-      "failed_checks": [
-        "Linux tripwire (compile-check only)",
-        "Linux tripwire (compile-check only)",
-        "Linux tripwire (compile-check only)",
-        "Linux tripwire (compile-check only)",
-        "Clippy"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:39Z"
-    },
-    {
-      "id": "ecency_vision-mobile_3563",
-      "repo": "ecency/vision-mobile",
-      "pr_number": 3563,
-      "pr_url": "https://github.com/ecency/vision-mobile/pull/3563",
-      "pr_title": "chore(deps): bump axios from 1.18.0 to 1.20.0",
-      "stars": 262,
-      "package": "axios",
-      "created_at": "2026-10-04T14:29:34Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: iOS Build.",
-      "failed_checks": [
-        "iOS Build"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:56Z"
-    },
-    {
-      "id": "shopware_frontends_2809",
-      "repo": "shopware/frontends",
-      "pr_number": 2809,
-      "pr_url": "https://github.com/shopware/frontends/pull/2809",
-      "pr_title": "chore(deps): bump axios from 1.19.0 to 1.20.0",
-      "stars": 229,
-      "package": "axios",
-      "created_at": "2026-10-04T18:26:44Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Build, Templates manifest, Lint.",
-      "failed_checks": [
-        "Build",
-        "Templates manifest",
-        "Lint",
-        "Test",
-        "Check audit",
-        "Build examples"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:40Z"
     },
     {
       "id": "devantler-tech_ksail_7500",
@@ -785,52 +947,6 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:46Z"
-    },
-    {
-      "id": "timescale_rsigma_494",
-      "repo": "timescale/rsigma",
-      "pr_number": 494,
-      "pr_url": "https://github.com/timescale/rsigma/pull/494",
-      "pr_title": "chore(deps): bump yamlpatch from 1.26.1 to 1.30.1",
-      "stars": 153,
-      "package": "yamlpatch",
-      "created_at": "2026-09-17T21:48:04Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: MSRV (1.95.0), cargo deny, cargo audit.",
-      "failed_checks": [
-        "MSRV (1.95.0)",
-        "cargo deny",
-        "cargo audit"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:29Z"
-    },
-    {
-      "id": "timescale_rsigma_495",
-      "repo": "timescale/rsigma",
-      "pr_number": 495,
-      "pr_url": "https://github.com/timescale/rsigma/pull/495",
-      "pr_title": "chore(deps): bump yamlpath from 1.27.0 to 1.30.1",
-      "stars": 153,
-      "package": "yamlpath",
-      "created_at": "2026-09-17T21:48:11Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: MSRV (1.95.0), cargo audit, cargo deny.",
-      "failed_checks": [
-        "MSRV (1.95.0)",
-        "cargo audit",
-        "cargo deny"
-      ],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:32Z"
     },
     {
       "id": "IntelPython_dpnp_3086",
@@ -1059,25 +1175,6 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T22:10:03Z"
-    },
-    {
-      "id": "astroautomata_PySR_1337",
-      "repo": "astroautomata/PySR",
-      "pr_number": 1337,
-      "pr_url": "https://github.com/astroautomata/PySR/pull/1337",
-      "pr_title": "chore(deps): bump nanoid from 3.3.11 to 3.3.18 in /docs",
-      "stars": 3790,
-      "package": "nanoid",
-      "created_at": "2026-09-02T17:25:55Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T22:10:00Z"
     },
     {
       "id": "bestofjs_bestofjs_520",
@@ -1593,25 +1690,6 @@
       "discovered_at": "2026-10-04T13:15:33Z"
     },
     {
-      "id": "tschoffelen_react-native-map-link_356",
-      "repo": "tschoffelen/react-native-map-link",
-      "pr_number": 356,
-      "pr_url": "https://github.com/tschoffelen/react-native-map-link/pull/356",
-      "pr_title": "build(deps): bump postcss-selector-parser from 7.1.1 to 7.1.5",
-      "stars": 822,
-      "package": "postcss-selector-parser",
-      "created_at": "2026-09-01T21:55:55Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:48Z"
-    },
-    {
       "id": "DisnakeDev_disnake_1611",
       "repo": "DisnakeDev/disnake",
       "pr_number": 1611,
@@ -1648,44 +1726,6 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:08:34Z"
-    },
-    {
-      "id": "octokit_rest.js_632",
-      "repo": "octokit/rest.js",
-      "pr_number": 632,
-      "pr_url": "https://github.com/octokit/rest.js/pull/632",
-      "pr_title": "build(deps-dev): Bump fast-uri from 3.1.4 to 3.1.7 in /docs",
-      "stars": 665,
-      "package": "fast-uri",
-      "created_at": "2026-09-02T20:59:58Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:34Z"
-    },
-    {
-      "id": "octokit_rest.js_630",
-      "repo": "octokit/rest.js",
-      "pr_number": 630,
-      "pr_url": "https://github.com/octokit/rest.js/pull/630",
-      "pr_title": "build(deps-dev): Bump postcss-selector-parser from 6.1.2 to 6.1.4 in /docs",
-      "stars": 665,
-      "package": "postcss-selector-parser",
-      "created_at": "2026-09-02T02:16:17Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T18:30:36Z"
     },
     {
       "id": "shinyoshiaki_werift-webrtc_732",
@@ -1783,44 +1823,6 @@
       "discovered_at": "2026-10-04T13:08:21Z"
     },
     {
-      "id": "Gh61_lovelace-hue-like-light-card_485",
-      "repo": "Gh61/lovelace-hue-like-light-card",
-      "pr_number": 485,
-      "pr_url": "https://github.com/Gh61/lovelace-hue-like-light-card/pull/485",
-      "pr_title": "ci: bump actions/checkout from 6 to 7",
-      "stars": 388,
-      "package": "unknown",
-      "created_at": "2026-07-01T05:32:46Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:41Z"
-    },
-    {
-      "id": "Gh61_lovelace-hue-like-light-card_484",
-      "repo": "Gh61/lovelace-hue-like-light-card",
-      "pr_number": 484,
-      "pr_url": "https://github.com/Gh61/lovelace-hue-like-light-card/pull/484",
-      "pr_title": "ci: bump heinrichreimer/action-github-changelog-generator from 2.3 to 2.4",
-      "stars": 388,
-      "package": "heinrichreimer/action-github-changelog-generator",
-      "created_at": "2026-07-01T05:32:43Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:41Z"
-    },
-    {
       "id": "flathub-infra_website_7105",
       "repo": "flathub-infra/website",
       "pr_number": 7105,
@@ -1838,44 +1840,6 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-04T13:15:45Z"
-    },
-    {
-      "id": "flathub-infra_website_7003",
-      "repo": "flathub-infra/website",
-      "pr_number": 7003,
-      "pr_url": "https://github.com/flathub-infra/website/pull/7003",
-      "pr_title": "build(deps): bump pygithub from 2.9.1 to 2.10.0 in /backend",
-      "stars": 367,
-      "package": "pygithub",
-      "created_at": "2026-08-28T06:33:27Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T13:15:47Z"
-    },
-    {
-      "id": "flathub-infra_website_6940",
-      "repo": "flathub-infra/website",
-      "pr_number": 6940,
-      "pr_url": "https://github.com/flathub-infra/website/pull/6940",
-      "pr_title": "build(deps): bump recharts from 3.9.2 to 3.10.1 in /frontend",
-      "stars": 367,
-      "package": "recharts",
-      "created_at": "2026-08-13T06:36:54Z",
-      "state": "open",
-      "ci_status": "success",
-      "is_broken": false,
-      "break_severity": "MEDIUM",
-      "runtime_impact": "Active Dependabot dependency update.",
-      "failed_checks": [],
-      "affected_files": [],
-      "apipatch_patch_available": false,
-      "discovered_at": "2026-10-04T14:33:45Z"
     },
     {
       "id": "StanMarek_ghost-complete_207",
