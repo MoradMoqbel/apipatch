@@ -1,9 +1,47 @@
 {
-  "updated_at": "2026-10-05T17:43:14Z",
+  "updated_at": "2026-10-05T23:36:09Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
   "leads": [
+    {
+      "id": "appsmithorg_appsmith_42348",
+      "repo": "appsmithorg/appsmith",
+      "pr_number": 42348,
+      "pr_url": "https://github.com/appsmithorg/appsmith/pull/42348",
+      "pr_title": "chore(deps): bump redis from 7.4.8 to 8.10.2 in /deploy/docker",
+      "stars": 41017,
+      "package": "redis",
+      "created_at": "2026-10-05T23:34:30Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (7.4.8 -> 8.10.2) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:26Z"
+    },
+    {
+      "id": "appsmithorg_appsmith_42347",
+      "repo": "appsmithorg/appsmith",
+      "pr_number": 42347,
+      "pr_url": "https://github.com/appsmithorg/appsmith/pull/42347",
+      "pr_title": "chore(deps-dev): bump cypress-network-idle from 1.14.2 to 2.0.1 in /app/client",
+      "stars": 41017,
+      "package": "cypress-network-idle",
+      "created_at": "2026-10-05T23:33:25Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (1.14.2 -> 2.0.1) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:53Z"
+    },
     {
       "id": "HumanSignal_label-studio_9970",
       "repo": "HumanSignal/label-studio",
@@ -309,6 +347,34 @@
       "discovered_at": "2026-10-05T08:05:56Z"
     },
     {
+      "id": "google_go-containerregistry_2461",
+      "repo": "google/go-containerregistry",
+      "pr_number": 2461,
+      "pr_url": "https://github.com/google/go-containerregistry/pull/2461",
+      "pr_title": "build(deps): bump the actions group across 1 directory with 11 updates",
+      "stars": 4066,
+      "package": "unknown",
+      "created_at": "2026-09-23T02:37:39Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Presubmit.",
+      "failed_checks": [
+        "Presubmit"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Presubmit",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:36:05Z"
+    },
+    {
       "id": "ColeMurray_background-agents_2285",
       "repo": "ColeMurray/background-agents",
       "pr_number": 2285,
@@ -344,6 +410,101 @@
       "is_real_code_break": false,
       "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
+    },
+    {
+      "id": "kubeflow_trainer_4180",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4180,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4180",
+      "pr_title": "chore(deps): bump datafusion from 53.1.0 to 55.1.0 in /pkg/data_cache",
+      "stars": 2238,
+      "package": "datafusion",
+      "created_at": "2026-10-05T23:34:21Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (53.1.0 -> 55.1.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:28Z"
+    },
+    {
+      "id": "kubeflow_trainer_4178",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4178,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4178",
+      "pr_title": "chore(deps): bump mlx-lm from 0.31.3 to 0.32.0 in /cmd/runtimes/mlx",
+      "stars": 2238,
+      "package": "mlx-lm",
+      "created_at": "2026-10-05T23:34:15Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.31.3 -> 0.32.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:32Z"
+    },
+    {
+      "id": "kubeflow_trainer_4134",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4134,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4134",
+      "pr_title": "chore(deps): bump the kubernetes group across 1 directory with 10 updates",
+      "stars": 2238,
+      "package": "unknown",
+      "created_at": "2026-09-28T23:33:24Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Test.",
+      "failed_checks": [
+        "Test"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Test",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:36:08Z"
+    },
+    {
+      "id": "alitto_pond_147",
+      "repo": "alitto/pond",
+      "pr_number": 147,
+      "pr_url": "https://github.com/alitto/pond/pull/147",
+      "pr_title": "chore(deps): bump actions/setup-go from 5 to 7",
+      "stars": 2197,
+      "package": "unknown",
+      "created_at": "2026-10-05T23:34:22Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Run tests (1.22.x, macos-latest), Coverage report.",
+      "failed_checks": [
+        "Run tests (1.22.x, macos-latest)",
+        "Coverage report"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Run tests (1.22.x, macos-latest), Coverage report",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:35:41Z"
     },
     {
       "id": "ferronweb_ferron_907",
@@ -402,6 +563,35 @@
       "is_real_code_break": false,
       "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
+    },
+    {
+      "id": "operator-framework_operator-lifecycle-manager_3935",
+      "repo": "operator-framework/operator-lifecycle-manager",
+      "pr_number": 3935,
+      "pr_url": "https://github.com/operator-framework/operator-lifecycle-manager/pull/3935",
+      "pr_title": ":seedling: bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.13.0 to 6.14.0",
+      "stars": 1863,
+      "package": "github.com/maxbrunsfeld/counterfeiter/v6",
+      "created_at": "2026-10-05T23:33:16Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: verify, verify.",
+      "failed_checks": [
+        "verify",
+        "verify"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"github.com/maxbrunsfeld/counterfeiter/v6\": \"6.13.0\" // Bumped to 6.14.0 which broke CI: verify, verify",
+          "fix": "\"github.com/maxbrunsfeld/counterfeiter/v6\": \"6.14.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:36:09Z"
     },
     {
       "id": "fossasia_eventyay_6193",
@@ -489,6 +679,32 @@
       "discovered_at": "2026-10-05T17:43:11Z"
     },
     {
+      "id": "SkriptLang_Skript_8895",
+      "repo": "SkriptLang/Skript",
+      "pr_number": 8895,
+      "pr_url": "https://github.com/SkriptLang/Skript/pull/8895",
+      "pr_title": "Bump gradle/actions from 6.3.0 to 6.4.0",
+      "stars": 1342,
+      "package": "gradle/actions",
+      "created_at": "2026-10-05T21:03:15Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 1,
+          "call": "\"gradle/actions\": \"6.3.0\" // Bumped to 6.4.0 which broke CI: build test pipeline",
+          "fix": "\"gradle/actions\": \"6.4.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:35:58Z"
+    },
+    {
       "id": "basementstudio_xmcp_665",
       "repo": "basementstudio/xmcp",
       "pr_number": 665,
@@ -545,6 +761,35 @@
       "discovered_at": "2026-10-05T08:06:04Z"
     },
     {
+      "id": "Dstack-TEE_dstack_1434",
+      "repo": "Dstack-TEE/dstack",
+      "pr_number": 1434,
+      "pr_url": "https://github.com/Dstack-TEE/dstack/pull/1434",
+      "pr_title": "build(deps): bump brace-expansion in /dstack/kms/auth-eth",
+      "stars": 555,
+      "package": "unknown",
+      "created_at": "2026-10-05T23:33:31Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Foundry project, Foundry project.",
+      "failed_checks": [
+        "Foundry project",
+        "Foundry project"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Foundry project, Foundry project",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:36:03Z"
+    },
+    {
       "id": "smartcontractkit_documentation_4271",
       "repo": "smartcontractkit/documentation",
       "pr_number": 4271,
@@ -576,6 +821,35 @@
       "is_real_code_break": false,
       "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
+    },
+    {
+      "id": "OWASP_Nest_5672",
+      "repo": "OWASP/Nest",
+      "pr_number": 5672,
+      "pr_url": "https://github.com/OWASP/Nest/pull/5672",
+      "pr_title": "chore(deps): bump the pip group across 1 directory with 1 update",
+      "stars": 457,
+      "package": "unknown",
+      "created_at": "2026-10-05T23:33:51Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Code checks / Dependency / Dependency audit, Code checks / Dependency / Dependency check.",
+      "failed_checks": [
+        "Code checks / Dependency / Dependency audit",
+        "Code checks / Dependency / Dependency check"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: Code checks / Dependency / Dependency audit, Code checks / Dependency / Dependency check",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:35:43Z"
     },
     {
       "id": "aws_mcp_proxy_for_aws_430",
@@ -709,6 +983,88 @@
       "is_real_code_break": true,
       "break_category": "AST_CODE_BREAK",
       "patch_type": "AST_CODE_REWRITE"
+    },
+    {
+      "id": "myConsciousness_atproto.dart_2593",
+      "repo": "myConsciousness/atproto.dart",
+      "pr_number": 2593,
+      "pr_url": "https://github.com/myConsciousness/atproto.dart/pull/2593",
+      "pr_title": "chore(deps): bump the pub-dependencies group across 1 directory with 3 updates",
+      "stars": 211,
+      "package": "unknown",
+      "created_at": "2026-09-14T03:05:52Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: build test pipeline",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:35:57Z"
+    },
+    {
+      "id": "franc6_ics_calendar_286",
+      "repo": "franc6/ics_calendar",
+      "pr_number": 286,
+      "pr_url": "https://github.com/franc6/ics_calendar/pull/286",
+      "pr_title": "Update pytest-homeassistant-custom-component requirement from >=0.13.366 to >=0.13.368",
+      "stars": 200,
+      "package": "unknown",
+      "created_at": "2026-10-05T23:33:21Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: test.",
+      "failed_checks": [
+        "test"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: test",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:35:39Z"
+    },
+    {
+      "id": "franc6_ics_calendar_284",
+      "repo": "franc6/ics_calendar",
+      "pr_number": 284,
+      "pr_url": "https://github.com/franc6/ics_calendar/pull/284",
+      "pr_title": "Update mashumaro requirement from >=3.22 to >=3.23",
+      "stars": 200,
+      "package": "unknown",
+      "created_at": "2026-10-05T23:32:59Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: test.",
+      "failed_checks": [
+        "test"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: test",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-05T23:35:56Z"
     },
     {
       "id": "felixdittrich92_OnnxTR_123",
@@ -953,6 +1309,158 @@
       "discovered_at": "2026-10-05T08:06:10Z"
     },
     {
+      "id": "kubeflow_trainer_4181",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4181,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4181",
+      "pr_title": "chore(deps): bump transformers from 5.16.1 to 5.18.0 in /cmd/runtimes/deepspeed",
+      "stars": 2238,
+      "package": "transformers",
+      "created_at": "2026-10-05T23:34:29Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:15Z"
+    },
+    {
+      "id": "kubeflow_trainer_4179",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4179,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4179",
+      "pr_title": "chore(deps): bump torch from 2.13.0 to 2.14.1 in /cmd/runtimes/deepspeed",
+      "stars": 2238,
+      "package": "torch",
+      "created_at": "2026-10-05T23:34:19Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:30Z"
+    },
+    {
+      "id": "kubeflow_trainer_4174",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4174,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4174",
+      "pr_title": "chore(deps): bump nvidia/cuda from 13.3.1-devel-ubuntu22.04 to 13.4.2-devel-ubuntu22.04 in /cmd/runtimes/mlx",
+      "stars": 2238,
+      "package": "nvidia/cuda",
+      "created_at": "2026-10-05T23:34:04Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:33Z"
+    },
+    {
+      "id": "kubeflow_trainer_4176",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4176,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4176",
+      "pr_title": "chore(deps): bump futures from 0.3.33 to 0.3.34 in /pkg/data_cache/test",
+      "stars": 2238,
+      "package": "futures",
+      "created_at": "2026-10-05T23:34:08Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:35Z"
+    },
+    {
+      "id": "kubeflow_trainer_4177",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4177,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4177",
+      "pr_title": "chore(deps): bump mlx from 0.32.2 to 0.32.3 in /cmd/runtimes/mlx",
+      "stars": 2238,
+      "package": "mlx",
+      "created_at": "2026-10-05T23:34:12Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:36Z"
+    },
+    {
+      "id": "kubeflow_trainer_4175",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4175,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4175",
+      "pr_title": "chore(deps): bump nvidia/cuda from 13.3.1-devel-ubuntu22.04 to 13.4.2-devel-ubuntu22.04 in /cmd/runtimes/deepspeed",
+      "stars": 2238,
+      "package": "nvidia/cuda",
+      "created_at": "2026-10-05T23:34:05Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:38Z"
+    },
+    {
+      "id": "kubeflow_trainer_4173",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4173,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4173",
+      "pr_title": "chore(deps): bump rust from 1.98-bookworm to 1.99-bookworm in /cmd/data_cache",
+      "stars": 2238,
+      "package": "rust",
+      "created_at": "2026-10-05T23:34:01Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:45Z"
+    },
+    {
+      "id": "kubeflow_trainer_4172",
+      "repo": "kubeflow/trainer",
+      "pr_number": 4172,
+      "pr_url": "https://github.com/kubeflow/trainer/pull/4172",
+      "pr_title": "chore(deps): bump google.golang.org/grpc from 1.83.2 to 1.84.0",
+      "stars": 2238,
+      "package": "google.golang.org/grpc",
+      "created_at": "2026-10-05T23:32:45Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:49Z"
+    },
+    {
       "id": "cloudfoundry_cli_3874",
       "repo": "cloudfoundry/cli",
       "pr_number": 3874,
@@ -1010,6 +1518,25 @@
       "discovered_at": "2026-10-05T08:06:17Z"
     },
     {
+      "id": "SkriptLang_Skript_8885",
+      "repo": "SkriptLang/Skript",
+      "pr_number": 8885,
+      "pr_url": "https://github.com/SkriptLang/Skript/pull/8885",
+      "pr_title": "Bump gradle-wrapper from 9.7.1 to 9.8.0",
+      "stars": 1342,
+      "package": "gradle-wrapper",
+      "created_at": "2026-09-28T21:03:06Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:54Z"
+    },
+    {
       "id": "HelpCode-ai_anythingmcp_872",
       "repo": "HelpCode-ai/anythingmcp",
       "pr_number": 872,
@@ -1027,6 +1554,63 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:06:07Z"
+    },
+    {
+      "id": "twisted_klein_968",
+      "repo": "twisted/klein",
+      "pr_number": 968,
+      "pr_url": "https://github.com/twisted/klein/pull/968",
+      "pr_title": "Bump pyflakes from 4.0.0 to 4.0.1",
+      "stars": 840,
+      "package": "pyflakes",
+      "created_at": "2026-10-05T23:33:32Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:36:01Z"
+    },
+    {
+      "id": "twisted_klein_967",
+      "repo": "twisted/klein",
+      "pr_number": 967,
+      "pr_url": "https://github.com/twisted/klein/pull/967",
+      "pr_title": "Bump cryptography from 50.0.1 to 50.0.2",
+      "stars": 840,
+      "package": "cryptography",
+      "created_at": "2026-10-05T23:33:25Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:36:06Z"
+    },
+    {
+      "id": "opendatacube_datacube-core_2619",
+      "repo": "opendatacube/datacube-core",
+      "pr_number": 2619,
+      "pr_url": "https://github.com/opendatacube/datacube-core/pull/2619",
+      "pr_title": "build(deps): bump astral-sh/uv from 0.12.22 to 0.12.23 in /docker",
+      "stars": 588,
+      "package": "astral-sh/uv",
+      "created_at": "2026-10-05T23:33:25Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:36:00Z"
     },
     {
       "id": "emarsden_dash-mpd-cli_271",
@@ -1143,6 +1727,63 @@
       "discovered_at": "2026-10-05T08:06:14Z"
     },
     {
+      "id": "Sped0n_bridget_741",
+      "repo": "Sped0n/bridget",
+      "pr_number": 741,
+      "pr_url": "https://github.com/Sped0n/bridget/pull/741",
+      "pr_title": "build(deps-dev): bump @types/node from 26.5.0 to 26.6.4",
+      "stars": 205,
+      "package": "@types/node",
+      "created_at": "2026-10-05T23:33:54Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:42Z"
+    },
+    {
+      "id": "Sped0n_bridget_742",
+      "repo": "Sped0n/bridget",
+      "pr_number": 742,
+      "pr_url": "https://github.com/Sped0n/bridget/pull/742",
+      "pr_title": "build(deps): bump swiper from 14.2.0 to 14.3.0",
+      "stars": 205,
+      "package": "swiper",
+      "created_at": "2026-10-05T23:34:07Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:47Z"
+    },
+    {
+      "id": "Sped0n_bridget_740",
+      "repo": "Sped0n/bridget",
+      "pr_number": 740,
+      "pr_url": "https://github.com/Sped0n/bridget/pull/740",
+      "pr_title": "build(deps-dev): bump @typescript-eslint/parser from 8.70.0 to 8.71.0",
+      "stars": 205,
+      "package": "@typescript-eslint/parser",
+      "created_at": "2026-10-05T23:33:40Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:50Z"
+    },
+    {
       "id": "Tight-Line_ballast_118",
       "repo": "Tight-Line/ballast",
       "pr_number": 118,
@@ -1198,6 +1839,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:06:05Z"
+    },
+    {
+      "id": "Gerharddc_Litterbox_187",
+      "repo": "Gerharddc/Litterbox",
+      "pr_number": 187,
+      "pr_url": "https://github.com/Gerharddc/Litterbox/pull/187",
+      "pr_title": "Bump taiki-e/install-action from 2.87.20 to 2.87.22",
+      "stars": 153,
+      "package": "taiki-e/install-action",
+      "created_at": "2026-10-05T23:34:12Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:46Z"
     },
     {
       "id": "Kanahiro_chiitiler_258",
@@ -1274,6 +1934,44 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T17:43:03Z"
+    },
+    {
+      "id": "somleng_somleng_2806",
+      "repo": "somleng/somleng",
+      "pr_number": 2806,
+      "pr_url": "https://github.com/somleng/somleng/pull/2806",
+      "pr_title": "Bump devise_invitable from 2.0.13 to 2.0.14",
+      "stars": 100,
+      "package": "devise_invitable",
+      "created_at": "2026-10-05T23:34:01Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:35:51Z"
+    },
+    {
+      "id": "somleng_somleng_2805",
+      "repo": "somleng/somleng",
+      "pr_number": 2805,
+      "pr_url": "https://github.com/somleng/somleng/pull/2805",
+      "pr_title": "Bump pg from 1.6.3 to 1.7.0",
+      "stars": 100,
+      "package": "pg",
+      "created_at": "2026-10-05T23:33:33Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T23:36:03Z"
     }
   ]
 }
