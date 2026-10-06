@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-06T04:19:07Z",
+  "updated_at": "2026-10-06T11:41:16Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
@@ -136,6 +136,51 @@
       "is_real_code_break": false,
       "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
+    },
+    {
+      "id": "aio-libs_aiohttp_13950",
+      "repo": "aio-libs/aiohttp",
+      "pr_number": 13950,
+      "pr_url": "https://github.com/aio-libs/aiohttp/pull/13950",
+      "pr_title": "Bump mypy from 2.1.0 to 2.4.0",
+      "stars": 16568,
+      "package": "mypy",
+      "created_at": "2026-10-05T10:34:39Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "pyproject.toml",
+          "line": 1,
+          "call": "\"mypy\": \"2.1.0\" // Bumped to 2.4.0 which broke CI: build test pipeline",
+          "fix": "\"mypy\": \"2.4.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:32Z"
+    },
+    {
+      "id": "aio-libs_aiohttp_13978",
+      "repo": "aio-libs/aiohttp",
+      "pr_number": 13978,
+      "pr_url": "https://github.com/aio-libs/aiohttp/pull/13978",
+      "pr_title": "Bump ast-serialize from 0.11.2 to 0.12.0",
+      "stars": 16568,
+      "package": "ast-serialize",
+      "created_at": "2026-10-06T10:47:10Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.11.2 -> 0.12.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:35Z"
     },
     {
       "id": "LearningCircuit_local-deep-research_6706",
@@ -285,6 +330,62 @@
       "discovered_at": "2026-10-05T17:43:13Z"
     },
     {
+      "id": "vllm-project_semantic-router_4380",
+      "repo": "vllm-project/semantic-router",
+      "pr_number": 4380,
+      "pr_url": "https://github.com/vllm-project/semantic-router/pull/4380",
+      "pr_title": "build(deps): bump undici from 7.29.0 to 7.30.0 in /website in the website-security group across 1 directory",
+      "stars": 6038,
+      "package": "undici",
+      "created_at": "2026-09-29T20:19:11Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: PR Gate.",
+      "failed_checks": [
+        "PR Gate"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"undici\": \"7.29.0\" // Bumped to 7.30.0 which broke CI: PR Gate",
+          "fix": "\"undici\": \"7.30.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:41:10Z"
+    },
+    {
+      "id": "vllm-project_semantic-router_4428",
+      "repo": "vllm-project/semantic-router",
+      "pr_number": 4428,
+      "pr_url": "https://github.com/vllm-project/semantic-router/pull/4428",
+      "pr_title": "build(deps): bump urllib3 from 2.7.0 to 2.8.0 in /src/vllm-sr in the cli-python-security group across 1 directory",
+      "stars": 6038,
+      "package": "urllib3",
+      "created_at": "2026-10-01T12:30:07Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: PR Gate.",
+      "failed_checks": [
+        "PR Gate"
+      ],
+      "affected_files": [
+        {
+          "file": "pyproject.toml",
+          "line": 1,
+          "call": "\"urllib3\": \"2.7.0\" // Bumped to 2.8.0 which broke CI: PR Gate",
+          "fix": "\"urllib3\": \"2.8.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:41:15Z"
+    },
+    {
       "id": "pdfme_pdfme_1652",
       "repo": "pdfme/pdfme",
       "pr_number": 1652,
@@ -375,6 +476,25 @@
       "discovered_at": "2026-10-05T23:36:05Z"
     },
     {
+      "id": "microsoft_kiota_8326",
+      "repo": "microsoft/kiota",
+      "pr_number": 8326,
+      "pr_url": "https://github.com/microsoft/kiota/pull/8326",
+      "pr_title": "build(deps-dev): bump multidict from 6.9.1 to 7.0.0 in /it/python",
+      "stars": 3825,
+      "package": "multidict",
+      "created_at": "2026-10-05T08:34:03Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (6.9.1 -> 7.0.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:45Z"
+    },
+    {
       "id": "ColeMurray_background-agents_2285",
       "repo": "ColeMurray/background-agents",
       "pr_number": 2285,
@@ -441,6 +561,100 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-06T04:18:52Z"
+    },
+    {
+      "id": "filecoin-project_lotus_13880",
+      "repo": "filecoin-project/lotus",
+      "pr_number": 13880,
+      "pr_url": "https://github.com/filecoin-project/lotus/pull/13880",
+      "pr_title": "build(deps): bump go.opentelemetry.io/otel/metric from 1.46.0 to 1.47.0",
+      "stars": 2987,
+      "package": "go.opentelemetry.io/otel/metric",
+      "created_at": "2026-10-06T10:31:17Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Changelog.",
+      "failed_checks": [
+        "Changelog"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"go.opentelemetry.io/otel/metric\": \"1.46.0\" // Bumped to 1.47.0 which broke CI: Changelog",
+          "fix": "\"go.opentelemetry.io/otel/metric\": \"1.47.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:58Z"
+    },
+    {
+      "id": "filecoin-project_lotus_13883",
+      "repo": "filecoin-project/lotus",
+      "pr_number": 13883,
+      "pr_url": "https://github.com/filecoin-project/lotus/pull/13883",
+      "pr_title": "build(deps): bump golang.org/x/time from 0.15.0 to 0.16.0",
+      "stars": 2987,
+      "package": "golang.org/x/time",
+      "created_at": "2026-10-06T10:31:40Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.15.0 -> 0.16.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:00Z"
+    },
+    {
+      "id": "filecoin-project_lotus_13887",
+      "repo": "filecoin-project/lotus",
+      "pr_number": 13887,
+      "pr_url": "https://github.com/filecoin-project/lotus/pull/13887",
+      "pr_title": "build(deps): bump github.com/zondax/ledger-filecoin-go from 1.2.2 to 1.2.3 in the crypto-hardware group across 1 directory",
+      "stars": 2987,
+      "package": "github.com/zondax/ledger-filecoin-go",
+      "created_at": "2026-10-06T11:37:26Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Changelog.",
+      "failed_checks": [
+        "Changelog"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"github.com/zondax/ledger-filecoin-go\": \"1.2.2\" // Bumped to 1.2.3 which broke CI: Changelog",
+          "fix": "\"github.com/zondax/ledger-filecoin-go\": \"1.2.3\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:41:03Z"
+    },
+    {
+      "id": "filecoin-project_lotus_13854",
+      "repo": "filecoin-project/lotus",
+      "pr_number": 13854,
+      "pr_url": "https://github.com/filecoin-project/lotus/pull/13854",
+      "pr_title": "build(deps): bump github.com/ipfs/boxo from 0.42.2 to 0.43.0 in the ipfs-ecosystem group across 1 directory",
+      "stars": 2987,
+      "package": "github.com/ipfs/boxo",
+      "created_at": "2026-10-01T23:43:02Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.42.2 -> 0.43.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:11Z"
     },
     {
       "id": "kubeflow_trainer_4180",
@@ -767,6 +981,103 @@
       "patch_type": "MANIFEST_PIN"
     },
     {
+      "id": "Redocly_redocly-cli_3197",
+      "repo": "Redocly/redocly-cli",
+      "pr_number": 3197,
+      "pr_url": "https://github.com/Redocly/redocly-cli/pull/3197",
+      "pr_title": "chore(deps-dev): bump source-map-js from 1.2.1 to 1.2.2",
+      "stars": 1517,
+      "package": "source-map-js",
+      "created_at": "2026-10-06T09:53:26Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"source-map-js\": \"1.2.1\" // Bumped to 1.2.2 which broke CI: build test pipeline",
+          "fix": "\"source-map-js\": \"1.2.2\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:40Z"
+    },
+    {
+      "id": "Redocly_redocly-cli_3199",
+      "repo": "Redocly/redocly-cli",
+      "pr_number": 3199,
+      "pr_url": "https://github.com/Redocly/redocly-cli/pull/3199",
+      "pr_title": "chore(deps-dev): bump proxy-addr from 2.0.7 to 2.0.8",
+      "stars": 1517,
+      "package": "proxy-addr",
+      "created_at": "2026-10-06T09:53:35Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"proxy-addr\": \"2.0.7\" // Bumped to 2.0.8 which broke CI: build test pipeline",
+          "fix": "\"proxy-addr\": \"2.0.8\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:42Z"
+    },
+    {
+      "id": "Redocly_redocly-cli_3198",
+      "repo": "Redocly/redocly-cli",
+      "pr_number": 3198,
+      "pr_url": "https://github.com/Redocly/redocly-cli/pull/3198",
+      "pr_title": "chore(deps): bump tinypool and oxfmt",
+      "stars": 1517,
+      "package": "unknown",
+      "created_at": "2026-10-06T09:53:31Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: build test pipeline",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:43Z"
+    },
+    {
+      "id": "fmind_mlops-python-package_144",
+      "repo": "fmind/mlops-python-package",
+      "pr_number": 144,
+      "pr_url": "https://github.com/fmind/mlops-python-package/pull/144",
+      "pr_title": "chore(deps): bump shap from 0.49.1 to 0.52.0 in the python group across 1 directory",
+      "stars": 1420,
+      "package": "shap",
+      "created_at": "2026-10-06T05:47:29Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.49.1 -> 0.52.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:44Z"
+    },
+    {
       "id": "cloudposse_atmos_3260",
       "repo": "cloudposse/atmos",
       "pr_number": 3260,
@@ -840,6 +1151,25 @@
       "discovered_at": "2026-10-05T17:43:14Z"
     },
     {
+      "id": "CERT-Polska_Artemis_3169",
+      "repo": "CERT-Polska/Artemis",
+      "pr_number": 3169,
+      "pr_url": "https://github.com/CERT-Polska/Artemis/pull/3169",
+      "pr_title": "build(deps): bump multiprocessing-logging from 0.3.4 to 0.4.0",
+      "stars": 1236,
+      "package": "multiprocessing-logging",
+      "created_at": "2026-09-21T14:27:06Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.3.4 -> 0.4.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:34Z"
+    },
+    {
       "id": "mivano_azure-cost-cli_361",
       "repo": "mivano/azure-cost-cli",
       "pr_number": 361,
@@ -866,6 +1196,34 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-05T08:06:04Z"
+    },
+    {
+      "id": "wolph_python-progressbar_329",
+      "repo": "wolph/python-progressbar",
+      "pr_number": 329,
+      "pr_url": "https://github.com/wolph/python-progressbar/pull/329",
+      "pr_title": "build(deps): bump urllib3 from 2.7.0 to 2.8.0",
+      "stars": 881,
+      "package": "urllib3",
+      "created_at": "2026-10-06T11:39:10Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: tox (docs-demos).",
+      "failed_checks": [
+        "tox (docs-demos)"
+      ],
+      "affected_files": [
+        {
+          "file": "pyproject.toml",
+          "line": 1,
+          "call": "\"urllib3\": \"2.7.0\" // Bumped to 2.8.0 which broke CI: tox (docs-demos)",
+          "fix": "\"urllib3\": \"2.8.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:40Z"
     },
     {
       "id": "Dstack-TEE_dstack_1434",
@@ -928,6 +1286,25 @@
       "is_real_code_break": false,
       "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
+    },
+    {
+      "id": "ZaxbyHub_opencode-swarm_3074",
+      "repo": "ZaxbyHub/opencode-swarm",
+      "pr_number": 3074,
+      "pr_url": "https://github.com/ZaxbyHub/opencode-swarm/pull/3074",
+      "pr_title": "chore(deps): bump actions/upload-artifact from 4.6.2 to 7.0.1",
+      "stars": 489,
+      "package": "actions/upload-artifact",
+      "created_at": "2026-10-04T21:09:13Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (4.6.2 -> 7.0.1) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:05Z"
     },
     {
       "id": "OWASP_Nest_5672",
@@ -1471,6 +1848,35 @@
       "patch_type": "MANIFEST_PIN"
     },
     {
+      "id": "UiPath_coder_eval_208",
+      "repo": "UiPath/coder_eval",
+      "pr_number": 208,
+      "pr_url": "https://github.com/UiPath/coder_eval/pull/208",
+      "pr_title": "chore(deps): bump oauthlib from 3.3.1 to 4.0.0",
+      "stars": 148,
+      "package": "oauthlib",
+      "created_at": "2026-09-29T21:20:11Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Live Integration Tests (Codex), Delegate Live E2E (ROPC).",
+      "failed_checks": [
+        "Live Integration Tests (Codex)",
+        "Delegate Live E2E (ROPC)"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"oauthlib\": \"3.3.1\" // Bumped to 4.0.0 which broke CI: Live Integration Tests (Codex), Delegate Live E2E (ROPC)",
+          "fix": "\"oauthlib\": \"4.0.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:31Z"
+    },
+    {
       "id": "OriginTrail_dkg_2847",
       "repo": "OriginTrail/dkg",
       "pr_number": 2847,
@@ -1535,6 +1941,25 @@
       "patch_type": "AST_CODE_REWRITE"
     },
     {
+      "id": "phpgt_Dom_487",
+      "repo": "phpgt/Dom",
+      "pr_number": 487,
+      "pr_url": "https://github.com/phpgt/Dom/pull/487",
+      "pr_title": "build(deps-dev): bump phpstan/phpstan from 1.12.34 to 2.2.16",
+      "stars": 124,
+      "package": "phpstan/phpstan",
+      "created_at": "2026-09-28T09:32:24Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (1.12.34 -> 2.2.16) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:01Z"
+    },
+    {
       "id": "sandydargoport_prism_615",
       "repo": "sandydargoport/prism",
       "pr_number": 615,
@@ -1561,6 +1986,32 @@
       "discovered_at": "2026-10-05T08:06:08Z"
     },
     {
+      "id": "Ocelot-Social-Community_Ocelot-Social_10368",
+      "repo": "Ocelot-Social-Community/Ocelot-Social",
+      "pr_number": 10368,
+      "pr_url": "https://github.com/Ocelot-Social-Community/Ocelot-Social/pull/10368",
+      "pr_title": "build(deps-dev): bump eslint-plugin-vue from 10.11.0 to 10.11.1 in /webapp",
+      "stars": 113,
+      "package": "eslint-plugin-vue",
+      "created_at": "2026-10-03T01:04:08Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"eslint-plugin-vue\": \"10.11.0\" // Bumped to 10.11.1 which broke CI: build test pipeline",
+          "fix": "\"eslint-plugin-vue\": \"10.11.1\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T11:40:48Z"
+    },
+    {
       "id": "DIYgod_RSSHub_23471",
       "repo": "DIYgod/RSSHub",
       "pr_number": 23471,
@@ -1578,6 +2029,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:06:15Z"
+    },
+    {
+      "id": "fastapi_full-stack-fastapi-template_2497",
+      "repo": "fastapi/full-stack-fastapi-template",
+      "pr_number": 2497,
+      "pr_url": "https://github.com/fastapi/full-stack-fastapi-template/pull/2497",
+      "pr_title": "\u2b06 Bump the python-packages group across 1 directory with 4 updates",
+      "stars": 45888,
+      "package": "unknown",
+      "created_at": "2026-10-01T10:20:38Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:53Z"
     },
     {
       "id": "goauthentik_authentik_26726",
@@ -1637,6 +2107,25 @@
       "discovered_at": "2026-10-06T04:18:38Z"
     },
     {
+      "id": "aws_aws-cdk_38981",
+      "repo": "aws/aws-cdk",
+      "pr_number": 38981,
+      "pr_url": "https://github.com/aws/aws-cdk/pull/38981",
+      "pr_title": "chore(deps): bump the npm_and_yarn group across 3 directories with 3 updates",
+      "stars": 12920,
+      "package": "unknown",
+      "created_at": "2026-10-06T10:03:32Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:38Z"
+    },
+    {
       "id": "solidtime-io_solidtime_1292",
       "repo": "solidtime-io/solidtime",
       "pr_number": 1292,
@@ -1654,6 +2143,63 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:05:59Z"
+    },
+    {
+      "id": "apache_beam_40432",
+      "repo": "apache/beam",
+      "pr_number": 40432,
+      "pr_url": "https://github.com/apache/beam/pull/40432",
+      "pr_title": "Bump multidict from 6.7.1 to 6.9.1 in /sdks/python/container/py314",
+      "stars": 8678,
+      "package": "multidict",
+      "created_at": "2026-10-06T11:37:13Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:04Z"
+    },
+    {
+      "id": "apache_beam_40431",
+      "repo": "apache/beam",
+      "pr_number": 40431,
+      "pr_url": "https://github.com/apache/beam/pull/40431",
+      "pr_title": "Bump pymongo from 4.17.0 to 4.18.2 in /sdks/python/container/py314",
+      "stars": 8678,
+      "package": "pymongo",
+      "created_at": "2026-10-06T11:37:06Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:07Z"
+    },
+    {
+      "id": "microsoft_kiota_8340",
+      "repo": "microsoft/kiota",
+      "pr_number": 8340,
+      "pr_url": "https://github.com/microsoft/kiota/pull/8340",
+      "pr_title": "build(deps): bump proxy-addr from 2.0.7 to 2.0.8 in /it/typescript",
+      "stars": 3825,
+      "package": "proxy-addr",
+      "created_at": "2026-10-06T11:37:03Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:51Z"
     },
     {
       "id": "wordpress-mobile_WordPress-Android_23390",
@@ -1730,6 +2276,44 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T04:18:50Z"
+    },
+    {
+      "id": "filecoin-project_lotus_13882",
+      "repo": "filecoin-project/lotus",
+      "pr_number": 13882,
+      "pr_url": "https://github.com/filecoin-project/lotus/pull/13882",
+      "pr_title": "build(deps): bump the libp2p-ecosystem group across 1 directory with 2 updates",
+      "stars": 2987,
+      "package": "unknown",
+      "created_at": "2026-10-06T10:31:24Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:57Z"
+    },
+    {
+      "id": "filecoin-project_lotus_13879",
+      "repo": "filecoin-project/lotus",
+      "pr_number": 13879,
+      "pr_url": "https://github.com/filecoin-project/lotus/pull/13879",
+      "pr_title": "build(deps): bump go.opentelemetry.io/otel from 1.46.0 to 1.47.0",
+      "stars": 2987,
+      "package": "go.opentelemetry.io/otel",
+      "created_at": "2026-10-06T10:31:15Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:59Z"
     },
     {
       "id": "kubeflow_trainer_4181",
@@ -1960,6 +2544,82 @@
       "discovered_at": "2026-10-05T08:06:18Z"
     },
     {
+      "id": "nornir-automation_nornir_1110",
+      "repo": "nornir-automation/nornir",
+      "pr_number": 1110,
+      "pr_url": "https://github.com/nornir-automation/nornir/pull/1110",
+      "pr_title": "chore(deps): bump jupyterlab from 4.6.2 to 4.6.4",
+      "stars": 1626,
+      "package": "jupyterlab",
+      "created_at": "2026-10-06T11:38:31Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:46Z"
+    },
+    {
+      "id": "nornir-automation_nornir_1109",
+      "repo": "nornir-automation/nornir",
+      "pr_number": 1109,
+      "pr_url": "https://github.com/nornir-automation/nornir/pull/1109",
+      "pr_title": "chore(deps): bump notebook from 7.6.0 to 7.6.3",
+      "stars": 1626,
+      "package": "notebook",
+      "created_at": "2026-10-06T11:36:39Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:08Z"
+    },
+    {
+      "id": "nornir-automation_nornir_1108",
+      "repo": "nornir-automation/nornir",
+      "pr_number": 1108,
+      "pr_url": "https://github.com/nornir-automation/nornir/pull/1108",
+      "pr_title": "chore(deps): bump tornado from 6.5.8 to 6.5.9",
+      "stars": 1626,
+      "package": "tornado",
+      "created_at": "2026-10-06T11:36:27Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:12Z"
+    },
+    {
+      "id": "ceph_ceph-csi_6575",
+      "repo": "ceph/ceph-csi",
+      "pr_number": 6575,
+      "pr_url": "https://github.com/ceph/ceph-csi/pull/6575",
+      "pr_title": "rebase: bump google.golang.org/grpc from 1.83.2 to 1.84.0 in /e2e",
+      "stars": 1579,
+      "package": "google.golang.org/grpc",
+      "created_at": "2026-09-21T20:53:35Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:33Z"
+    },
+    {
       "id": "sakura-editor_sakura_2713",
       "repo": "sakura-editor/sakura",
       "pr_number": 2713,
@@ -1996,6 +2656,101 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T23:35:54Z"
+    },
+    {
+      "id": "DataBiosphere_toil_5622",
+      "repo": "DataBiosphere/toil",
+      "pr_number": 5622,
+      "pr_url": "https://github.com/DataBiosphere/toil/pull/5622",
+      "pr_title": "Update addict requirement from <2.5,>=2.2.1 to >=2.4.0,<2.5",
+      "stars": 936,
+      "package": "unknown",
+      "created_at": "2026-10-06T11:38:15Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:49Z"
+    },
+    {
+      "id": "DataBiosphere_toil_5621",
+      "repo": "DataBiosphere/toil",
+      "pr_number": 5621,
+      "pr_url": "https://github.com/DataBiosphere/toil/pull/5621",
+      "pr_title": "Update setuptools requirement from >=64 to >=84.0.0",
+      "stars": 936,
+      "package": "unknown",
+      "created_at": "2026-10-06T11:38:11Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:50Z"
+    },
+    {
+      "id": "DataBiosphere_toil_5620",
+      "repo": "DataBiosphere/toil",
+      "pr_number": 5620,
+      "pr_url": "https://github.com/DataBiosphere/toil/pull/5620",
+      "pr_title": "Update ruamel-yaml requirement from <1,>=0.18.7 to >=0.19.1,<1",
+      "stars": 936,
+      "package": "unknown",
+      "created_at": "2026-10-06T11:37:58Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:54Z"
+    },
+    {
+      "id": "DataBiosphere_toil_5619",
+      "repo": "DataBiosphere/toil",
+      "pr_number": 5619,
+      "pr_url": "https://github.com/DataBiosphere/toil/pull/5619",
+      "pr_title": "Update idna requirement from >=2 to >=3.20",
+      "stars": 936,
+      "package": "unknown",
+      "created_at": "2026-10-06T11:37:55Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:56Z"
+    },
+    {
+      "id": "DataBiosphere_toil_5606",
+      "repo": "DataBiosphere/toil",
+      "pr_number": 5606,
+      "pr_url": "https://github.com/DataBiosphere/toil/pull/5606",
+      "pr_title": "Update docutils requirement from <0.23,>=0.16 to >=0.23,<0.24",
+      "stars": 936,
+      "package": "unknown",
+      "created_at": "2026-10-05T18:17:16Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:13Z"
     },
     {
       "id": "HelpCode-ai_anythingmcp_872",
@@ -2283,6 +3038,25 @@
       "discovered_at": "2026-10-05T08:06:14Z"
     },
     {
+      "id": "Nomi-CEu_Nomi-CEu_1596",
+      "repo": "Nomi-CEu/Nomi-CEu",
+      "pr_number": 1596,
+      "pr_url": "https://github.com/Nomi-CEu/Nomi-CEu/pull/1596",
+      "pr_title": "Bump crate-ci/typos from 1.47.2 to 1.50.3 in the actions-safe-updates group",
+      "stars": 297,
+      "package": "crate-ci/typos",
+      "created_at": "2026-10-06T11:37:16Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:06Z"
+    },
+    {
       "id": "mitre_heimdall2_8802",
       "repo": "mitre/heimdall2",
       "pr_number": 8802,
@@ -2492,6 +3266,25 @@
       "discovered_at": "2026-10-06T04:18:41Z"
     },
     {
+      "id": "mauricedb_use-abortable-fetch_1339",
+      "repo": "mauricedb/use-abortable-fetch",
+      "pr_number": 1339,
+      "pr_url": "https://github.com/mauricedb/use-abortable-fetch/pull/1339",
+      "pr_title": "build(deps-dev): bump react and @types/react",
+      "stars": 159,
+      "package": "unknown",
+      "created_at": "2026-10-01T18:53:34Z",
+      "state": "open",
+      "ci_status": "pending",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:16Z"
+    },
+    {
       "id": "jhipster_generator-jhipster-quarkus_714",
       "repo": "jhipster/generator-jhipster-quarkus",
       "pr_number": 714,
@@ -2549,6 +3342,44 @@
       "discovered_at": "2026-10-05T23:35:46Z"
     },
     {
+      "id": "kvesteri_postgresql-audit_138",
+      "repo": "kvesteri/postgresql-audit",
+      "pr_number": 138,
+      "pr_url": "https://github.com/kvesteri/postgresql-audit/pull/138",
+      "pr_title": "Bump werkzeug from 3.1.6 to 3.1.9 in /requirements",
+      "stars": 139,
+      "package": "werkzeug",
+      "created_at": "2026-10-06T11:38:00Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:55Z"
+    },
+    {
+      "id": "vaadin_flow-components_10354",
+      "repo": "vaadin/flow-components",
+      "pr_number": 10354,
+      "pr_url": "https://github.com/vaadin/flow-components/pull/10354",
+      "pr_title": "chore: bump dev.langchain4j:langchain4j from 1.20.2 to 1.21.0",
+      "stars": 129,
+      "package": "unknown",
+      "created_at": "2026-10-06T10:12:56Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:40:37Z"
+    },
+    {
       "id": "Kanahiro_chiitiler_258",
       "repo": "Kanahiro/chiitiler",
       "pr_number": 258,
@@ -2604,6 +3435,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:06:12Z"
+    },
+    {
+      "id": "2youg1_sprawling-agents_54",
+      "repo": "2youg1/sprawling-agents",
+      "pr_number": 54,
+      "pr_url": "https://github.com/2youg1/sprawling-agents/pull/54",
+      "pr_title": "card-S0.DEPS: bump the patch-and-minor group with 3 updates",
+      "stars": 106,
+      "package": "unknown",
+      "created_at": "2026-10-06T11:36:06Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T11:41:14Z"
     },
     {
       "id": "nats-io_nats-site_1115",
