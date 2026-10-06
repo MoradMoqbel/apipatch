@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-06T11:41:16Z",
+  "updated_at": "2026-10-06T17:45:28Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
@@ -1151,6 +1151,34 @@
       "discovered_at": "2026-10-05T17:43:14Z"
     },
     {
+      "id": "basementstudio_xmcp_713",
+      "repo": "basementstudio/xmcp",
+      "pr_number": 713,
+      "pr_url": "https://github.com/basementstudio/xmcp/pull/713",
+      "pr_title": "chore(deps-dev): bump vitest from 3.2.7 to 4.1.11",
+      "stars": 1332,
+      "package": "vitest",
+      "created_at": "2026-10-06T17:38:30Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: changeset-check.",
+      "failed_checks": [
+        "changeset-check"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"vitest\": \"3.2.7\" // Bumped to 4.1.11 which broke CI: changeset-check",
+          "fix": "\"vitest\": \"4.1.11\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T17:45:11Z"
+    },
+    {
       "id": "CERT-Polska_Artemis_3169",
       "repo": "CERT-Polska/Artemis",
       "pr_number": 3169,
@@ -1224,6 +1252,25 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-06T11:40:40Z"
+    },
+    {
+      "id": "hashgraph-online_hol-guard_3158",
+      "repo": "hashgraph-online/hol-guard",
+      "pr_number": 3158,
+      "pr_url": "https://github.com/hashgraph-online/hol-guard/pull/3158",
+      "pr_title": "deps(actions): bump astral-sh/setup-uv from 6.8.0 to 10.2.0",
+      "stars": 793,
+      "package": "astral-sh/setup-uv",
+      "created_at": "2026-09-28T09:29:16Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (6.8.0 -> 10.2.0) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:22Z"
     },
     {
       "id": "Dstack-TEE_dstack_1434",
@@ -1305,6 +1352,35 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T11:41:05Z"
+    },
+    {
+      "id": "sockmaster27_svader_761",
+      "repo": "sockmaster27/svader",
+      "pr_number": 761,
+      "pr_url": "https://github.com/sockmaster27/svader/pull/761",
+      "pr_title": "Bump @sveltejs/kit from 2.70.3 to 3.0.0",
+      "stars": 465,
+      "package": "@sveltejs/kit",
+      "created_at": "2026-10-06T17:44:18Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: test, check.",
+      "failed_checks": [
+        "test",
+        "check"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"@sveltejs/kit\": \"2.70.3\" // Bumped to 3.0.0 which broke CI: test, check",
+          "fix": "\"@sveltejs/kit\": \"3.0.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T17:45:13Z"
     },
     {
       "id": "OWASP_Nest_5672",
@@ -1909,6 +1985,63 @@
       "discovered_at": "2026-10-05T08:06:01Z"
     },
     {
+      "id": "SiddhantSadangi_st_supabase_connection_47",
+      "repo": "SiddhantSadangi/st_supabase_connection",
+      "pr_number": 47,
+      "pr_url": "https://github.com/SiddhantSadangi/st_supabase_connection/pull/47",
+      "pr_title": "build(deps): bump supabase-functions from 2.31.0 to 2.32.0",
+      "stars": 142,
+      "package": "supabase-functions",
+      "created_at": "2026-10-06T17:43:54Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pinned demo runtime.",
+      "failed_checks": [
+        "Pinned demo runtime"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"supabase-functions\": \"2.31.0\" // Bumped to 2.32.0 which broke CI: Pinned demo runtime",
+          "fix": "\"supabase-functions\": \"2.32.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T17:45:25Z"
+    },
+    {
+      "id": "SiddhantSadangi_st_supabase_connection_46",
+      "repo": "SiddhantSadangi/st_supabase_connection",
+      "pr_number": 46,
+      "pr_url": "https://github.com/SiddhantSadangi/st_supabase_connection/pull/46",
+      "pr_title": "build(deps): bump realtime from 2.31.0 to 2.32.0",
+      "stars": 142,
+      "package": "realtime",
+      "created_at": "2026-10-06T17:43:54Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pinned demo runtime, Pinned demo runtime.",
+      "failed_checks": [
+        "Pinned demo runtime",
+        "Pinned demo runtime"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"realtime\": \"2.31.0\" // Bumped to 2.32.0 which broke CI: Pinned demo runtime, Pinned demo runtime",
+          "fix": "\"realtime\": \"2.32.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T17:45:27Z"
+    },
+    {
       "id": "fabriziosalmi_wildbox_667",
       "repo": "fabriziosalmi/wildbox",
       "pr_number": 667,
@@ -2012,6 +2145,44 @@
       "discovered_at": "2026-10-06T11:40:48Z"
     },
     {
+      "id": "langchain-ai_langchain_41092",
+      "repo": "langchain-ai/langchain",
+      "pr_number": 41092,
+      "pr_url": "https://github.com/langchain-ai/langchain/pull/41092",
+      "pr_title": "chore(deps): bump fsspec from 2026.6.0 to 2026.9.0 in /libs/partners/huggingface",
+      "stars": 147502,
+      "package": "fsspec",
+      "created_at": "2026-10-06T17:43:53Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:17Z"
+    },
+    {
+      "id": "langchain-ai_langchain_41091",
+      "repo": "langchain-ai/langchain",
+      "pr_number": 41091,
+      "pr_url": "https://github.com/langchain-ai/langchain/pull/41091",
+      "pr_title": "chore(deps): bump fsspec from 2026.6.0 to 2026.9.0 in /libs/partners/mistralai",
+      "stars": 147502,
+      "package": "fsspec",
+      "created_at": "2026-10-06T17:43:45Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:23Z"
+    },
+    {
       "id": "DIYgod_RSSHub_23471",
       "repo": "DIYgod/RSSHub",
       "pr_number": 23471,
@@ -2086,6 +2257,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T04:19:05Z"
+    },
+    {
+      "id": "marimo-team_marimo_11122",
+      "repo": "marimo-team/marimo",
+      "pr_number": 11122,
+      "pr_url": "https://github.com/marimo-team/marimo/pull/11122",
+      "pr_title": "chore(deps): bump proxy-addr from 2.0.7 to 2.0.8",
+      "stars": 23039,
+      "package": "proxy-addr",
+      "created_at": "2026-10-06T06:34:26Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:05Z"
     },
     {
       "id": "tiann_KernelSU_3760",
@@ -2314,6 +2504,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T11:40:59Z"
+    },
+    {
+      "id": "David-Crty_databasement_679",
+      "repo": "David-Crty/databasement",
+      "pr_number": 679,
+      "pr_url": "https://github.com/David-Crty/databasement/pull/679",
+      "pr_title": "chore(deps): bump compression from 1.8.1 to 1.8.2 in /docs",
+      "stars": 2510,
+      "package": "compression",
+      "created_at": "2026-10-06T17:38:29Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:15Z"
     },
     {
       "id": "kubeflow_trainer_4181",
@@ -2639,6 +2848,25 @@
       "discovered_at": "2026-10-05T08:06:17Z"
     },
     {
+      "id": "stats-organization_github-stats-extended_626",
+      "repo": "stats-organization/github-stats-extended",
+      "pr_number": 626,
+      "pr_url": "https://github.com/stats-organization/github-stats-extended/pull/626",
+      "pr_title": "build(deps-dev): Bump turbo from 2.10.12 to 2.11.5",
+      "stars": 1454,
+      "package": "turbo",
+      "created_at": "2026-10-03T00:49:24Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:14Z"
+    },
+    {
       "id": "SkriptLang_Skript_8885",
       "repo": "SkriptLang/Skript",
       "pr_number": 8885,
@@ -2655,7 +2883,7 @@
       "failed_checks": [],
       "affected_files": [],
       "apipatch_patch_available": false,
-      "discovered_at": "2026-10-05T23:35:54Z"
+      "discovered_at": "2026-10-06T17:45:28Z"
     },
     {
       "id": "DataBiosphere_toil_5622",
@@ -2810,6 +3038,25 @@
       "discovered_at": "2026-10-05T23:36:06Z"
     },
     {
+      "id": "frePPLe_frepple_775",
+      "repo": "frePPLe/frepple",
+      "pr_number": 775,
+      "pr_url": "https://github.com/frePPLe/frepple/pull/775",
+      "pr_title": "Bump postcss-selector-parser from 6.1.2 to 6.1.4",
+      "stars": 756,
+      "package": "postcss-selector-parser",
+      "created_at": "2026-10-06T17:43:56Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:26Z"
+    },
+    {
       "id": "lakernote_easy-postman_176",
       "repo": "lakernote/easy-postman",
       "pr_number": 176,
@@ -2960,6 +3207,63 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:06:16Z"
+    },
+    {
+      "id": "DesignLiquido_delegua_1453",
+      "repo": "DesignLiquido/delegua",
+      "pr_number": 1453,
+      "pr_url": "https://github.com/DesignLiquido/delegua/pull/1453",
+      "pr_title": "build(deps-dev): bump @types/node from 26.6.1 to 26.6.4",
+      "stars": 491,
+      "package": "@types/node",
+      "created_at": "2026-09-28T23:44:01Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:04Z"
+    },
+    {
+      "id": "DesignLiquido_delegua_1459",
+      "repo": "DesignLiquido/delegua",
+      "pr_number": 1459,
+      "pr_url": "https://github.com/DesignLiquido/delegua/pull/1459",
+      "pr_title": "build(deps): bump shell-quote from 1.10.0 to 1.12.0",
+      "stars": 491,
+      "package": "shell-quote",
+      "created_at": "2026-10-06T17:42:01Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:12Z"
+    },
+    {
+      "id": "sockmaster27_svader_760",
+      "repo": "sockmaster27/svader",
+      "pr_number": 760,
+      "pr_url": "https://github.com/sockmaster27/svader/pull/760",
+      "pr_title": "Bump eslint from 10.11.0 to 10.12.0",
+      "stars": 465,
+      "package": "eslint",
+      "created_at": "2026-10-06T17:44:02Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:18Z"
     },
     {
       "id": "smallrye_jandex_729",
@@ -3131,6 +3435,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T04:19:02Z"
+    },
+    {
+      "id": "OAI_learn.openapis.org_214",
+      "repo": "OAI/learn.openapis.org",
+      "pr_number": 214,
+      "pr_url": "https://github.com/OAI/learn.openapis.org/pull/214",
+      "pr_title": "build(deps): bump prettier from 3.8.3 to 3.9.9",
+      "stars": 234,
+      "package": "prettier",
+      "created_at": "2026-10-06T17:42:44Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T17:45:24Z"
     },
     {
       "id": "AbsaOSS_spline-spark-agent_937",
