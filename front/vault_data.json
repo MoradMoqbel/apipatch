@@ -1,9 +1,28 @@
 {
-  "updated_at": "2026-10-06T17:45:28Z",
+  "updated_at": "2026-10-06T22:09:08Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
   "leads": [
+    {
+      "id": "microsoft_vscode_340014",
+      "repo": "microsoft/vscode",
+      "pr_number": 340014,
+      "pr_url": "https://github.com/microsoft/vscode/pull/340014",
+      "pr_title": "build(deps): bump katex from 0.16.22 to 0.18.2",
+      "stars": 193608,
+      "package": "katex",
+      "created_at": "2026-10-06T09:51:31Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.16.22 -> 0.18.2) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:09:02Z"
+    },
     {
       "id": "appsmithorg_appsmith_42348",
       "repo": "appsmithorg/appsmith",
@@ -41,6 +60,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T23:35:53Z"
+    },
+    {
+      "id": "jitsi_jitsi-meet_17940",
+      "repo": "jitsi/jitsi-meet",
+      "pr_number": 17940,
+      "pr_url": "https://github.com/jitsi/jitsi-meet/pull/17940",
+      "pr_title": "chore(deps): bump i18next-http-backend from 0.0.0 to 4.0.2 in /react-native-sdk",
+      "stars": 30052,
+      "package": "i18next-http-backend",
+      "created_at": "2026-10-06T22:07:26Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (0.0.0 -> 4.0.2) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:55Z"
     },
     {
       "id": "HumanSignal_label-studio_9970",
@@ -238,6 +276,94 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-05T17:43:08Z"
+    },
+    {
+      "id": "Kaggle_kaggle-cli_1212",
+      "repo": "Kaggle/kaggle-cli",
+      "pr_number": 1212,
+      "pr_url": "https://github.com/Kaggle/kaggle-cli/pull/1212",
+      "pr_title": "chore(deps): bump urllib3 from 2.7.0 to 2.8.0 in /tools/releases",
+      "stars": 7583,
+      "package": "urllib3",
+      "created_at": "2026-10-05T22:13:16Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: kaggle-cli-integration-tests-branch (kaggle-cicd), kaggle-cli-branch-3-13-13 (kaggle-cicd), kaggle-cli-branch-3-14-4 (kaggle-cicd).",
+      "failed_checks": [
+        "kaggle-cli-integration-tests-branch (kaggle-cicd)",
+        "kaggle-cli-branch-3-13-13 (kaggle-cicd)",
+        "kaggle-cli-branch-3-14-4 (kaggle-cicd)",
+        "kaggle-cli-branch-3-12-13 (kaggle-cicd)",
+        "kaggle-cli-branch-3-11-15 (kaggle-cicd)"
+      ],
+      "affected_files": [
+        {
+          "file": "pyproject.toml",
+          "line": 1,
+          "call": "\"urllib3\": \"2.7.0\" // Bumped to 2.8.0 which broke CI: kaggle-cli-integration-tests-branch (kaggle-cicd), kaggle-cli-branch-3-13-13 (kaggle-cicd)",
+          "fix": "\"urllib3\": \"2.8.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T22:09:03Z"
+    },
+    {
+      "id": "gopasspw_gopass_3652",
+      "repo": "gopasspw/gopass",
+      "pr_number": 3652,
+      "pr_url": "https://github.com/gopasspw/gopass/pull/3652",
+      "pr_title": "chore(deps): bump github.com/noborus/ov from 0.54.0 to 0.55.0",
+      "stars": 7249,
+      "package": "github.com/noborus/ov",
+      "created_at": "2026-10-06T21:53:18Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: dependabot.",
+      "failed_checks": [
+        "dependabot"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"github.com/noborus/ov\": \"0.54.0\" // Bumped to 0.55.0 which broke CI: dependabot",
+          "fix": "\"github.com/noborus/ov\": \"0.55.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T22:08:50Z"
+    },
+    {
+      "id": "gopasspw_gopass_3651",
+      "repo": "gopasspw/gopass",
+      "pr_number": 3651,
+      "pr_url": "https://github.com/gopasspw/gopass/pull/3651",
+      "pr_title": "chore(deps): bump github.com/ProtonMail/go-crypto from 1.5.0 to 1.5.2",
+      "stars": 7249,
+      "package": "github.com/protonmail/go-crypto",
+      "created_at": "2026-10-06T21:53:04Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: dependabot.",
+      "failed_checks": [
+        "dependabot"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"github.com/protonmail/go-crypto\": \"1.5.0\" // Bumped to 1.5.2 which broke CI: dependabot",
+          "fix": "\"github.com/protonmail/go-crypto\": \"1.5.2\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T22:09:08Z"
     },
     {
       "id": "VueTorrent_VueTorrent_2944",
@@ -915,6 +1041,34 @@
       "discovered_at": "2026-10-05T23:36:09Z"
     },
     {
+      "id": "fossasia_eventyay_6274",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6274,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6274",
+      "pr_title": "chore(deps-dev): bump vite-plugin-pwa from 1.3.0 to 2.0.0 in /app/eventyay/webapp/video",
+      "stars": 1700,
+      "package": "vite-plugin-pwa",
+      "created_at": "2026-10-06T22:07:04Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Sourcery review.",
+      "failed_checks": [
+        "Sourcery review"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"vite-plugin-pwa\": \"1.3.0\" // Bumped to 2.0.0 which broke CI: Sourcery review",
+          "fix": "\"vite-plugin-pwa\": \"2.0.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T22:08:52Z"
+    },
+    {
       "id": "fossasia_eventyay_6193",
       "repo": "fossasia/eventyay",
       "pr_number": 6193,
@@ -1273,6 +1427,32 @@
       "discovered_at": "2026-10-06T17:45:22Z"
     },
     {
+      "id": "kubernetes-csi_external-snapshotter_1503",
+      "repo": "kubernetes-csi/external-snapshotter",
+      "pr_number": 1503,
+      "pr_url": "https://github.com/kubernetes-csi/external-snapshotter/pull/1503",
+      "pr_title": "Bump the github-dependencies group across 1 directory with 45 updates",
+      "stars": 646,
+      "package": "unknown",
+      "created_at": "2026-10-06T17:11:49Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: build test pipeline",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T22:08:58Z"
+    },
+    {
       "id": "Dstack-TEE_dstack_1434",
       "repo": "Dstack-TEE/dstack",
       "pr_number": 1434,
@@ -1440,6 +1620,34 @@
       "discovered_at": "2026-10-06T04:19:03Z"
     },
     {
+      "id": "SciML_SciMLSensitivity.jl_1692",
+      "repo": "SciML/SciMLSensitivity.jl",
+      "pr_number": 1692,
+      "pr_url": "https://github.com/SciML/SciMLSensitivity.jl/pull/1692",
+      "pr_title": "Update NLsolve requirement from 4.5.1 to 4.5.1, 5.0 in the all-julia-packages group across 1 directory",
+      "stars": 397,
+      "package": "unknown",
+      "created_at": "2026-09-30T22:12:29Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: tests / Core8 (julia 1.11, ubuntu-latest) / Tests - Core8 (Julia 1.11).",
+      "failed_checks": [
+        "tests / Core8 (julia 1.11, ubuntu-latest) / Tests - Core8 (Julia 1.11)"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: tests / Core8 (julia 1.11, ubuntu-latest) / Tests - Core8 (Julia 1.11)",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T22:08:54Z"
+    },
+    {
       "id": "aws_mcp_proxy_for_aws_430",
       "repo": "aws/mcp-proxy-for-aws",
       "pr_number": 430,
@@ -1504,6 +1712,32 @@
       "is_real_code_break": false,
       "break_category": "MANIFEST_PIN",
       "patch_type": "MANIFEST_PIN"
+    },
+    {
+      "id": "kubernetes-sigs_cloud-provider-azure_11106",
+      "repo": "kubernetes-sigs/cloud-provider-azure",
+      "pr_number": 11106,
+      "pr_url": "https://github.com/kubernetes-sigs/cloud-provider-azure/pull/11106",
+      "pr_title": "build(deps): bump the all group with 7 updates",
+      "stars": 294,
+      "package": "unknown",
+      "created_at": "2026-10-05T17:03:34Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: build test pipeline",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-06T22:08:59Z"
     },
     {
       "id": "mitre_heimdall2_8801",
@@ -2221,6 +2455,120 @@
       "discovered_at": "2026-10-06T11:40:53Z"
     },
     {
+      "id": "jitsi_jitsi-meet_17945",
+      "repo": "jitsi/jitsi-meet",
+      "pr_number": 17945,
+      "pr_url": "https://github.com/jitsi/jitsi-meet/pull/17945",
+      "pr_title": "chore(deps-dev): bump proxy-addr from 2.0.7 to 2.0.8",
+      "stars": 30052,
+      "package": "proxy-addr",
+      "created_at": "2026-10-06T22:07:57Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:45Z"
+    },
+    {
+      "id": "jitsi_jitsi-meet_17944",
+      "repo": "jitsi/jitsi-meet",
+      "pr_number": 17944,
+      "pr_url": "https://github.com/jitsi/jitsi-meet/pull/17944",
+      "pr_title": "chore(deps-dev): bump compression from 1.8.1 to 1.8.2",
+      "stars": 30052,
+      "package": "compression",
+      "created_at": "2026-10-06T22:07:56Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:46Z"
+    },
+    {
+      "id": "jitsi_jitsi-meet_17943",
+      "repo": "jitsi/jitsi-meet",
+      "pr_number": 17943,
+      "pr_url": "https://github.com/jitsi/jitsi-meet/pull/17943",
+      "pr_title": "chore(deps): bump shell-quote from 1.10.0 to 1.12.0",
+      "stars": 30052,
+      "package": "shell-quote",
+      "created_at": "2026-10-06T22:07:51Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:49Z"
+    },
+    {
+      "id": "jitsi_jitsi-meet_17942",
+      "repo": "jitsi/jitsi-meet",
+      "pr_number": 17942,
+      "pr_url": "https://github.com/jitsi/jitsi-meet/pull/17942",
+      "pr_title": "chore(deps): bump source-map-js from 1.2.1 to 1.2.2",
+      "stars": 30052,
+      "package": "source-map-js",
+      "created_at": "2026-10-06T22:07:40Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:51Z"
+    },
+    {
+      "id": "jitsi_jitsi-meet_17941",
+      "repo": "jitsi/jitsi-meet",
+      "pr_number": 17941,
+      "pr_url": "https://github.com/jitsi/jitsi-meet/pull/17941",
+      "pr_title": "chore(deps): bump dompurify from 3.4.12 to 3.4.16",
+      "stars": 30052,
+      "package": "dompurify",
+      "created_at": "2026-10-06T22:07:33Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:53Z"
+    },
+    {
+      "id": "ArchiveBox_ArchiveBox_1901",
+      "repo": "ArchiveBox/ArchiveBox",
+      "pr_number": 1901,
+      "pr_url": "https://github.com/ArchiveBox/ArchiveBox/pull/1901",
+      "pr_title": "Update browser tools and Python security dependencies on dev",
+      "stars": 28698,
+      "package": "unknown",
+      "created_at": "2026-10-02T17:19:39Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:09:07Z"
+    },
+    {
       "id": "goauthentik_authentik_26726",
       "repo": "goauthentik/authentik",
       "pr_number": 26726,
@@ -2506,6 +2854,25 @@
       "discovered_at": "2026-10-06T11:40:59Z"
     },
     {
+      "id": "guillermolg00_morphicons_39",
+      "repo": "guillermolg00/morphicons",
+      "pr_number": 39,
+      "pr_url": "https://github.com/guillermolg00/morphicons/pull/39",
+      "pr_title": "chore(deps): bump the minor-and-patch group across 1 directory with 12 updates",
+      "stars": 2800,
+      "package": "unknown",
+      "created_at": "2026-10-06T22:05:50Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:09:04Z"
+    },
+    {
       "id": "David-Crty_databasement_679",
       "repo": "David-Crty/databasement",
       "pr_number": 679,
@@ -2751,6 +3118,82 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-05T08:06:18Z"
+    },
+    {
+      "id": "fossasia_eventyay_6272",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6272,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6272",
+      "pr_title": "chore(deps): bump websockets from 17.1 to 17.2 in /app",
+      "stars": 1700,
+      "package": "websockets",
+      "created_at": "2026-10-06T22:06:25Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:57Z"
+    },
+    {
+      "id": "fossasia_eventyay_6273",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6273,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6273",
+      "pr_title": "chore(deps): bump tzdata from 2026.4 to 2026.5 in /app",
+      "stars": 1700,
+      "package": "tzdata",
+      "created_at": "2026-10-06T22:06:41Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:09:00Z"
+    },
+    {
+      "id": "fossasia_eventyay_6271",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6271,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6271",
+      "pr_title": "chore(deps): bump django-filter from 26.1 to 26.2 in /app",
+      "stars": 1700,
+      "package": "django-filter",
+      "created_at": "2026-10-06T22:05:52Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:09:06Z"
+    },
+    {
+      "id": "fossasia_eventyay_6270",
+      "repo": "fossasia/eventyay",
+      "pr_number": 6270,
+      "pr_url": "https://github.com/fossasia/eventyay/pull/6270",
+      "pr_title": "chore(deps): bump zipp from 4.1.0 to 4.1.1 in /app",
+      "stars": 1700,
+      "package": "zipp",
+      "created_at": "2026-10-06T22:05:22Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:09:07Z"
     },
     {
       "id": "nornir-automation_nornir_1110",
@@ -3304,6 +3747,25 @@
       "discovered_at": "2026-10-05T08:06:06Z"
     },
     {
+      "id": "JVT038_MetaTube_195",
+      "repo": "JVT038/MetaTube",
+      "pr_number": 195,
+      "pr_url": "https://github.com/JVT038/MetaTube/pull/195",
+      "pr_title": "Bump urllib3 from 2.7.0 to 2.8.0",
+      "stars": 376,
+      "package": "urllib3",
+      "created_at": "2026-10-06T22:07:53Z",
+      "state": "open",
+      "ci_status": "pending",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:08:47Z"
+    },
+    {
       "id": "inovex_scrumlr.io_6765",
       "repo": "inovex/scrumlr.io",
       "pr_number": 6765,
@@ -3435,6 +3897,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T04:19:02Z"
+    },
+    {
+      "id": "guaardvark_guaardvark_305",
+      "repo": "guaardvark/guaardvark",
+      "pr_number": 305,
+      "pr_url": "https://github.com/guaardvark/guaardvark/pull/305",
+      "pr_title": "chore(deps): Bump source-map-js from 1.2.1 to 1.2.2 in /frontend",
+      "stars": 251,
+      "package": "source-map-js",
+      "created_at": "2026-10-06T22:06:49Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-06T22:09:01Z"
     },
     {
       "id": "OAI_learn.openapis.org_214",
