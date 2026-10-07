@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T08:13:21Z",
+  "updated_at": "2026-10-07T16:00:08Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
@@ -1574,6 +1574,25 @@
       "discovered_at": "2026-10-06T11:40:40Z"
     },
     {
+      "id": "DataDog_dd-trace-js_10662",
+      "repo": "DataDog/dd-trace-js",
+      "pr_number": 10662,
+      "pr_url": "https://github.com/DataDog/dd-trace-js/pull/10662",
+      "pr_title": "chore(deps-dev): bump mocha from 11.8.0 to 12.0.3",
+      "stars": 836,
+      "package": "mocha",
+      "created_at": "2026-10-07T00:58:49Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "HIGH",
+      "runtime_impact": "Major version bump (11.8.0 -> 12.0.3) requiring API compatibility verification.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T15:59:59Z"
+    },
+    {
       "id": "hashgraph-online_hol-guard_3158",
       "repo": "hashgraph-online/hol-guard",
       "pr_number": 3158,
@@ -2254,6 +2273,35 @@
       ],
       "apipatch_patch_available": true,
       "discovered_at": "2026-10-05T08:05:59Z"
+    },
+    {
+      "id": "shm11C3_HardwareVisualizer_2364",
+      "repo": "shm11C3/HardwareVisualizer",
+      "pr_number": 2364,
+      "pr_url": "https://github.com/shm11C3/HardwareVisualizer/pull/2364",
+      "pr_title": "Chore(deps-dev): Bump the vitest group with 2 updates",
+      "stars": 183,
+      "package": "unknown",
+      "created_at": "2026-10-07T15:43:14Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: test-e2e-native, check-frontend.",
+      "failed_checks": [
+        "test-e2e-native",
+        "check-frontend"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: test-e2e-native, check-frontend",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-07T16:00:08Z"
     },
     {
       "id": "nowledge-co_hawdb_858",
@@ -3076,6 +3124,44 @@
       "discovered_at": "2026-10-07T01:58:17Z"
     },
     {
+      "id": "spinnaker_spinnaker_8159",
+      "repo": "spinnaker/spinnaker",
+      "pr_number": 8159,
+      "pr_url": "https://github.com/spinnaker/spinnaker/pull/8159",
+      "pr_title": "chore(deps-dev): bump vitest from 4.1.10 to 4.1.11 in /deck",
+      "stars": 9802,
+      "package": "vitest",
+      "created_at": "2026-10-06T17:46:10Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T16:00:07Z"
+    },
+    {
+      "id": "openclaw_clawhub_3861",
+      "repo": "openclaw/clawhub",
+      "pr_number": 3861,
+      "pr_url": "https://github.com/openclaw/clawhub/pull/3861",
+      "pr_title": "chore(deps): bump h3 from 2.0.1-rc.25 to 2.0.1-rc.32",
+      "stars": 9492,
+      "package": "h3",
+      "created_at": "2026-09-30T16:09:00Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T15:59:56Z"
+    },
+    {
       "id": "solidtime-io_solidtime_1292",
       "repo": "solidtime-io/solidtime",
       "pr_number": 1292,
@@ -3834,6 +3920,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T17:45:14Z"
+    },
+    {
+      "id": "cooklang_cookcli_635",
+      "repo": "cooklang/cookcli",
+      "pr_number": 635,
+      "pr_url": "https://github.com/cooklang/cookcli/pull/635",
+      "pr_title": "chore(deps-dev): bump source-map-js from 1.2.1 to 1.2.2",
+      "stars": 1400,
+      "package": "source-map-js",
+      "created_at": "2026-10-07T15:58:46Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T15:59:58Z"
     },
     {
       "id": "SkriptLang_Skript_8885",
@@ -4651,6 +4756,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T22:08:47Z"
+    },
+    {
+      "id": "microsoft_regorus_829",
+      "repo": "microsoft/regorus",
+      "pr_number": 829,
+      "pr_url": "https://github.com/microsoft/regorus/pull/829",
+      "pr_title": "build(deps): bump the rust-dependencies group across 6 directories with 10 updates",
+      "stars": 353,
+      "package": "thiserror",
+      "created_at": "2026-10-01T02:44:10Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T15:59:55Z"
     },
     {
       "id": "inovex_scrumlr.io_6765",
