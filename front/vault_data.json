@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T01:58:46Z",
+  "updated_at": "2026-10-07T08:13:21Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
@@ -60,6 +60,61 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-07T01:58:37Z"
+    },
+    {
+      "id": "getsentry_sentry_125821",
+      "repo": "getsentry/sentry",
+      "pr_number": 125821,
+      "pr_url": "https://github.com/getsentry/sentry/pull/125821",
+      "pr_title": "build(deps-dev): bump eslint from 10.8.0 to 10.12.0",
+      "stars": 45495,
+      "package": "eslint",
+      "created_at": "2026-09-28T22:35:46Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Frontend, Jest (0, 8).",
+      "failed_checks": [
+        "Frontend",
+        "Jest (0, 8)"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"eslint\": \"10.8.0\" // Bumped to 10.12.0 which broke CI: Frontend, Jest (0, 8)",
+          "fix": "\"eslint\": \"10.12.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-07T08:13:14Z"
+    },
+    {
+      "id": "getsentry_sentry_124983",
+      "repo": "getsentry/sentry",
+      "pr_number": 124983,
+      "pr_url": "https://github.com/getsentry/sentry/pull/124983",
+      "pr_title": "build(deps): bump @stripe/stripe-js from 5.10.0 to 7.10.0",
+      "stars": 45495,
+      "package": "@stripe/stripe-js",
+      "created_at": "2026-09-18T22:39:00Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"@stripe/stripe-js\": \"5.10.0\" // Bumped to 7.10.0 which broke CI: build test pipeline",
+          "fix": "\"@stripe/stripe-js\": \"7.10.0\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-07T08:13:15Z"
     },
     {
       "id": "appsmithorg_appsmith_42348",
@@ -657,6 +712,32 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T11:40:45Z"
+    },
+    {
+      "id": "martin-olivier_airgorah_242",
+      "repo": "martin-olivier/airgorah",
+      "pr_number": 242,
+      "pr_url": "https://github.com/martin-olivier/airgorah/pull/242",
+      "pr_title": "build(deps): Bump lazy_static from 1.5.0 to 1.5.1",
+      "stars": 3824,
+      "package": "lazy_static",
+      "created_at": "2026-10-05T19:38:37Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
+      "failed_checks": [],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "\"lazy_static\": \"1.5.0\" // Bumped to 1.5.1 which broke CI: build test pipeline",
+          "fix": "\"lazy_static\": \"1.5.1\" // ApiPatch: Apply companion migration fix to restore green CI"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-07T08:13:14Z"
     },
     {
       "id": "ColeMurray_background-agents_2285",
@@ -1811,6 +1892,36 @@
       "patch_type": "AST_CODE_REWRITE"
     },
     {
+      "id": "rfsbraz_deleterr_313",
+      "repo": "rfsbraz/deleterr",
+      "pr_number": 313,
+      "pr_url": "https://github.com/rfsbraz/deleterr/pull/313",
+      "pr_title": "chore(deps): bump the python-packages group across 1 directory with 6 updates",
+      "stars": 340,
+      "package": "unknown",
+      "created_at": "2026-10-01T08:18:51Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: unit_tests, build, integration-tests.",
+      "failed_checks": [
+        "unit_tests",
+        "build",
+        "integration-tests"
+      ],
+      "affected_files": [
+        {
+          "file": "package.json",
+          "line": 1,
+          "call": "Dependency bump broke CI check: unit_tests, build",
+          "fix": "ApiPatch: Apply companion code update to restore green build"
+        }
+      ],
+      "apipatch_patch_available": true,
+      "discovered_at": "2026-10-07T08:13:18Z"
+    },
+    {
       "id": "huridocs_uwazi_9809",
       "repo": "huridocs/uwazi",
       "pr_number": 9809,
@@ -2851,6 +2962,25 @@
       "discovered_at": "2026-10-06T04:19:05Z"
     },
     {
+      "id": "pulumi_pulumi_24956",
+      "repo": "pulumi/pulumi",
+      "pr_number": 24956,
+      "pr_url": "https://github.com/pulumi/pulumi/pull/24956",
+      "pr_title": "Bump urllib3 from 2.7.0 to 2.8.0 in /sdk/python",
+      "stars": 25767,
+      "package": "urllib3",
+      "created_at": "2026-10-01T07:43:58Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:20Z"
+    },
+    {
       "id": "marimo-team_marimo_11122",
       "repo": "marimo-team/marimo",
       "pr_number": 11122,
@@ -3210,6 +3340,63 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T22:09:04Z"
+    },
+    {
+      "id": "UniversalMediaServer_UniversalMediaServer_6386",
+      "repo": "UniversalMediaServer/UniversalMediaServer",
+      "pr_number": 6386,
+      "pr_url": "https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6386",
+      "pr_title": "Bump @tabler/icons-react from 3.41.1 to 3.48.0 in /react-client",
+      "stars": 2656,
+      "package": "@tabler/icons-react",
+      "created_at": "2026-10-07T00:17:22Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:10Z"
+    },
+    {
+      "id": "UniversalMediaServer_UniversalMediaServer_6364",
+      "repo": "UniversalMediaServer/UniversalMediaServer",
+      "pr_number": 6364,
+      "pr_url": "https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6364",
+      "pr_title": "Bump the react group across 1 directory with 3 updates",
+      "stars": 2656,
+      "package": "unknown",
+      "created_at": "2026-09-30T00:14:17Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:11Z"
+    },
+    {
+      "id": "UniversalMediaServer_UniversalMediaServer_6384",
+      "repo": "UniversalMediaServer/UniversalMediaServer",
+      "pr_number": 6384,
+      "pr_url": "https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6384",
+      "pr_title": "Bump eslint-plugin-react-refresh from 0.5.2 to 0.5.7 in /react-client",
+      "stars": 2656,
+      "package": "eslint-plugin-react-refresh",
+      "created_at": "2026-10-07T00:16:24Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:12Z"
     },
     {
       "id": "David-Crty_databasement_679",
@@ -3687,6 +3874,25 @@
       "discovered_at": "2026-10-07T01:58:38Z"
     },
     {
+      "id": "hexpm_hexpm_2010",
+      "repo": "hexpm/hexpm",
+      "pr_number": 2010,
+      "pr_url": "https://github.com/hexpm/hexpm/pull/2010",
+      "pr_title": "Bump the mix group with 2 updates",
+      "stars": 1170,
+      "package": "unknown",
+      "created_at": "2026-10-07T08:09:12Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:21Z"
+    },
+    {
       "id": "DataBiosphere_toil_5622",
       "repo": "DataBiosphere/toil",
       "pr_number": 5622,
@@ -3934,6 +4140,44 @@
       "discovered_at": "2026-10-06T04:18:51Z"
     },
     {
+      "id": "OpenRailAssociation_osrd_18970",
+      "repo": "OpenRailAssociation/osrd",
+      "pr_number": 18970,
+      "pr_url": "https://github.com/OpenRailAssociation/osrd/pull/18970",
+      "pr_title": "front: bump sass from 1.104.1 to 1.105.1 in /front",
+      "stars": 663,
+      "package": "sass",
+      "created_at": "2026-10-02T18:28:45Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:02Z"
+    },
+    {
+      "id": "OpenRailAssociation_osrd_19004",
+      "repo": "OpenRailAssociation/osrd",
+      "pr_number": 19004,
+      "pr_url": "https://github.com/OpenRailAssociation/osrd/pull/19004",
+      "pr_title": "front: bump source-map-js from 1.2.1 to 1.2.2 in /front",
+      "stars": 663,
+      "package": "source-map-js",
+      "created_at": "2026-10-06T08:12:12Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:19Z"
+    },
+    {
       "id": "microsoft_microsoft-ui-reactor_1339",
       "repo": "microsoft/microsoft-ui-reactor",
       "pr_number": 1339,
@@ -4008,6 +4252,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T04:18:59Z"
+    },
+    {
+      "id": "safe-global_safe-wallet-monorepo_8942",
+      "repo": "safe-global/safe-wallet-monorepo",
+      "pr_number": 8942,
+      "pr_url": "https://github.com/safe-global/safe-wallet-monorepo/pull/8942",
+      "pr_title": "chore(deps): bump axios from 1.18.1 to 1.20.0",
+      "stars": 592,
+      "package": "axios",
+      "created_at": "2026-10-05T15:21:49Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:08Z"
     },
     {
       "id": "opendatacube_datacube-core_2619",
@@ -4941,6 +5204,44 @@
       "discovered_at": "2026-10-05T23:35:46Z"
     },
     {
+      "id": "StarCitizenToolBox_app_420",
+      "repo": "StarCitizenToolBox/app",
+      "pr_number": 420,
+      "pr_url": "https://github.com/StarCitizenToolBox/app/pull/420",
+      "pr_title": "build(deps): bump rustls from 0.23.37 to 0.23.45 in /rust",
+      "stars": 145,
+      "package": "rustls",
+      "created_at": "2026-10-07T08:12:19Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:02Z"
+    },
+    {
+      "id": "StarCitizenToolBox_app_419",
+      "repo": "StarCitizenToolBox/app",
+      "pr_number": 419,
+      "pr_url": "https://github.com/StarCitizenToolBox/app/pull/419",
+      "pr_title": "build(deps): bump rustls from 0.23.40 to 0.23.45 in /packages/p4k_upgrader",
+      "stars": 145,
+      "package": "rustls",
+      "created_at": "2026-10-07T08:12:00Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:17Z"
+    },
+    {
       "id": "kvesteri_postgresql-audit_138",
       "repo": "kvesteri/postgresql-audit",
       "pr_number": 138,
@@ -4977,6 +5278,25 @@
       "affected_files": [],
       "apipatch_patch_available": false,
       "discovered_at": "2026-10-06T11:40:37Z"
+    },
+    {
+      "id": "microsoft_physical-ai-toolchain_1860",
+      "repo": "microsoft/physical-ai-toolchain",
+      "pr_number": 1860,
+      "pr_url": "https://github.com/microsoft/physical-ai-toolchain/pull/1860",
+      "pr_title": "chore(deps-dev): bump ip-address from 10.7.0 to 10.7.3",
+      "stars": 122,
+      "package": "ip-address",
+      "created_at": "2026-10-05T23:17:01Z",
+      "state": "open",
+      "ci_status": "success",
+      "is_broken": false,
+      "break_severity": "MEDIUM",
+      "runtime_impact": "Active Dependabot dependency update.",
+      "failed_checks": [],
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-07T08:13:09Z"
     },
     {
       "id": "Kanahiro_chiitiler_258",
