@@ -626,12 +626,35 @@
       renderLeads(filtered);
     }
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     async function loadVaultData() {
       try {
         const resp = await fetch('/vault_data.json?t=' + Date.now());
         if (!resp.ok) throw new Error('Data load failed');
         const data = await resp.json();
-        allLeads = data.leads || [];
+        const rawLeads = data.leads || [];
+
+        // Strictly filter to ONLY leads with real, verified breakages and AST/manifest code diffs
+        allLeads = rawLeads.filter(l => {
+          if (!l.is_broken) return false;
+          if (!l.affected_files || !l.affected_files.length) return false;
+          const isFake = l.affected_files.some(f =>
+            (f.file === 'package.json' && f.line === 1) ||
+            (f.file && f.file.endsWith('ci.yml') && f.line === 1) ||
+            (f.fix && f.fix.includes('Apply companion migration fix')) ||
+            (f.fix && f.fix.includes('Apply companion code update'))
+          );
+          return !isFake;
+        });
 
         // Render Metrics
         document.getElementById('metricBrokenLeads').textContent = allLeads.length;
@@ -659,7 +682,7 @@
       container.innerHTML = '';
 
       if (!leads.length) {
-        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-dim);">No active leads for this filter.</div>';
+        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-dim);">No active verified breaking leads for this filter.</div>';
         return;
       }
 
@@ -668,21 +691,17 @@
         row.className = 'lead-row';
 
         const filesHtml = (l.affected_files && l.affected_files.length) ? l.affected_files.map(f => `
-          <div class="code-evidence">
-            <div style="font-weight: 600; margin-bottom: 6px; color: #93c5fd;">📄 ${f.file}:${f.line}</div>
-            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 2px; font-weight: 600;">Previous (Broken):</div>
-            <span class="code-line-del">- ${f.call}</span>
-            <div style="font-size: 11px; color: #34d399; margin-top: 6px; margin-bottom: 2px; font-weight: 600;">Suggested (ApiPatch AST Fix):</div>
-            <span class="code-line-add">+ ${f.fix}</span>
+          <div class="code-evidence" style="margin-top: 10px; background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <div style="font-weight: 700; margin-bottom: 8px; color: #93c5fd; font-family: var(--font-mono); font-size: 13px;">📄 ${escapeHtml(f.file)}:${f.line}</div>
+            <div style="font-size: 11px; color: #f87171; margin-bottom: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Previous (Broken):</div>
+            <pre style="margin: 0 0 10px 0; padding: 8px 12px; background: rgba(239, 68, 68, 0.12); border-left: 3px solid #ef4444; border-radius: 4px; color: #fca5a5; font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; word-break: break-all; overflow-x: auto;">- ${escapeHtml(f.call)}</pre>
+            <div style="font-size: 11px; color: #34d399; margin-bottom: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Suggested (ApiPatch AST Fix):</div>
+            <pre style="margin: 0; padding: 8px 12px; background: rgba(16, 185, 129, 0.12); border-left: 3px solid #10b981; border-radius: 4px; color: #86efac; font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; word-break: break-all; overflow-x: auto;">+ ${escapeHtml(f.fix)}</pre>
           </div>
-        `).join('') : (l.ci_status === 'failure' ? `
-          <div style="margin-top: 8px; font-size: 11px; color: #94a3b8; font-family: var(--font-mono); background: rgba(15, 23, 42, 0.4); padding: 8px 12px; border-radius: 6px; border: 1px dashed rgba(100, 116, 139, 0.3);">
-            🔍 Root Cause Telemetry: CI check failed. AST patch pending automated code inspection (Zero synthetic guess policy).
-          </div>
-        ` : '');
+        `).join('') : '';
 
         const failedChecksHtml = (l.failed_checks || []).map(c => `
-          <div style="color: #f87171; font-size: 11px; margin-top: 4px;">❌ ${c}</div>
+          <div style="color: #f87171; font-size: 11px; margin-top: 4px; font-family: var(--font-mono);">❌ ${escapeHtml(c)}</div>
         `).join('');
 
         const createdDate = l.created_at ? new Date(l.created_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Today';
@@ -701,26 +720,23 @@
             <div>
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
                 <a href="${l.pr_url}" target="_blank" rel="noopener" class="repo-link">
-                  <span>${l.repo}</span>
+                  <span>${escapeHtml(l.repo)}</span>
                 </a>
                 <span class="star-badge">★ ${l.stars} Stars</span>
                 <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; font-family: var(--font-mono); font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">● OPEN PR</span>
                 ${patchTypeBadge}
                 <span style="color: var(--text-dim); font-size: 11px; font-family: var(--font-mono);">${createdDate}</span>
               </div>
-              <div class="pr-title">#${l.pr_number}: ${l.pr_title}</div>
+              <div class="pr-title">#${l.pr_number}: ${escapeHtml(l.pr_title)}</div>
             </div>
             <div class="break-meta">
               <span class="badge-critical">${l.break_severity || 'CRITICAL'}</span>
               ${l.ci_status === 'failure' ? '<span class="badge-ci-fail">❌ CI FAILED</span>' : '<span style="color: #f59e0b; font-size: 11px;">⚠️ PENDING CHECK</span>'}
-              <span style="color: var(--text-dim);">${l.package.toUpperCase()}</span>
+              <span style="color: var(--text-dim);">${escapeHtml((l.package || '').toUpperCase())}</span>
             </div>
           </div>
 
-          <div style="font-size: 13px; color: #cbd5e1;">
-            <strong>Runtime Impact:</strong> ${l.runtime_impact || 'Fatal runtime exception under bumped version.'}
-            ${failedChecksHtml}
-          </div>
+          ${failedChecksHtml ? `<div style="margin-top: 4px; margin-bottom: 6px;">${failedChecksHtml}</div>` : ''}
 
           ${filesHtml}
 
