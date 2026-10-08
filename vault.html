@@ -667,13 +667,19 @@
         const row = document.createElement('div');
         row.className = 'lead-row';
 
-        const filesHtml = (l.affected_files || []).map(f => `
+        const filesHtml = (l.affected_files && l.affected_files.length) ? l.affected_files.map(f => `
           <div class="code-evidence">
             <div style="font-weight: 600; margin-bottom: 6px; color: #93c5fd;">📄 ${f.file}:${f.line}</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 2px; font-weight: 600;">Previous (Broken):</div>
             <span class="code-line-del">- ${f.call}</span>
+            <div style="font-size: 11px; color: #34d399; margin-top: 6px; margin-bottom: 2px; font-weight: 600;">Suggested (ApiPatch AST Fix):</div>
             <span class="code-line-add">+ ${f.fix}</span>
           </div>
-        `).join('');
+        `).join('') : (l.ci_status === 'failure' ? `
+          <div style="margin-top: 8px; font-size: 11px; color: #94a3b8; font-family: var(--font-mono); background: rgba(15, 23, 42, 0.4); padding: 8px 12px; border-radius: 6px; border: 1px dashed rgba(100, 116, 139, 0.3);">
+            🔍 Root Cause Telemetry: CI check failed. AST patch pending automated code inspection (Zero synthetic guess policy).
+          </div>
+        ` : '');
 
         const failedChecksHtml = (l.failed_checks || []).map(c => `
           <div style="color: #f87171; font-size: 11px; margin-top: 4px;">❌ ${c}</div>
