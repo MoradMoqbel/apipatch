@@ -267,6 +267,32 @@ class GitHubClient:
             return repo_data["default_branch"]
         return "main"
 
+    def fetch_job_logs(self, repo_full_name: str, job_id: int) -> str:
+        """Downloads the raw build/test logs for a GitHub Actions job."""
+        clean_name = self.normalize_repo_name(repo_full_name)
+        url = f"{GITHUB_API_BASE}/repos/{clean_name}/actions/jobs/{job_id}/logs"
+        headers = {
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "ApiPatch-Autonomous-Agent/1.0"
+        }
+        if self.token:
+            headers["Authorization"] = f"token {self.token}"
+
+        if _HAS_REQUESTS:
+            try:
+                resp = requests.get(url, headers=headers, timeout=30, allow_redirects=True)
+                if resp.ok:
+                    return resp.text
+            except Exception:
+                pass
+
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=30) as response:
+                return response.read().decode("utf-8", errors="replace")
+        except Exception:
+            return ""
+
     # ── Forking ─────────────────────────────────────────────────────────────
 
     def fork_repository(self, repo_full_name: str, wait_ready: bool = True, max_wait_sec: int = 10) -> Optional[str]:

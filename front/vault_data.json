@@ -190,16 +190,10 @@
       "failed_checks": [
         "Changed files"
       ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 1,
-          "call": "\"release-drafter/release-drafter\": \"7.7.0\" // Bumped to 7.9.0 which broke CI: Changed files",
-          "fix": "\"release-drafter/release-drafter\": \"7.9.0\" // ApiPatch: Apply companion migration fix to restore green CI"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-05T08:05:57Z"
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T08:05:57Z",
+      "patch_type": null
     },
     {
       "id": "OI-wiki_OI-wiki_6995",
@@ -723,16 +717,10 @@
       "failed_checks": [
         "playground-test"
       ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 1,
-          "call": "\"vitest\": \"4.1.11\" // Bumped to 5.0.2 which broke CI: playground-test",
-          "fix": "\"vitest\": \"5.0.2\" // ApiPatch: Apply companion migration fix to restore green CI"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-05T08:05:50Z"
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T08:05:50Z",
+      "patch_type": null
     },
     {
       "id": "pdfme_pdfme_1649",
@@ -757,16 +745,10 @@
         "pdfme-test / packages",
         "playground-test"
       ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 1,
-          "call": "\"vitest\": \"4.1.11\" // Bumped to 5.0.2 which broke CI: pdfme-test, pdfme-test / cli (rest)",
-          "fix": "\"vitest\": \"5.0.2\" // ApiPatch: Apply companion migration fix to restore green CI"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-05T08:05:56Z"
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T08:05:56Z",
+      "patch_type": null
     },
     {
       "id": "google_go-containerregistry_2461",
@@ -1696,16 +1678,10 @@
       "failed_checks": [
         "build"
       ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 1,
-          "call": "\"spectre.console.cli\": \"0.55.0\" // Bumped to 0.57.2 which broke CI: build",
-          "fix": "\"spectre.console.cli\": \"0.57.2\" // ApiPatch: Apply companion migration fix to restore green CI"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-05T08:06:04Z"
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T08:06:04Z",
+      "patch_type": null
     },
     {
       "id": "umputun_revdiff_375",
@@ -2360,22 +2336,22 @@
       "pr_url": "https://github.com/aws/mcp-proxy-for-aws/pull/430",
       "pr_title": "chore(deps): update uv: bump the uv-version-updates group across 1 directory with 16 updates",
       "stars": 358,
-      "package": "langchain",
+      "package": "fastmcp",
       "created_at": "2026-10-04T12:00:00Z",
       "state": "open",
       "ci_status": "failure",
       "is_broken": true,
       "break_severity": "CRITICAL",
-      "runtime_impact": "LangChain v0.3 migration broke build: AttributeError: 'Runnable' object has no attribute 'run'.",
+      "runtime_impact": "Dependabot fastmcp v4.0.10 bump broke Anthropic MCP SDK import: cannot import name 'McpError' from 'mcp'.",
       "failed_checks": [
         "Build MCP Proxy for AWS (Build)"
       ],
       "affected_files": [
         {
-          "file": "mcp_proxy_for_aws/server.py",
-          "line": 277,
-          "call": "result = chain.run(input_text)",
-          "fix": "result = chain.invoke(input_text)"
+          "file": "tests/integ/test_library_client.py",
+          "line": 27,
+          "call": "from mcp import ClientSession, McpError",
+          "fix": "from mcp import ClientSession\ntry:\n    from mcp.shared.exceptions import McpError\nexcept ImportError:\n    from mcp import McpError"
         }
       ],
       "apipatch_patch_available": true,
@@ -2784,16 +2760,10 @@
         "pytest-common (ubuntu-latest, 3.12, openvino-headless)",
         "pytest-common (ubuntu-latest, 3.13, cpu-headless)"
       ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 1,
-          "call": "Dependency bump broke CI check: pytest-common (ubuntu-latest, 3.12, openvino-headless), pytest-common (ubuntu-latest, 3.13, cpu-headless)",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-05T08:05:59Z"
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T08:05:59Z",
+      "patch_type": null
     },
     {
       "id": "shm11C3_HardwareVisualizer_2364",
@@ -3133,16 +3103,10 @@
         "Tornado: Solidity [1/4]",
         "Compile EVM test artifacts (0.8.20/london)"
       ],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 1,
-          "call": "Dependency bump broke CI check: Tornado: Solidity [4/4], Tornado: Solidity [3/4]",
-          "fix": "ApiPatch: Apply companion code update to restore green build"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-05T08:06:01Z"
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T08:06:01Z",
+      "patch_type": null
     },
     {
       "id": "SiddhantSadangi_st_supabase_connection_47",
@@ -3267,16 +3231,10 @@
       "break_severity": "CRITICAL",
       "runtime_impact": "Dependabot bump caused CI failure: Pipeline failing.",
       "failed_checks": [],
-      "affected_files": [
-        {
-          "file": "package.json",
-          "line": 1,
-          "call": "\"eslint\": \"9.39.2\" // Bumped to 10.11.0 which broke CI: build test pipeline",
-          "fix": "\"eslint\": \"10.11.0\" // ApiPatch: Apply companion migration fix to restore green CI"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "discovered_at": "2026-10-05T08:06:08Z"
+      "affected_files": [],
+      "apipatch_patch_available": false,
+      "discovered_at": "2026-10-05T08:06:08Z",
+      "patch_type": null
     },
     {
       "id": "Ocelot-Social-Community_Ocelot-Social_10368",
