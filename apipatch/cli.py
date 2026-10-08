@@ -409,19 +409,35 @@ def main():
                         with open(out_path, "r", encoding="utf-8") as f:
                             existing_data = json.load(f)
                             for l in existing_data.get("leads", []):
-                                merged_leads_dict[l["id"]] = l
+                                aff = l.get("affected_files", [])
+                                is_fake = any(
+                                    (f.get("file") in ("package.json", "pyproject.toml", ".github/workflows/ci.yml") and f.get("line") == 1) or
+                                    "Apply companion migration fix" in f.get("fix", "") or
+                                    "Apply companion code update" in f.get("fix", "")
+                                    for f in aff
+                                )
+                                if not is_fake and l.get("is_broken") and aff:
+                                    merged_leads_dict[l["id"]] = l
                     except Exception:
                         pass
                 for r in sweep_results:
-                    merged_leads_dict[r["id"]] = r
+                    aff = r.get("affected_files", [])
+                    is_fake = any(
+                        (f.get("file") in ("package.json", "pyproject.toml", ".github/workflows/ci.yml") and f.get("line") == 1) or
+                        "Apply companion migration fix" in f.get("fix", "") or
+                        "Apply companion code update" in f.get("fix", "")
+                        for f in aff
+                    )
+                    if not is_fake and r.get("is_broken") and aff:
+                        merged_leads_dict[r["id"]] = r
 
-                # Strictly prune leads older than 30 days
+                # Strictly prune leads older than 30 days and keep verified broken leads only
                 cutoff_date = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
                 all_leads = [
                     l for l in merged_leads_dict.values()
-                    if (l.get("created_at") or "")[:10] >= cutoff_date
+                    if (l.get("created_at") or "")[:10] >= cutoff_date and l.get("is_broken") and l.get("affected_files")
                 ]
-                all_leads.sort(key=lambda x: (0 if x.get("is_broken") else 1, -x.get("stars", 0)))
+                all_leads.sort(key=lambda x: (0 if x.get("patch_type") == "AST_CODE_REWRITE" else 1, -x.get("stars", 0)))
 
                 with open(out_path, "w", encoding="utf-8") as f:
                     json.dump({
