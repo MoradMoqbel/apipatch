@@ -1,50 +1,9 @@
 {
-  "updated_at": "2026-10-10T07:02:00Z",
+  "updated_at": "2026-10-10T13:13:08Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
   "leads": [
-    {
-      "id": "aws-samples_sample-autonomous-cloud-coding-agents_947",
-      "repo": "aws-samples/sample-autonomous-cloud-coding-agents",
-      "pr_number": 947,
-      "pr_url": "https://github.com/aws-samples/sample-autonomous-cloud-coding-agents/pull/947",
-      "pr_title": "chore(deps): uv: bump the all-python group across 1 directory with 9 updates",
-      "stars": 158,
-      "package": "langchain",
-      "created_at": "2026-10-10T06:54:17Z",
-      "state": "open",
-      "ci_status": "failure",
-      "is_broken": true,
-      "break_severity": "CRITICAL",
-      "runtime_impact": "Dependabot bump caused CI failure: Secrets, deps, and workflow scan, build (agentcore)",
-      "failed_checks": [
-        "Secrets, deps, and workflow scan",
-        "build (agentcore)"
-      ],
-      "affected_files": [
-        {
-          "file": "agent/scripts/diagnostics/test_sdk_smoke.py",
-          "line": 167,
-          "call": "AttributeError: 'Runnable' object has no attribute 'run'",
-          "fix": "Migrate .run(...) to .invoke(...)"
-        },
-        {
-          "file": "agent/scripts/diagnostics/test_subprocess_threading.py",
-          "line": 91,
-          "call": "AttributeError: 'Runnable' object has no attribute 'run'",
-          "fix": "Migrate .run(...) to .invoke(...)"
-        },
-        {
-          "file": "agent/src/pipeline.py",
-          "line": 652,
-          "call": "AttributeError: 'Runnable' object has no attribute 'run'",
-          "fix": "Migrate .run(...) to .invoke(...)"
-        }
-      ],
-      "apipatch_patch_available": true,
-      "patch_type": "AST_CODE_REWRITE"
-    },
     {
       "id": "apache_superset_44938",
       "repo": "apache/superset",
@@ -116,6 +75,47 @@
       "discovered_at": "2026-10-04T18:30:40Z",
       "is_real_code_break": true,
       "break_category": "AST_CODE_BREAK",
+      "patch_type": "AST_CODE_REWRITE"
+    },
+    {
+      "id": "aws-samples_sample-autonomous-cloud-coding-agents_947",
+      "repo": "aws-samples/sample-autonomous-cloud-coding-agents",
+      "pr_number": 947,
+      "pr_url": "https://github.com/aws-samples/sample-autonomous-cloud-coding-agents/pull/947",
+      "pr_title": "chore(deps): uv: bump the all-python group across 1 directory with 9 updates",
+      "stars": 158,
+      "package": "langchain",
+      "created_at": "2026-10-10T06:54:17Z",
+      "state": "open",
+      "ci_status": "failure",
+      "is_broken": true,
+      "break_severity": "CRITICAL",
+      "runtime_impact": "Dependabot bump caused CI failure: Secrets, deps, and workflow scan, build (agentcore)",
+      "failed_checks": [
+        "Secrets, deps, and workflow scan",
+        "build (agentcore)"
+      ],
+      "affected_files": [
+        {
+          "file": "agent/scripts/diagnostics/test_sdk_smoke.py",
+          "line": 167,
+          "call": "AttributeError: 'Runnable' object has no attribute 'run'",
+          "fix": "Migrate .run(...) to .invoke(...)"
+        },
+        {
+          "file": "agent/scripts/diagnostics/test_subprocess_threading.py",
+          "line": 91,
+          "call": "AttributeError: 'Runnable' object has no attribute 'run'",
+          "fix": "Migrate .run(...) to .invoke(...)"
+        },
+        {
+          "file": "agent/src/pipeline.py",
+          "line": 652,
+          "call": "AttributeError: 'Runnable' object has no attribute 'run'",
+          "fix": "Migrate .run(...) to .invoke(...)"
+        }
+      ],
+      "apipatch_patch_available": true,
       "patch_type": "AST_CODE_REWRITE"
     },
     {
