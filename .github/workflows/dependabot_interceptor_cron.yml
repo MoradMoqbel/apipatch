@@ -34,6 +34,7 @@ jobs:
       - name: Run Autonomous Dependabot Sweep (Filtered by Stars >= 100)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           echo "Starting Autonomous Dependabot Interceptor Sweep (100+ Stars)..."
           python -m apipatch intercept sweep --min-stars 100 --max 50 --output front/vault_data.json

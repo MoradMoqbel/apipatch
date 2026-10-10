@@ -523,6 +523,20 @@ class DependabotInterceptor:
                 break
         return leads
 
+    def get_user_submitted_repos(self) -> set:
+        """Returns set of lowercase repo names where the user has already opened a PR."""
+        auth_user = self.client.get_authenticated_user()
+        if not auth_user:
+            return set()
+        user_prs = self.client.request(f"/search/issues?q=author:{auth_user}+is:pr&per_page=100")
+        repos = set()
+        if user_prs and isinstance(user_prs, dict) and "items" in user_prs:
+            for item in user_prs["items"]:
+                r = "/".join(item.get("repository_url", "").split("/")[-2:]).lower()
+                if r:
+                    repos.add(r)
+        return repos
+
     def run_autonomous_sweep(
         self,
         packages: Optional[List[str]] = None,
@@ -539,6 +553,9 @@ class DependabotInterceptor:
         # Support legacy argument max_prs_per_pkg
         scan_limit = kwargs.get("max_prs_per_pkg", max_prs)
         verified_leads = []
+        user_submitted_repos = self.get_user_submitted_repos()
+        if user_submitted_repos:
+            print(f"[*] Excluding {len(user_submitted_repos)} repositories already patched with user PRs.")
 
         if packages:
             print(f"[*] Starting Package-Targeted Sweep across {len(packages)} ecosystems (min_stars: {min_stars}, limit: {scan_limit}, max_age: {max_age_days}d)...")
@@ -555,6 +572,8 @@ class DependabotInterceptor:
 
         for pr in candidate_prs:
             repo = pr["repo"]
+            if repo.lower() in user_submitted_repos:
+                continue
             num = pr["number"]
             lead_key = f"{repo}#{num}"
             if lead_key in seen_leads:
