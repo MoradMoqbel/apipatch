@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T22:46:10Z",
+  "updated_at": "2026-10-20T01:30:06Z",
   "radar_status": "ONLINE_HOURLY",
   "min_stars_threshold": 100,
   "cron_frequency": "Every 1 Hour (24/7 Cloud Daemon)",
