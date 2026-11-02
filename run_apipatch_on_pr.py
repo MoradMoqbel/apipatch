@@ -682,6 +682,14 @@ def validate_and_diff(payload_json: str) -> Dict[str, Any]:
     refactored = ensure_docstring_restored(original_code, refactored, ext)
     refactored = shield_unaffected_functions(original_code, refactored, libs, ext)
 
+    # Preserve exact .regex(/.../) literals from original_code so JSON escaping never alters regex patterns
+    orig_regexes = re.findall(r"\.regex\(\s*/[^/\n]+/[gimsuy]*\s*\)", original_code)
+    ref_regexes = re.findall(r"\.regex\(\s*/[^\n]+/[gimsuy]*\s*\)", refactored)
+    if len(orig_regexes) == len(ref_regexes) and orig_regexes != ref_regexes:
+        for o_rx, r_rx in zip(orig_regexes, ref_regexes):
+            if o_rx != r_rx:
+                refactored = refactored.replace(r_rx, o_rx, 1)
+
     # Normalize trailing newlines so difflib never prints identical -/+ lines at EOF
     norm_orig = "\n".join(line.rstrip() for line in original_code.strip().splitlines()) + "\n"
     norm_ref = "\n".join(line.rstrip() for line in refactored.strip().splitlines()) + "\n"
