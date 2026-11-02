@@ -19,6 +19,8 @@ from typing import Dict, Any, List, Optional
 
 from apipatch.doc_hunter import DocHunter
 from apipatch.validator import CodeValidator
+from apipatch.filters import should_ignore_path
+from apipatch.auto_detector import extract_imports_from_code, extract_imports_from_js_code
 from apipatch.engine import (
     strip_code_fences,
     sanitize_python_formatting,
@@ -26,6 +28,82 @@ from apipatch.engine import (
     shield_unaffected_functions,
     is_meaningful_code_change
 )
+
+
+def classify_and_score_source_code(source: str, file_path: str, pkg: str) -> int:
+    """
+    100% Dynamic AST & Import/Export Structural Classifier:
+    Evaluates the actual code content (imports, exported symbols, AST definitions, and test-runner calls)
+    to distinguish production implementation modules from test suites or tooling configs without
+    relying on hardcoded filename lists.
+    Returns a structural relevance score (negative = test/non-production, positive = production module).
+    """
+    if not source or len(source.strip()) < 15:
+        return -500
+
+    is_py = file_path.endswith(".py")
+    score = 0
+
+    # 1. Parse actual imports from AST / module syntax
+    imported_pkgs = (
+        extract_imports_from_code(source)
+        if is_py
+        else extract_imports_from_js_code(source)
+    )
+    imported_low = {imp.lower() for imp in imported_pkgs}
+
+    # 2. Check if the code structurally invokes a test runner (describe/it/expect or pytest/unittest)
+    if is_py:
+        try:
+            import ast
+            tree = ast.parse(source)
+            fn_names = [n.name for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+            cls_names = [n.name for n in ast.walk(tree) if isinstance(n, ast.ClassDef)]
+            test_fns = [f for f in fn_names if f.startswith("test_")]
+            prod_fns = [f for f in fn_names if not f.startswith("test_") and not f.startswith("_")]
+            if ("pytest" in imported_low or "unittest" in imported_low) and len(test_fns) > len(prod_fns):
+                return -400
+            if prod_fns or cls_names:
+                score += 60
+        except Exception:
+            pass
+    else:
+        has_test_blocks = bool(re.search(r"\b(?:describe|it|test)\s*\(\s*['\"`]", source)) and bool(
+            re.search(r"\bexpect\s*\(", source)
+        )
+        has_exports = bool(
+            re.search(
+                r"(?:^|\n)\s*export\s+(?:const|let|var|function|class|default|interface|type|\{)|module\.exports\s*=",
+                source
+            )
+        )
+        if has_test_blocks and not has_exports:
+            return -400
+        if has_test_blocks:
+            score -= 200
+        if has_exports:
+            score += 60
+
+    # 3. Check if the target upgraded package is directly imported or referenced in the code
+    clean_pkg = (pkg or "").strip().split()[0].lower()
+    pkg_tokens = [
+        t.lower()
+        for t in re.split(r"[\s,&/@\-_]+", pkg or "")
+        if len(t) >= 3 and t.lower() not in ("sdk", "core", "js", "py", "ts", "the", "and")
+    ]
+    if clean_pkg and (
+        clean_pkg in imported_low
+        or any(clean_pkg in imp for imp in imported_low)
+        or f"'{clean_pkg}'" in source.lower()
+        or f'"{clean_pkg}"' in source.lower()
+    ):
+        score += 200
+    elif any(any(tok in imp for imp in imported_low) for tok in pkg_tokens):
+        score += 140
+    elif any(re.search(rf"\b{re.escape(tok)}\b", source.lower()) for tok in pkg_tokens):
+        score += 50
+
+    return score
 
 
 def fetch_url_text(url: str, timeout: int = 8, accept: str = "text/plain, application/vnd.github.v3.diff, */*") -> Optional[str]:
@@ -149,24 +227,17 @@ def discover_source_file_dynamically(
 
     def is_valid_code_candidate(path_str: str) -> bool:
         fname = path_str.split("/")[-1].lower()
-        low_p = path_str.lower()
-        if fname.startswith(".") or path_str.endswith(".d.ts"):
+        if fname.startswith(".") or path_str.endswith(".d.ts") or fname == "__init__.py":
             return False
-        # Aggressively reject tests, e2e, mocks, and fixtures
-        if any(t in low_p for t in ("test", "spec", "e2e", "jest", "fixture", "mock", "setup.", "__init__.py")):
+        if should_ignore_path(path_str, ignore_docs=True, ignore_tests=True, ignore_non_prod=True):
             return False
-        # Aggressively reject tooling configs unless the package being upgraded is that tool
-        is_tool_pkg = any(k in (pkg or "").lower() for k in ("vite", "eslint", "jest", "webpack", "babel", "rollup", "vitest", "playwright"))
-        if not is_tool_pkg:
-            if any(cfg in fname for cfg in ("eslint", "jest", "prettier", "babel", "tsconfig", "webpack", "vite.config", "vitest")):
-                return False
         return path_str.endswith(code_exts)
 
     def dir_priority(d_path: str) -> int:
         low_d = d_path.lower()
         sc = 0
-        if "admin" in low_d or "example" in low_d:
-            sc += 40
+        if should_ignore_path(d_path, ignore_docs=True, ignore_tests=True, ignore_non_prod=True):
+            sc += 80
         for tok in pkg_tokens:
             if tok in low_d:
                 sc -= 40
@@ -186,8 +257,7 @@ def discover_source_file_dynamically(
             p = it["path"]
             ctype = it["contentType"]
             if ctype == "directory":
-                low_name = it["name"].lower()
-                if low_name not in ("test", "tests", "__tests__", "docs", "dist", "node_modules", ".github", "examples", "cypress", "e2e"):
+                if not should_ignore_path(p, ignore_docs=True, ignore_tests=True, ignore_non_prod=True) and it["name"] not in ("dist", "node_modules", ".github"):
                     sub_dirs_to_visit.append(p)
             elif is_valid_code_candidate(p):
                 candidate_files.append(p)
@@ -203,8 +273,7 @@ def discover_source_file_dynamically(
             for it in list_github_dir_dynamic(repo, sd):
                 p = it["path"]
                 if it["contentType"] == "directory":
-                    low_name = it["name"].lower()
-                    if low_name not in ("test", "tests", "__tests__", "docs", "dist", "node_modules", ".github", "cypress", "e2e"):
+                    if not should_ignore_path(p, ignore_docs=True, ignore_tests=True, ignore_non_prod=True) and it["name"] not in ("dist", "node_modules", ".github"):
                         next_level_dirs.append(p)
                 elif is_valid_code_candidate(p):
                     candidate_files.append(p)
@@ -212,7 +281,7 @@ def discover_source_file_dynamically(
 
     def file_priority(fp: str) -> int:
         low = fp.lower()
-        score = 20 if ("example" in low or "demo" in low or "admin" in low) else 0
+        score = 20 if should_ignore_path(fp, ignore_docs=True, ignore_tests=True, ignore_non_prod=True) else 0
         for tok in pkg_tokens:
             if tok in low:
                 score -= 30
@@ -222,41 +291,25 @@ def discover_source_file_dynamically(
 
     candidate_files.sort(key=file_priority)
 
-    clean_pkg_exact = (pkg or "").strip().split()[0].lower()
-    token_matched_file = ""
-    token_matched_source = ""
+    best_file = ""
+    best_source = ""
+    best_score = -999
     for fp in candidate_files[:35]:
         src = fetch_raw_repo_file(repo, fp)
         if not src:
             continue
-        src_low = src.lower()
-        # 1. Exact package import match (e.g. '@anthropic-ai/sdk' or 'zod')
-        if clean_pkg_exact and (
-            f"'{clean_pkg_exact}'" in src_low
-            or f'"{clean_pkg_exact}"' in src_low
-            or f"import {clean_pkg_exact}" in src_low
-            or f"from {clean_pkg_exact}" in src_low
-        ):
+        sc = classify_and_score_source_code(src, fp, pkg)
+        if sc >= 200:
             return fp, src
-        # 2. Token match fallback (must match import or from statement or identifier)
-        if not token_matched_file:
-            for tok in pkg_tokens:
-                if (
-                    f"'{tok}" in src_low
-                    or f'"{tok}' in src_low
-                    or f"import {tok}" in src_low
-                    or f"from {tok}" in src_low
-                    or f" {tok}." in src_low
-                    or f"{tok}(" in src_low
-                ):
-                    token_matched_file = fp
-                    token_matched_source = src
-                    break
+        if sc > best_score and sc >= 100:
+            best_score = sc
+            best_file = fp
+            best_source = src
 
-    if token_matched_file:
-        return token_matched_file, token_matched_source
+    if best_file:
+        return best_file, best_source
 
-    # NEVER return an arbitrary file if it does not use the package!
+    # NEVER return an arbitrary file if it does not structurally import/use the package!
     return "", ""
 
 
@@ -452,44 +505,35 @@ def prepare_apipatch_context(repo: str, pr_number: int, pkg: str) -> Dict[str, A
     pr_file_names = [f["path"] for f in parsed_files]
 
     code_exts = (".py", ".ts", ".tsx", ".js", ".jsx")
-    code_files = [
-        f for f in parsed_files
-        if f["path"].endswith(code_exts)
-        and "test" not in f["path"].lower()
-        and "lock" not in f["path"].lower()
-    ]
-    if not code_files:
-        code_files = [f for f in parsed_files if f["path"].endswith(code_exts)]
-
     target_file = ""
     raw_source = ""
     pr_file_diff = ""
 
-    # 1. If the PR directly modifies a Python/TS/JS source file, inspect that exact file
-    if code_files:
-        target_file = code_files[0]["path"]
-        pr_file_diff = code_files[0]["diff"]
-        raw_source = fetch_raw_repo_file(repo, target_file) or ""
+    # 1. Dynamically evaluate all code files in the PR by AST structure (exports vs test-runner blocks)
+    best_pr_score = -999
+    for f in parsed_files:
+        fpath = f["path"]
+        if not fpath.endswith(code_exts) or fpath.endswith(".d.ts"):
+            continue
+        if should_ignore_path(fpath, ignore_docs=True, ignore_tests=True, ignore_non_prod=True):
+            continue
+        src = fetch_raw_repo_file(repo, fpath) or ""
+        if not src:
+            continue
+        sc = classify_and_score_source_code(src, fpath, pkg)
+        if sc >= 0 and sc > best_pr_score:
+            best_pr_score = sc
+            target_file = fpath
+            raw_source = src
+            pr_file_diff = f["diff"]
 
-    # 2. If it's a Dependabot/Renovate PR (only touches package.json / pyproject.toml / lockfiles),
-    #    100% DYNAMICALLY crawl the repository tree on GitHub to find the file importing `pkg`!
+    # 2. If it's a Dependabot/Renovate PR (only touches manifests/lockfiles),
+    #    100% DYNAMICALLY crawl the repository tree on GitHub to find the production module importing `pkg`!
     if not raw_source:
         disc_file, disc_source = discover_source_file_dynamically(repo, pkg, pr_file_names)
         if disc_file and disc_source:
             target_file = disc_file
             raw_source = disc_source
-
-    if not target_file and parsed_files:
-        non_manifest = [
-            f for f in parsed_files
-            if not f["path"].endswith((".json", ".md", ".lock", ".yaml", ".yml", ".toml", ".txt"))
-            and not any(t in f["path"].lower() for t in ("test", "spec", "e2e", "jest"))
-        ]
-        if non_manifest:
-            chosen = non_manifest[0]
-            target_file = chosen["path"]
-            pr_file_diff = chosen["diff"]
-            raw_source = fetch_raw_repo_file(repo, target_file) or ""
 
     focused_source = extract_focused_source_window(raw_source, pkg) if raw_source else ""
 

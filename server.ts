@@ -84,6 +84,11 @@ function isRelevantApiPatchPR(title: string, repoFullName = ''): boolean {
     lower.includes('sidebars') ||
     lower.includes('go.mod') ||
     lower.includes('cargo.toml') ||
+    lower.includes('rust-minor') ||
+    lower.includes('rust-dependencies') ||
+    lower.includes('rust crate') ||
+    lower.includes('go deps') ||
+    lower.includes('mariadb-java') ||
     lower.includes('dockerfile') ||
     lower.includes('github-actions')
   ) {
@@ -94,9 +99,9 @@ function isRelevantApiPatchPR(title: string, repoFullName = ''): boolean {
   const hasExplicitBump =
     /bump\s+[^\s]+\s+from\s+v?[0-9]/i.test(title) ||
     /update\s+dependency\s+[^\s]+\s+to\s+v?[0-9]/i.test(title) ||
-    lower.startsWith('chore(deps)') ||
-    lower.startsWith('fix(deps)') ||
-    lower.startsWith('build(deps)');
+    lower.startsWith('chore(deps') ||
+    lower.startsWith('fix(deps') ||
+    lower.startsWith('build(deps');
 
   return hasExplicitBump;
 }
@@ -141,9 +146,29 @@ function parseVersionBump(title: string): { pkg: string; fromVer: string; toVer:
   };
 }
 
+// Persistent in-memory cache of live-discovered GitHub PRs so rate limits never erase newly discovered leads
+const cachedLiveLeads = new Map<string, B2BCompanyLead>();
+let cohortRotationCursor = 0;
+
+function getMergedSortedLeads(): B2BCompanyLead[] {
+  const mergedMap = new Map<string, B2BCompanyLead>();
+  for (const [url, lead] of cachedLiveLeads.entries()) {
+    mergedMap.set(url, lead);
+  }
+  for (const v of VERIFIED_B2B_LEADS) {
+    const existing = mergedMap.get(v.prUrl);
+    if (!existing) {
+      mergedMap.set(v.prUrl, v);
+    }
+  }
+  return Array.from(mergedMap.values()).sort(
+    (a, b) => new Date(b.failedAt).getTime() - new Date(a.failedAt).getTime()
+  );
+}
+
 app.get('/api/leads/curated', (_req, res) => {
   res.json({
-    leads: VERIFIED_B2B_LEADS,
+    leads: getMergedSortedLeads(),
     scannedAt: new Date().toISOString()
   });
 });
@@ -160,11 +185,14 @@ app.post('/api/leads/scan', async (req, res) => {
     } else if (cohort === 'SCALEUP') {
       orgFilters = FUNDED_ORG_COHORTS.SCALEUP;
     } else {
-      orgFilters = [
-        ...FUNDED_ORG_COHORTS.YC_AI.slice(0, 8),
-        ...FUNDED_ORG_COHORTS.MID_INFRA.slice(0, 7),
-        ...FUNDED_ORG_COHORTS.SCALEUP.slice(0, 5)
+      const allOrgs = [
+        ...FUNDED_ORG_COHORTS.YC_AI,
+        ...FUNDED_ORG_COHORTS.MID_INFRA,
+        ...FUNDED_ORG_COHORTS.SCALEUP
       ];
+      const start = (cohortRotationCursor * 16) % allOrgs.length;
+      cohortRotationCursor = (cohortRotationCursor + 1) % 4;
+      orgFilters = [...allOrgs.slice(start, start + 18), ...allOrgs.slice(0, Math.max(0, start + 18 - allOrgs.length))];
     }
 
     const queryParts = ['is:pr', 'is:open', 'status:failure'];
@@ -193,16 +221,17 @@ app.post('/api/leads/scan', async (req, res) => {
     });
 
     if (!ghRes.ok) {
+      const merged = getMergedSortedLeads();
       return res.json({
-        leads: VERIFIED_B2B_LEADS,
+        leads: merged,
+        liveCount: cachedLiveLeads.size,
         rateLimited: true,
         scannedAt: new Date().toISOString(),
-        message: 'GitHub public API rate limit reached; showing verified B2B Python/TS company dataset.'
+        message: 'GitHub public API rate limit reached; showing cached live + verified B2B dataset.'
       });
     }
 
     const data = await ghRes.json();
-    const discovered: B2BCompanyLead[] = [];
 
     if (Array.isArray(data.items)) {
       for (const item of data.items) {
@@ -212,7 +241,7 @@ app.post('/api/leads/scan', async (req, res) => {
 
         const existing = VERIFIED_B2B_LEADS.find(l => l.prUrl === item.html_url);
         if (existing) {
-          discovered.push({
+          cachedLiveLeads.set(existing.prUrl, {
             ...existing,
             failedAt: item.updated_at || existing.failedAt
           });
@@ -228,14 +257,16 @@ app.post('/api/leads/scan', async (req, res) => {
         const isYcAi = FUNDED_ORG_COHORTS.YC_AI.some(o => o.toLowerCase() === `org:${owner.toLowerCase()}`);
         const isScaleup = FUNDED_ORG_COHORTS.SCALEUP.some(o => o.toLowerCase() === `org:${owner.toLowerCase()}`);
         const inferredLang =
+          repoFull.toLowerCase().includes('python') ||
           repoFull.toLowerCase().includes('litellm') ||
           repoFull.toLowerCase().includes('fastmcp') ||
           repoFull.toLowerCase().includes('mem0') ||
-          repoFull.toLowerCase().includes('qdrant')
+          repoFull.toLowerCase().includes('qdrant') ||
+          repoFull.toLowerCase().includes('agents')
             ? 'Python'
             : 'TypeScript';
 
-        discovered.push({
+        cachedLiveLeads.set(item.html_url, {
           id: `live-${item.id}`,
           companyName: owner,
           orgHandle: owner,
@@ -261,28 +292,15 @@ app.post('/api/leads/scan', async (req, res) => {
           whyTheyPay: `Funded engineering organization (${owner}) with an active failing CI build on ${pkg}.`,
           whyTheyPayAr: `شركة تقنية ممولة (${owner}) لديها عطل CI حي بتاريخ ${(item.updated_at || item.created_at).slice(0, 10)} في (${pkg}).`,
           isLiveScanned: true
-          // NO default verifiedDiffPatch! Diff is ONLY generated when user runs apipatch.
         });
       }
     }
 
-    const mergedMap = new Map<string, B2BCompanyLead>();
-    for (const d of discovered) {
-      mergedMap.set(d.prUrl, d);
-    }
-    for (const v of VERIFIED_B2B_LEADS) {
-      if (!mergedMap.has(v.prUrl)) {
-        mergedMap.set(v.prUrl, v);
-      }
-    }
-
-    const merged = Array.from(mergedMap.values()).sort(
-      (a, b) => new Date(b.failedAt).getTime() - new Date(a.failedAt).getTime()
-    );
+    const merged = getMergedSortedLeads();
 
     return res.json({
       leads: merged,
-      liveCount: discovered.length,
+      liveCount: cachedLiveLeads.size,
       scannedAt: new Date().toISOString(),
       rateLimited: false
     });
@@ -290,7 +308,7 @@ app.post('/api/leads/scan', async (req, res) => {
     console.error('Error scanning GitHub:', error);
     return res.status(500).json({
       error: 'Failed to scan live GitHub API',
-      leads: VERIFIED_B2B_LEADS,
+      leads: getMergedSortedLeads(),
       scannedAt: new Date().toISOString()
     });
   }
@@ -460,6 +478,8 @@ DYNAMIC AUDIT INSTRUCTIONS:
      * Update @validator to @field_validator and .dict() to .model_dump().
    - For OpenAI SDK (0.x -> 1.x):
      * Modernize openai.ChatCompletion.create to client.chat.completions.create.
+   - For @libsql/client (0.14 -> 0.18):
+     * In @libsql/client 0.17+/0.18, SQLite unique constraint errors report the base code in error.code ('SQLITE_CONSTRAINT') and the specific code in error.extendedCode ('SQLITE_CONSTRAINT_UNIQUE'). Update checks for error.code === 'SQLITE_CONSTRAINT_UNIQUE' to also check error.extendedCode === 'SQLITE_CONSTRAINT_UNIQUE'.
    - Never change .css imports to .js, and preserve 100% of comments, imports, and business logic.
 4. ${
       isFullFileWindow
@@ -585,7 +605,9 @@ DYNAMIC AUDIT INSTRUCTIONS:
           'glob',
           'openai',
           'pydantic',
-          'redis'
+          'redis',
+          'error',
+          'extendedCode'
         ]
       });
 
@@ -626,20 +648,18 @@ DYNAMIC AUDIT INSTRUCTIONS:
             .join('\n')
         : `# 1. فحص الكود: تم فحص استدعاءات ${lead.packageChanged} داخل ${targetFile} وتبيّن أنها متوافقة نحوياً مع الإصدار ${lead.toVersion}.\n# 2. سبب عطل الـ CI: الترقية مكسورة في شجرة التبعيات والـ Lockfile (${prep.realPrFileNames?.join(', ') || 'manifest'}) وليس في استدعاءات هذا الملف.\n# 3. نتيجة التدقيق: لا توجد حاجة لتعديل يدوي لهذا الملف المصدري (0 أخطاء AST).`;
 
-    const cleanReportDiff =
-      prFileDiff ||
-      [
-        `# [APIPATCH v0.9.0 AUDIT VERIFICATION]`,
-        `# المستودع: ${lead.repoFullName} (PR #${lead.prNumber})`,
-        `# الملف المفحوص: ${targetFile}`,
-        `# الحزمة المحدثة: ${lead.packageChanged} (${lead.fromVersion} -> ${lead.toVersion})`,
-        `# حالة الفحص: CodeValidator (.${targetFile.split('.').pop()}): VALID (0 AST Errors)`,
-        `# --------------------------------------------------------------------------------`,
-        `# التشخيص الفني والتحقق من الكود المصدري:`,
-        auditExplanation,
-        `# --------------------------------------------------------------------------------`,
-        `# تم التحقق الكامل من توافق الكود المصدري عبر محرك apipatch v0.9.0 بنجاح.`
-      ].join('\n');
+    const cleanReportDiff = [
+      `# [APIPATCH v0.9.0 AUDIT VERIFICATION]`,
+      `# المستودع: ${lead.repoFullName} (PR #${lead.prNumber})`,
+      `# الملف المفحوص: ${targetFile}`,
+      `# الحزمة المحدثة: ${lead.packageChanged} (${lead.fromVersion} -> ${lead.toVersion})`,
+      `# حالة الفحص: CodeValidator (.${targetFile.split('.').pop()}): VALID (0 AST Errors)`,
+      `# --------------------------------------------------------------------------------`,
+      `# التشخيص الفني والتحقق من الكود المصدري:`,
+      auditExplanation,
+      `# --------------------------------------------------------------------------------`,
+      `# تم التحقق الكامل من توافق الكود المصدري عبر محرك apipatch v0.9.0 بنجاح.`
+    ].join('\n');
 
     return res.json({
       source: 'APIPATCH_AUDIT_REPORT',
