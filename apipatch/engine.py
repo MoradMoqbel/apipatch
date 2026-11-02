@@ -76,9 +76,15 @@ def safe_print(text: str):
 def is_meaningful_code_change(original_code: str, refactored_code: str, ext: str) -> bool:
     """
     Determines if the refactoring contains a genuine semantic/structural code change
-    rather than cosmetic formatting, blank line insertions, or docstring/string spacing tweaks.
+    rather than cosmetic formatting, blank line insertions, regex escape mutations, or docstring tweaks.
     """
     if not refactored_code or original_code.strip() == refactored_code.strip():
+        return False
+
+    # Universal safeguard across TS/JS/Python: reject changes that ONLY alter backslashes or whitespace
+    orig_no_escape_ws = re.sub(r"[\s\\]+", "", original_code)
+    ref_no_escape_ws = re.sub(r"[\s\\]+", "", refactored_code)
+    if orig_no_escape_ws == ref_no_escape_ws:
         return False
 
     if ext in {".py", ".pyw"}:

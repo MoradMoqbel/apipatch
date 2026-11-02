@@ -328,6 +328,34 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
       from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
       async_session_factory = async_sessionmaker(engine, expire_on_commit=False)
 """
+    },
+
+    "zod": {
+        "aliases": ["zod"],
+        "description": "Zod v3 to v4 Enterprise Migration Guidelines",
+        "guidance": """\
+• Zod v3 → v4 Migration Guidelines:
+  - Strict Objects:
+      OLD: z.object({...}).strict()
+      NEW: z.strictObject({...})
+  - Partial Enum Records:
+      OLD: z.record(z.enum(...), valueSchema)
+      NEW: z.partialRecord(z.enum(...), valueSchema)
+      (In Zod v4, z.record with z.enum requires every enum key to be present unless z.partialRecord is used.)
+  - Type Annotations:
+      OLD: z.ZodSchema<T>
+      NEW: z.ZodType<T>
+"""
+    },
+
+    "graphql-scalars": {
+        "aliases": ["graphql-scalars"],
+        "description": "GraphQL Scalars v1 to v2 Migration Guidelines",
+        "guidance": """\
+• GraphQL Scalars v1 → v2 Migration Guidelines:
+  - In v2, parseLiteral signatures on GraphQLScalarType omit the legacy second 'variables' argument when wrapping or delegating scalar resolvers, and strict scalar serialization enforces ISO/Date instance checks.
+  - Only modify files that actually import 'graphql-scalars'. If the file already uses compatible resolver wrappers, return has_breaking_changes=false.
+"""
     }
 }
 
