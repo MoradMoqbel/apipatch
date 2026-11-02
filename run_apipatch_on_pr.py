@@ -15,11 +15,13 @@ import json
 import difflib
 import argparse
 import urllib.request
-from typing import Dict, Any, List, Optional
+import urllib.parse
+from typing import Dict, Any, List, Optional, Tuple
 
 from apipatch.doc_hunter import DocHunter
 from apipatch.validator import CodeValidator
 from apipatch.filters import should_ignore_path
+from apipatch.knowledge import get_relevant_knowledge
 from apipatch.auto_detector import extract_imports_from_code, extract_imports_from_js_code
 from apipatch.engine import (
     strip_code_fences,
@@ -28,6 +30,21 @@ from apipatch.engine import (
     shield_unaffected_functions,
     is_meaningful_code_change
 )
+
+
+def get_github_token() -> str:
+    tok = os.environ.get("GITHUB_TOKEN", "").strip()
+    if tok:
+        return tok
+    try:
+        if os.path.exists(".env"):
+            for line in open(".env", "r", encoding="utf-8").read().splitlines():
+                if line.startswith("GITHUB_TOKEN="):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+    except Exception:
+        pass
+    return ""
+
 
 
 def classify_and_score_source_code(source: str, file_path: str, pkg: str) -> int:
@@ -233,6 +250,48 @@ def discover_source_file_dynamically(
             return False
         return path_str.endswith(code_exts)
 
+    # Fast-path: Use authenticated GitHub Code Search API (0.4s) when GITHUB_TOKEN is available
+    gh_token = get_github_token()
+    clean_pkg_query = (pkg or "").strip().split()[0].strip()
+    if gh_token and clean_pkg_query:
+        try:
+            q_str = urllib.parse.quote(f'repo:{repo} "{clean_pkg_query}"')
+            search_req = urllib.request.Request(
+                f"https://api.github.com/search/code?q={q_str}&per_page=12",
+                headers={
+                    "Authorization": f"Bearer {gh_token}",
+                    "Accept": "application/vnd.github+json",
+                    "User-Agent": "ApiPatch-Engine/0.9.0"
+                }
+            )
+            with urllib.request.urlopen(search_req, timeout=6) as resp:
+                s_data = json.loads(resp.read().decode("utf-8", errors="replace"))
+                s_paths = [
+                    it.get("path", "")
+                    for it in s_data.get("items", [])
+                    if is_valid_code_candidate(it.get("path", ""))
+                ]
+                # Prioritize production paths over examples
+                s_paths.sort(key=lambda p: (1 if "example" in p.lower() or "demo" in p.lower() else 0, len(p)))
+                best_s_file = ""
+                best_s_src = ""
+                best_s_score = -999
+                for fp in s_paths[:8]:
+                    src = fetch_raw_repo_file(repo, fp)
+                    if not src:
+                        continue
+                    sc = classify_and_score_source_code(src, fp, pkg)
+                    if sc >= 200 and "example" not in fp.lower():
+                        return fp, src
+                    if sc > best_s_score and sc >= 100:
+                        best_s_score = sc
+                        best_s_file = fp
+                        best_s_src = src
+                if best_s_file:
+                    return best_s_file, best_s_src
+        except Exception:
+            pass
+
     def dir_priority(d_path: str) -> int:
         low_d = d_path.lower()
         sc = 0
@@ -262,11 +321,11 @@ def discover_source_file_dynamically(
             elif is_valid_code_candidate(p):
                 candidate_files.append(p)
 
-    # Visit up to 4 levels of promising subdirectories prioritized by relevance
-    for _depth in range(4):
+    # Visit up to 2 levels of promising subdirectories prioritized by relevance
+    for _depth in range(2):
         sub_dirs_to_visit.sort(key=dir_priority)
         next_level_dirs: List[str] = []
-        for sd in sub_dirs_to_visit[:12]:
+        for sd in sub_dirs_to_visit[:8]:
             if sd in visited_dirs:
                 continue
             visited_dirs.add(sd)
@@ -294,7 +353,7 @@ def discover_source_file_dynamically(
     best_file = ""
     best_source = ""
     best_score = -999
-    for fp in candidate_files[:35]:
+    for fp in candidate_files[:20]:
         src = fetch_raw_repo_file(repo, fp)
         if not src:
             continue
@@ -369,6 +428,10 @@ def build_live_dynamic_grounding(pkg_list: List[str], target_file: str, raw_sour
     used_calls = set(re.findall(r"\.([a-zA-Z_][a-zA-Z0-9_]{2,})", raw_source or ""))
     lines: List[str] = []
 
+    curated_guidance = get_relevant_knowledge([p.strip().split()[0] for p in pkg_list if p.strip()], raw_source)
+    if curated_guidance:
+        lines.append(curated_guidance)
+
     for raw_pkg in pkg_list[:2]:
         clean_pkg = raw_pkg.strip().split()[0].strip()
         if not clean_pkg:
@@ -439,9 +502,9 @@ def build_live_dynamic_grounding(pkg_list: List[str], target_file: str, raw_sour
                 if ch_raw:
                     # Split by ### or ## while preserving parent ## heading context
                     parent_h2 = ""
-                    generic_containers = {"string", "number", "boolean", "object", "array", " optional", "unknown"}
+                    generic_containers = {"string", "number", "boolean", "object", "array", "optional", "unknown"}
                     specific_calls = {c for c in used_calls if c.lower() not in generic_containers}
-                    scored_secs: List[Tuple[int, str]] = []
+                    scored_secs: List[Tuple[int, str, str]] = []
                     for block in re.split(r"(?=^#{2,3} )", ch_raw, flags=re.M):
                         b_lines = [l for l in block.splitlines() if l.strip()]
                         if not b_lines:
