@@ -120,9 +120,9 @@ def classify_and_score_source_code(source: str, file_path: str, pkg: str) -> int
     elif any(re.search(rf"\b{re.escape(tok)}\b", source.lower()) for tok in pkg_tokens):
         score += 50
 
-    # 4. Reward files with actual method/chained API invocations (e.g. .strict(), z.record(), etc.)
-    call_count = len(re.findall(r"\.[a-zA-Z_][a-zA-Z0-9_]*\s*\(", source))
-    score += min(90, call_count * 4)
+    # 4. Reward files with diverse method/chained API invocations (e.g. .strict(), .record(), .discriminatedUnion())
+    unique_methods = set(re.findall(r"\.([a-zA-Z_][a-zA-Z0-9_]*)\s*\(", source))
+    score += min(250, len(unique_methods) * 18)
 
     return score
 

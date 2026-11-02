@@ -353,8 +353,13 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
         "description": "GraphQL Scalars v1 to v2 Migration Guidelines",
         "guidance": """\
 • GraphQL Scalars v1 → v2 Migration Guidelines:
-  - In v2, parseLiteral signatures on GraphQLScalarType omit the legacy second 'variables' argument when wrapping or delegating scalar resolvers, and strict scalar serialization enforces ISO/Date instance checks.
-  - Only modify files that actually import 'graphql-scalars'. If the file already uses compatible resolver wrappers, return has_breaking_changes=false.
+  - Named Scalar Imports for Nexus / Schema Builders:
+      OLD: import { DateTimeResolver } from 'graphql-scalars';
+           const DateTimeScalar = asNexusMethod(DateTimeResolver, 'date');
+      NEW: import { GraphQLDateTime } from 'graphql-scalars';
+           const DateTimeScalar = asNexusMethod(GraphQLDateTime, 'date');
+  - Readonly Scalar Config Mutation (GraphQL v16+ / graphql-scalars v2):
+      Direct mutation of `GraphQLDate.parseValue = ...` or `GraphQLDate.parseLiteral = ...` fails because scalar properties are readonly getters. Clone via `new GraphQLScalarType({ ...GraphQLDate.toConfig(), parseValue: ..., parseLiteral: ... })`.
 """
     }
 }
