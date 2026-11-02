@@ -95,19 +95,30 @@ function isRelevantApiPatchPR(title: string, repoFullName = ''): boolean {
     return false;
   }
 
-  // Must match an actual third-party dependency bump (Dependabot / Renovate) or explicit library upgrade
-  const hasExplicitBump =
-    /bump\s+[^\s]+\s+from\s+v?[0-9]/i.test(title) ||
-    /update\s+dependency\s+[^\s]+\s+to\s+v?[0-9]/i.test(title) ||
-    lower.startsWith('chore(deps') ||
-    lower.startsWith('fix(deps') ||
-    lower.startsWith('build(deps');
+  // Must match an explicit package version upgrade with real version numbers (e.g., 'bump X from 1.0 to 2.0' or 'update dependency X to v4')
+  const { pkg, toVer } = parseVersionBump(title);
+  if (!pkg || pkg === 'Third-Party SDK' || toVer === 'latest' || toVer === 'v2.x') {
+    return false;
+  }
 
-  return hasExplicitBump;
+  const pkgLow = pkg.toLowerCase();
+  // Reject Go modules, Java Maven coordinates, and Rust crates
+  if (
+    pkgLow.includes('github.com/') ||
+    pkgLow.includes('golang.org/') ||
+    pkgLow.includes('gopkg.in/') ||
+    pkgLow.includes('k8s.io/') ||
+    pkgLow.includes(':') ||
+    ['aes-gcm', 'reqwest', 'base64', 'sha2', 'tokio', 'serde', 'go', 'kubernetes', 'frontend', 'sdk'].includes(pkgLow)
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 function parseVersionBump(title: string): { pkg: string; fromVer: string; toVer: string; isMajor: boolean } {
-  const bumpMatch = title.match(/bump\s+([^\s]+)\s+from\s+v?([0-9a-zA-Z.-]+)\s+to\s+v?([0-9a-zA-Z.-]+)/i);
+  const bumpMatch = title.match(/bump\s+(@?[a-zA-Z0-9._/-]+)\s+from\s+v?([0-9][0-9a-zA-Z.-]*)\s+to\s+v?([0-9][0-9a-zA-Z.-]*)/i);
   if (bumpMatch) {
     const pkg = bumpMatch[1];
     const fromVer = bumpMatch[2];
@@ -118,7 +129,7 @@ function parseVersionBump(title: string): { pkg: string; fromVer: string; toVer:
     return { pkg, fromVer, toVer, isMajor };
   }
 
-  const renovateMatch = title.match(/update\s+dependency\s+([^\s]+)\s+to\s+v?([0-9a-zA-Z.-]+)/i);
+  const renovateMatch = title.match(/update\s+dependency\s+(@?[a-zA-Z0-9._/-]+)\s+to\s+v?([0-9][0-9a-zA-Z.-]*)/i);
   if (renovateMatch) {
     return {
       pkg: renovateMatch[1],
@@ -128,40 +139,85 @@ function parseVersionBump(title: string): { pkg: string; fromVer: string; toVer:
     };
   }
 
-  const depsColonMatch = title.match(/^(?:fix|feat|chore|build)\(deps(?:-dev)?\):\s*(?:bump|update|upgrade)\s+([^\s]+)/i);
-  if (depsColonMatch) {
-    return {
-      pkg: depsColonMatch[1],
-      fromVer: 'previous',
-      toVer: 'latest',
-      isMajor: true
-    };
-  }
-
   return {
     pkg: 'Third-Party SDK',
     fromVer: 'v1.x',
     toVer: 'v2.x',
-    isMajor: true
+    isMajor: false
   };
 }
 
-// Persistent in-memory cache of live-discovered GitHub PRs so rate limits never erase newly discovered leads
+const ORG_PROFILE_DIRECTORY: Record<
+  string,
+  { companyName: string; fundingStage: string; fundingAmount: string; companyUrl: string; contactChannel: string; decisionMakerRole: string }
+> = {
+  nocodb: {
+    companyName: 'NocoDB',
+    fundingStage: 'Seed / Series A ($10.5M+ · Decibel Partners)',
+    fundingAmount: '$10.5M+',
+    companyUrl: 'https://nocodb.com',
+    contactChannel: 'founders@nocodb.com · @nocodb',
+    decisionMakerRole: 'Co-Founder & CEO (Naveen Ala)'
+  },
+  weaviate: {
+    companyName: 'Weaviate',
+    fundingStage: 'Series B ($67.7M+ · Index Ventures)',
+    fundingAmount: '$67.7M+',
+    companyUrl: 'https://weaviate.io',
+    contactChannel: 'hello@weaviate.io · @weaviate_io',
+    decisionMakerRole: 'Co-Founder & CTO (Etienne Dilocker)'
+  },
+  berriai: {
+    companyName: 'LiteLLM (BerriAI · YC W23)',
+    fundingStage: 'Seed ($2.1M+ · Y Combinator W23)',
+    fundingAmount: '$2.1M+',
+    companyUrl: 'https://litellm.ai',
+    contactChannel: 'founders@berri.ai · @LiteLLM',
+    decisionMakerRole: 'Co-Founder & CEO (Krrish Dholakia / Ishaan Jaffer)'
+  },
+  posthog: {
+    companyName: 'PostHog (YC W20)',
+    fundingStage: 'Series B ($27.0M+ · Y Combinator)',
+    fundingAmount: '$27.0M+',
+    companyUrl: 'https://posthog.com',
+    contactChannel: 'hey@posthog.com · @posthog',
+    decisionMakerRole: 'Co-Founder & CTO (Tim Glaser / James Hawkins)'
+  },
+  continuedev: {
+    companyName: 'Continue.dev (YC S23)',
+    fundingStage: 'Seed ($3.1M+ · Y Combinator S23)',
+    fundingAmount: '$3.1M+',
+    companyUrl: 'https://continue.dev',
+    contactChannel: 'ty@continue.dev · @continuedev',
+    decisionMakerRole: 'Co-Founder & CTO (Nate Sesti / Ty Dunn)'
+  }
+};
+
+// Persistent in-memory cache of live-discovered GitHub PRs keyed by company orgHandle (strictly 1 lead per company)
 const cachedLiveLeads = new Map<string, B2BCompanyLead>();
 let cohortRotationCursor = 0;
 
 function getMergedSortedLeads(): B2BCompanyLead[] {
-  const mergedMap = new Map<string, B2BCompanyLead>();
-  for (const [url, lead] of cachedLiveLeads.entries()) {
-    mergedMap.set(url, lead);
-  }
+  // Deduplicate strictly by company (orgHandle.toLowerCase()) so no company ever appears twice
+  const byOrg = new Map<string, B2BCompanyLead>();
+
+  // 1. Seed with verified curated leads first (highest-quality CTO contact & funding data)
   for (const v of VERIFIED_B2B_LEADS) {
-    const existing = mergedMap.get(v.prUrl);
+    byOrg.set(v.orgHandle.toLowerCase(), v);
+  }
+
+  // 2. Merge live-discovered bot PRs (only adding new unique companies or updating timestamp of existing PR)
+  for (const [, liveLead] of cachedLiveLeads.entries()) {
+    const orgKey = liveLead.orgHandle.toLowerCase();
+    const existing = byOrg.get(orgKey);
     if (!existing) {
-      mergedMap.set(v.prUrl, v);
+      byOrg.set(orgKey, liveLead);
+    } else if (existing.prUrl === liveLead.prUrl && new Date(liveLead.failedAt) > new Date(existing.failedAt)) {
+      byOrg.set(orgKey, { ...existing, failedAt: liveLead.failedAt });
     }
   }
-  return Array.from(mergedMap.values()).sort(
+
+  return Array.from(byOrg.values()).sort(
     (a, b) => new Date(b.failedAt).getTime() - new Date(a.failedAt).getTime()
   );
 }
@@ -241,10 +297,11 @@ app.post('/api/leads/scan', async (req, res) => {
         const repoFull = (item.repository_url || '').replace('https://api.github.com/repos/', '');
         const [owner] = repoFull.split('/');
         if (!owner) continue;
+        const orgKey = owner.toLowerCase();
 
         const existing = VERIFIED_B2B_LEADS.find(l => l.prUrl === item.html_url);
         if (existing) {
-          cachedLiveLeads.set(existing.prUrl, {
+          cachedLiveLeads.set(orgKey, {
             ...existing,
             failedAt: item.updated_at || existing.failedAt
           });
@@ -262,8 +319,16 @@ app.post('/api/leads/scan', async (req, res) => {
         }
 
         const { pkg, fromVer, toVer, isMajor } = parseVersionBump(item.title || '');
-        const isYcAi = FUNDED_ORG_COHORTS.YC_AI.some(o => o.toLowerCase() === `org:${owner.toLowerCase()}`);
-        const isScaleup = FUNDED_ORG_COHORTS.SCALEUP.some(o => o.toLowerCase() === `org:${owner.toLowerCase()}`);
+        if (!pkg || pkg === 'Third-Party SDK') continue;
+
+        const profile = ORG_PROFILE_DIRECTORY[orgKey];
+        if (!profile && !customPackage?.trim()) {
+          // Only surface organizations where we have verified CTO/founder contact & funding profile
+          continue;
+        }
+
+        const isYcAi = FUNDED_ORG_COHORTS.YC_AI.some(o => o.toLowerCase() === `org:${orgKey}`);
+        const isScaleup = FUNDED_ORG_COHORTS.SCALEUP.some(o => o.toLowerCase() === `org:${orgKey}`);
         const inferredLang =
           repoFull.toLowerCase().includes('python') ||
           repoFull.toLowerCase().includes('litellm') ||
@@ -274,16 +339,16 @@ app.post('/api/leads/scan', async (req, res) => {
             ? 'Python'
             : 'TypeScript';
 
-        cachedLiveLeads.set(item.html_url, {
+        cachedLiveLeads.set(orgKey, {
           id: `live-${item.id}`,
-          companyName: owner,
+          companyName: profile?.companyName || owner,
           orgHandle: owner,
           tier: isYcAi ? 'YC_AI' : isScaleup ? 'SCALEUP' : 'MID_INFRA',
-          fundingStage: 'Verified Funded B2B Org',
-          fundingAmount: 'Venture-Backed',
-          companyUrl: `https://github.com/${owner}`,
-          contactChannel: `github.com/${owner}`,
-          decisionMakerRole: 'CTO / VP Engineering',
+          fundingStage: profile?.fundingStage || 'Verified Funded B2B Org',
+          fundingAmount: profile?.fundingAmount || 'Venture-Backed',
+          companyUrl: profile?.companyUrl || `https://github.com/${owner}`,
+          contactChannel: profile?.contactChannel || `github.com/${owner}`,
+          decisionMakerRole: profile?.decisionMakerRole || 'CTO / VP Engineering',
           repoFullName: repoFull,
           prNumber: item.number,
           prTitle: item.title,
@@ -296,9 +361,9 @@ app.post('/api/leads/scan', async (req, res) => {
           language: ecosystem === 'Python' ? 'Python' : inferredLang,
           createdAt: item.created_at,
           failedAt: item.updated_at || item.created_at,
-          failureSummary: `Live failing dependency/SDK PR (#${item.number}) updated on ${(item.updated_at || item.created_at).slice(0, 10)} in ${repoFull}.`,
-          whyTheyPay: `Funded engineering organization (${owner}) with an active failing CI build on ${pkg}.`,
-          whyTheyPayAr: `شركة تقنية ممولة (${owner}) لديها عطل CI حي بتاريخ ${(item.updated_at || item.created_at).slice(0, 10)} في (${pkg}).`,
+          failureSummary: `Live failing Dependabot/Renovate PR (#${item.number}) updated on ${(item.updated_at || item.created_at).slice(0, 10)} in ${repoFull}.`,
+          whyTheyPay: `${profile?.companyName || owner} (${profile?.fundingAmount || 'Venture-Backed'}) has an active failing bot PR upgrading ${pkg} (${fromVer} -> ${toVer}).`,
+          whyTheyPayAr: `شركة ${profile?.companyName || owner} (${profile?.fundingAmount || 'ممولة'}) لديها PR مفتوح من البوت بتاريخ ${(item.updated_at || item.created_at).slice(0, 10)} لترقية (${pkg}) من ${fromVer} إلى ${toVer} وفشل الـ CI!`,
           isLiveScanned: true
         });
       }
