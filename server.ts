@@ -553,6 +553,9 @@ DYNAMIC AUDIT INSTRUCTIONS:
      * Modernize openai.ChatCompletion.create to client.chat.completions.create.
    - For @libsql/client (0.14 -> 0.18):
      * In @libsql/client 0.17+/0.18, SQLite unique constraint errors report the base code in error.code ('SQLITE_CONSTRAINT') and the specific code in error.extendedCode ('SQLITE_CONSTRAINT_UNIQUE'). Update checks for error.code === 'SQLITE_CONSTRAINT_UNIQUE' to also check error.extendedCode === 'SQLITE_CONSTRAINT_UNIQUE'.
+   - For glob (v10 -> v14):
+     * In glob v11/v14, named export globStream is deprecated. Update import { globStream } from 'glob' to import { glob } from 'glob'.
+     * Update const globStreamInstance = globStream(globPattern, ...) to const globStreamInstance = glob.stream(globPattern, ...).
    - Never change .css imports to .js, and preserve 100% of comments, imports, and business logic.
 4. ${
       isFullFileWindow

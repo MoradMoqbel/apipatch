@@ -361,6 +361,20 @@ MIGRATION_KNOWLEDGE_BASE: Dict[str, Dict[str, Any]] = {
   - Readonly Scalar Config Mutation (GraphQL v16+ / graphql-scalars v2):
       Direct mutation of `GraphQLDate.parseValue = ...` or `GraphQLDate.parseLiteral = ...` fails because scalar properties are readonly getters. Clone via `new GraphQLScalarType({ ...GraphQLDate.toConfig(), parseValue: ..., parseLiteral: ... })`.
 """
+    },
+
+    "glob": {
+        "aliases": ["glob"],
+        "description": "Glob v10 to v14 Enterprise Migration Guidelines",
+        "guidance": """\
+• Glob v10 → v14 Migration Guidelines:
+  - Stream Invocations:
+      OLD: import { globStream } from 'glob';
+           const stream = globStream(pattern, options);
+      NEW: import { glob } from 'glob';
+           const stream = glob.stream(pattern, options);
+  - In Glob v11+, named export `globStream` is deprecated in favor of `glob.stream(pattern, options)`.
+"""
     }
 }
 
