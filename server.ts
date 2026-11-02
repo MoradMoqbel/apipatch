@@ -213,12 +213,15 @@ app.post('/api/leads/scan', async (req, res) => {
     const q = queryParts.join(' ') + ' sort:updated-desc';
     const url = `https://api.github.com/search/issues?q=${encodeURIComponent(q)}&per_page=30`;
 
-    const ghRes = await fetch(url, {
-      headers: {
-        'User-Agent': 'ApiPatch-B2B-Continuous-Scanner',
-        'Accept': 'application/vnd.github+json'
-      }
-    });
+    const ghHeaders: Record<string, string> = {
+      'User-Agent': 'ApiPatch-B2B-Continuous-Scanner',
+      'Accept': 'application/vnd.github+json'
+    };
+    if (process.env.GITHUB_TOKEN) {
+      ghHeaders['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+    }
+
+    const ghRes = await fetch(url, { headers: ghHeaders });
 
     if (!ghRes.ok) {
       const merged = getMergedSortedLeads();
@@ -248,8 +251,13 @@ app.post('/api/leads/scan', async (req, res) => {
           continue;
         }
 
-        // Strictly filter to real dependency / SDK upgrades in Python/TS/JS repositories relevant to ApiPatch
-        if (!customPackage?.trim() && !isRelevantApiPatchPR(item.title || '', repoFull)) {
+        // Only surface automated dependency bot PRs (Dependabot / Renovate) where no human has written the code fix yet
+        const authorLogin = (item.user?.login || '').toLowerCase();
+        const isDependencyBot =
+          authorLogin.includes('dependabot') ||
+          authorLogin.includes('renovate') ||
+          authorLogin.includes('[bot]');
+        if (!customPackage?.trim() && (!isDependencyBot || !isRelevantApiPatchPR(item.title || '', repoFull))) {
           continue;
         }
 
