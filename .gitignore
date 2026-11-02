@@ -46,3 +46,6 @@ build/
 # OS specific
 .DS_Store
 Thumbs.db
+.aistudio/
+bun.lock
+metadata.json

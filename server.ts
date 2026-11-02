@@ -535,27 +535,16 @@ DYNAMIC AUDIT INSTRUCTIONS:
    - If <untrusted_source_code> does NOT actually import, declare, or use "${lead.packageChanged}", or if the symbols from "${lead.packageChanged}" do NOT suffer from breaking changes in this file:
      You MUST set "has_breaking_changes": false, "detected_issues": [], "refactored_code": the exact original code unchanged, and "code_replacements": [].
      NEVER hallucinate or generate unrelated diffs (such as changing regex escapes, whitespace, comments, or tooling configurations).
-3. Apply ALL authoritative migrations for the target library:
-   - For Zod (v3 -> v4):
-     * Never convert .strict() to z.looseObject() — .strict() ALWAYS maps to z.strictObject({...}), and .passthrough() maps to z.looseObject({...}).
-     * If multiple schemas in the file use .object({...}).strict(), convert ALL of them to .strictObject({...}) with clean single-line 'z.strictObject({' formatting.
-     * If z.record(z.enum(...), ...) is used for partial/selected keys, update it to z.partialRecord(z.enum(...), ...) as shown in the changelog.
-     * If z.ZodTypeAny is used, update it to z.ZodType.
-   - For @anthropic-ai/sdk (0.x -> 1.x):
-     * Flatten deprecated namespaces: Anthropic.Messages.MessageParam -> Anthropic.MessageParam.
-     * Anthropic.Messages.ToolResultBlockParam -> Anthropic.ToolResultBlockParam.
-     * Anthropic.Messages.ContentBlock -> Anthropic.ContentBlock.
-   - For GraphQL Scalars (1.x -> 2.x):
-     * Modernize deprecated scalar imports or resolver maps to v2 named exports.
-   - For Pydantic (v1 -> v2):
-     * Update @validator to @field_validator and .dict() to .model_dump().
-   - For OpenAI SDK (0.x -> 1.x):
-     * Modernize openai.ChatCompletion.create to client.chat.completions.create.
-   - For @libsql/client (0.14 -> 0.18):
-     * In @libsql/client 0.17+/0.18, SQLite unique constraint errors report the base code in error.code ('SQLITE_CONSTRAINT') and the specific code in error.extendedCode ('SQLITE_CONSTRAINT_UNIQUE'). Update checks for error.code === 'SQLITE_CONSTRAINT_UNIQUE' to also check error.extendedCode === 'SQLITE_CONSTRAINT_UNIQUE'.
-   - For glob (v10 -> v14):
-     * In glob v11/v14, named export globStream is deprecated. Update import { globStream } from 'glob' to import { glob } from 'glob'.
-     * Update const globStreamInstance = globStream(globPattern, ...) to const globStreamInstance = glob.stream(globPattern, ...).
+3. AUTONOMOUS SENIOR STAFF ARCHITECT REASONING (Zero Hardcoded Whitelist Constraints):
+   You possess first-principles deductive reasoning about API architecture across the entire open-source ecosystem (TypeScript, JavaScript, Python, Go, Rust).
+   Do NOT wait for a pre-written rule or static cheat-sheet. You reason autonomously about ANY package ("${lead.packageChanged}") undergoing a major or breaking version upgrade (${lead.fromVersion} -> ${lead.toVersion}):
+   - Analyze every import, declaration, and invocation of "${lead.packageChanged}" inside <untrusted_source_code>:
+     * Export renames or removals: Deprecated top-level/named helper functions moved into namespace methods, class constructors, or subpaths (e.g. globStream -> glob.stream(), DateTimeResolver -> GraphQLDateTime, Anthropic.Messages.* namespace flattening).
+     * Method signature and argument evolutions: Options objects restructured, parameters renamed, or configuration flags modernized.
+     * Error contract alterations: Specific error codes moving from error.code to error.extendedCode (e.g. @libsql/client SQLite constraints), error.status to error.statusCode, or typed exception subclasses.
+     * Schema & builder modernizations: (e.g. Zod .object().strict() -> z.strictObject({...}), Pydantic @validator -> @field_validator and .dict() -> .model_dump(), OpenAI SDK client.chat.completions.create).
+     * Async / Promise / Streaming contract shifts: Callbacks deprecated in favor of Promises or async iterators.
+   - If official changelog notes or documentation are provided in context, adhere to them strictly. If not provided, synthesize the authoritative ecosystem idioms for ${lead.toVersion}.
    - Never change .css imports to .js, and preserve 100% of comments, imports, and business logic.
 4. ${
       isFullFileWindow

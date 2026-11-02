@@ -96,8 +96,11 @@ class DocHunter:
         candidates = [
             f"https://raw.githubusercontent.com/{owner}/{repo}/main/CHANGELOG.md",
             f"https://raw.githubusercontent.com/{owner}/{repo}/master/CHANGELOG.md",
+            f"https://raw.githubusercontent.com/{owner}/{repo}/main/changelog.md",
+            f"https://raw.githubusercontent.com/{owner}/{repo}/master/changelog.md",
             f"https://raw.githubusercontent.com/{owner}/{repo}/main/HISTORY.md",
             f"https://raw.githubusercontent.com/{owner}/{repo}/master/HISTORY.md",
+            f"https://raw.githubusercontent.com/{owner}/{repo}/main/docs/migration.md",
         ]
 
         for url in candidates:
