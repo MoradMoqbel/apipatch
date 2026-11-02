@@ -120,6 +120,10 @@ def classify_and_score_source_code(source: str, file_path: str, pkg: str) -> int
     elif any(re.search(rf"\b{re.escape(tok)}\b", source.lower()) for tok in pkg_tokens):
         score += 50
 
+    # 4. Reward files with actual method/chained API invocations (e.g. .strict(), z.record(), etc.)
+    call_count = len(re.findall(r"\.[a-zA-Z_][a-zA-Z0-9_]*\s*\(", source))
+    score += min(90, call_count * 4)
+
     return score
 
 
@@ -281,8 +285,8 @@ def discover_source_file_dynamically(
                     if not src:
                         continue
                     sc = classify_and_score_source_code(src, fp, pkg)
-                    if sc >= 200 and "example" not in fp.lower():
-                        return fp, src
+                    if "example" in fp.lower() or "demo" in fp.lower():
+                        sc -= 50
                     if sc > best_s_score and sc >= 100:
                         best_s_score = sc
                         best_s_file = fp
@@ -375,29 +379,66 @@ def discover_source_file_dynamically(
 def extract_focused_source_window(raw_source: str, pkg: str) -> str:
     """
     For files larger than 160 lines, extracts the lines around imports and around
-    the actual usage of `pkg` dynamically so Gemini sees the exact call sites.
+    the actual usage of `pkg` (and symbols imported from `pkg`) dynamically so Gemini sees the exact call sites.
     """
     lines = raw_source.splitlines()
     if len(lines) <= 160:
         return raw_source
 
+    clean_pkg = (pkg or "").strip().split()[0].lower()
     pkg_tokens = [
         t.lower()
         for t in re.split(r"[\s,&/@\-_]+", pkg or "")
-        if len(t) >= 3 and t.lower() not in ("sdk", "core", "js", "py", "ts", "the", "and")
+        if len(t) >= 3 and t.lower() not in ("sdk", "core", "js", "py", "ts", "the", "and", "graphql")
     ]
+
+    # Dynamically extract identifiers imported from `pkg` (e.g., DateTimeResolver from 'graphql-scalars')
+    imported_symbols: List[str] = []
+    if clean_pkg:
+        for m in re.finditer(
+            rf"import\s+(?:type\s+)?(?:\{{([^}}]+)\}}|([a-zA-Z0-9_$]+))\s+from\s+['\"][^'\"]*{re.escape(clean_pkg)}[^'\"]*['\"]",
+            raw_source,
+            flags=re.S
+        ):
+            grp = m.group(1) or m.group(2) or ""
+            for sym in grp.split(","):
+                s_clean = sym.strip().split(" as ")[-1].strip()
+                if len(s_clean) >= 2:
+                    imported_symbols.append(s_clean.lower())
+        for m in re.finditer(
+            rf"from\s+[^\s]*{re.escape(clean_pkg.replace('-', '_'))}[^\s]*\s+import\s+\(?([^);\n]+)\)?",
+            raw_source
+        ):
+            for sym in m.group(1).split(","):
+                s_clean = sym.strip().split(" as ")[-1].strip()
+                if len(s_clean) >= 2:
+                    imported_symbols.append(s_clean.lower())
+
+    search_terms = imported_symbols + pkg_tokens
+    if not search_terms and clean_pkg:
+        search_terms = [clean_pkg]
 
     # Always keep top 45 lines (imports)
     selected_indices = set(range(min(45, len(lines))))
 
-    # Find lines where pkg_tokens are used and include +/- 20 lines of context around each match
+    # First pass: prioritize lines where imported symbols from `pkg` are used
     for idx, line in enumerate(lines):
         low = line.lower()
-        if any(tok in low for tok in pkg_tokens):
-            for w in range(max(0, idx - 20), min(len(lines), idx + 25)):
+        if any(sym in low for sym in (imported_symbols or search_terms)):
+            for w in range(max(0, idx - 18), min(len(lines), idx + 22)):
                 selected_indices.add(w)
             if len(selected_indices) >= 145:
                 break
+
+    # Second pass: fallback to pkg_tokens if budget remains
+    if len(selected_indices) < 120:
+        for idx, line in enumerate(lines):
+            low = line.lower()
+            if any(tok in low for tok in search_terms):
+                for w in range(max(0, idx - 15), min(len(lines), idx + 20)):
+                    selected_indices.add(w)
+                if len(selected_indices) >= 145:
+                    break
 
     # If still small, include the last 70 lines (component render / main logic)
     if len(selected_indices) < 90:
